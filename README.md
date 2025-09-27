@@ -9,4 +9,4 @@ It's Cinephile Hub: Review films, share your passion, and discover your next fav
 ## Link to to the prototypes of pages
 https://www.figma.com/design/LCSz7x3rZoluZoh2JcoWtt/Untitled?node-id=0-1&t=cQkuHC7BYc8ZhbOu-1
 ## Link to to the API of server
-http://localhost:8080/swagger/index.html
+API of server can be found in the BE repository https://github.com/edraithenni/totallyguysproject
