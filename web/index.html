@@ -176,7 +176,7 @@ queryEl.addEventListener('keypress', e => { if (e.key==='Enter') searchMovies();
 async function searchMovies() {
   const q = queryEl.value.trim();
   if (!q) return;
-  resultsEl.innerHTML = '<p>Загрузка...</p>';
+  resultsEl.innerHTML = '<p>Loading...</p>';
   try {
     const data = await api(`/api/movies/search?title=${encodeURIComponent(q)}`);
     renderResults(data.Search || []);
@@ -188,7 +188,7 @@ async function searchMovies() {
 function renderResults(movies) {
   if (!movies.length) { resultsEl.innerHTML='<p>Ничего не найдено</p>'; return; }
   resultsEl.innerHTML = movies.map(movie => `
-    <div class="card" onclick="showDetails('${movie.omdb_id}')" style="cursor:pointer;">
+    <div class="card" onclick="showDetails(${movie.id})" style="cursor:pointer;">
       ${movie.poster && movie.poster!=='N/A' ? `<img src="${movie.poster}">` :
         '<div style="height:300px; background:#eee; display:flex;align-items:center;justify-content:center;">Нет изображения</div>'}
       <div class="card-body">
@@ -198,7 +198,6 @@ function renderResults(movies) {
     </div>
   `).join('');
 }
-
 
 async function showDetails(id) {
    window.location.href = `details.html?id=${id}`;

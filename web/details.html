@@ -4,45 +4,37 @@
   <meta charset="UTF-8">
   <title>Loading...</title>
   <link href="https://fonts.cdnfonts.com/css/so-bad" rel="stylesheet">
-</head>
-<style>
+  <style>
    body { font-family: "So Bad", sans-serif; margin: 0; background: #000000; color: #333; }
    header {
         background: url('src/hat.png') repeat center top;
         height: 120px;
         background-size: auto;
-       
         display: flex;
         align-items: center;
-      
     }
 
-    nav {
-        padding-left: 20px; 
-    }
-      .movie-container {
+    nav { padding-left: 20px; }
+
+    .movie-container {
         display: flex;
         gap: 40px;
         padding: 40px 20px;
         align-items: flex-start;
         max-width: 1200px;
-      
-    }
-
-    .movie-poster {
-        flex-shrink: 1;
+        margin: 0 auto;
     }
 
     .movie-poster img {
         width: 350px;
         height: auto;
-        border-radius: 10px;
+        border-radius: 0;
+        border: 4px solid #ffc659;
+        outline-offset: 4px; 
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
-    .movie-info {
-        flex: 1;
-    }
+    .movie-info { flex: 1; }
 
     .movie-info h2 {
         font-size: 36px;
@@ -56,25 +48,87 @@
         margin-bottom: 15px;
     }
 
-    .movie-info b {
+    .movie-info b { color: #8dd9ff; }
+
+    nav button.primary {
+        background: #584fdb;
         color: #8dd9ff;
+        border-radius: 0;
+        border: 2px solid #ffc659;
+        outline: 2px solid #fb5255;
+        cursor: pointer;
+        font-family: "So Bad", sans-serif; 
     }
 
-    nav button.primary { background: #584fdb; color: #8dd9ff;border-radius: 0; border: 2px solid #ffc659;
-    outline: 2px solid #fb5255; cursor: pointer; 
+    .reviews-section {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      border-top: 2px solid #584fdb;
+      color: #8dd9ff;
     }
-</style>
+
+    .reviews-section h3 {
+      font-size: 28px;
+      color: #ffc659;
+      margin-bottom: 15px;
+    }
+
+    .review {
+      background: #222;
+      border: 2px solid #584fdb;
+      padding: 10px 15px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+    }
+
+    .review-form {
+      margin-top: 20px;
+      padding: 15px;
+      border: 2px solid #ffc659;
+      background: #111;
+    }
+
+    .review-form textarea, .review-form input {
+      width: 95%;
+      margin-bottom: 10px;
+      padding: 8px;
+      background: #222;
+      border: 1px solid #584fdb;
+      color: #fff;
+      font-family: "So Bad", sans-serif;
+    }
+
+    .review-form button {
+      background: #584fdb;
+      color: #8dd9ff;
+      border: 2px solid #ffc659;
+      outline: 2px solid #fb5255;
+      cursor: pointer;
+      padding: 6px 12px;
+      font-family: "So Bad", sans-serif;
+    }
+    .movie-gif {
+  width: 250px;       
+  flex-shrink: 0;     
+}
+  </style>
+</head>
 <body>
   <header>
     <nav>
       <button id="btnBack" onclick="history.back()" class="primary">Back</button>
     </nav>
   </header>
+
+  <!-- Film details -->
   <div id="movieDetails">Loading...</div>
+
+  <!-- Reviews section -->
+  <div id="reviewsSection" class="reviews-section">Loading reviews...</div>
 
   <script>
     async function loadDetails() {
-      // retrieve id from query-parameter: details.html?id=...
       const params = new URLSearchParams(window.location.search);
       const id = params.get("id");
 
@@ -87,7 +141,6 @@
       try {
         const res = await fetch(`/api/movies/${id}`);
         const movie = await res.json();
-
 
         document.title = movie.title;
         document.getElementById("movieDetails").innerHTML = `
@@ -103,17 +156,91 @@
               <p><b>Director:</b> ${movie.director || '—'}</p>
               <p><b>Rating:</b> ${movie.rating || '—'}</p>
             </div>
+            <div class="movie-gif">
+    <img src="https://images.melonland.net/?url=https%3A%2F%2Fi.imgur.com%2FhWxzM0d.gif&w=1200&fit=inside&we&q=85&il&n=-1&default=1" alt="Movie gif">
+  </div>
+        </div>
         `;
+
+        loadReviews(id);
+
       } catch (err) {
         document.getElementById("movieDetails").innerText = "Error loading details";
       }
     }
 
+    async function loadReviews(movieId) {
+      try {
+        const revRes = await fetch(`/api/movies/${movieId}/reviews`);
+        if (!revRes.ok) {
+          document.getElementById("reviewsSection").innerText = "Failed to load reviews";
+          return;
+        }
+        const reviews = await revRes.json();
+
+        let reviewsHTML = "";
+        if (!reviews.length) {
+          reviewsHTML = `<p>No reviews yet.</p>`;
+        } else {
+          reviewsHTML = reviews.map(r => `
+            <div class="review">
+              <p><b>User #${r.user_id}</b> rated <b>${r.rating}/10</b></p>
+              <p>${r.content || ''}</p>
+            </div>
+          `).join("");
+        }
+
+        const formHTML = `
+          <div class="review-form">
+            <h4>Create Review</h4>
+            <textarea id="reviewContent" placeholder="Write your review"></textarea>
+            <input type="number" id="reviewRating" placeholder="Rating (1-10)" min="1" max="10">
+            <button onclick="submitReview(${movieId})">Submit</button>
+          </div>
+        `;
+
+        document.getElementById("reviewsSection").innerHTML = `
+          <h3>Reviews</h3>
+          ${reviewsHTML}
+          ${formHTML}
+        `;
+      } catch (err) {
+        document.getElementById("reviewsSection").innerText = "Error loading reviews";
+      }
+    }
+
+    async function submitReview(movieId) {
+      const content = document.getElementById("reviewContent").value;
+      const rating = parseInt(document.getElementById("reviewRating").value);
+
+      if (!rating || rating < 1 || rating > 10) {
+        alert("Rating must be between 1 and 10");
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/movies/${movieId}/reviews`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ content, rating })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          alert("Error: " + (err.error || "failed to create review"));
+          return;
+        }
+        document.getElementById("reviewContent").value = "";
+        document.getElementById("reviewRating").value = "";
+        loadReviews(movieId);
+
+      } catch (err) {
+        alert("Error submitting review");
+      }
+    }
+
     loadDetails();
-
-    
-
-
   </script>
 </body>
 </html>
