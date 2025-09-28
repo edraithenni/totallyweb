@@ -191,18 +191,24 @@ async function searchMovies() {
 }
 
 function renderResults(movies) {
-  if (!movies.length) { resultsEl.innerHTML='<p>Ничего не найдено</p>'; return; }
+  if (!movies.length) {
+    resultsEl.innerHTML = '<p>Nothing to show</p>';
+    return;
+  }
+
+  const defaultPoster = '/static/src/posternotfound.png'; 
+
   resultsEl.innerHTML = movies.map(movie => `
     <div class="card" onclick="showDetails(${movie.id})" style="cursor:pointer;">
-      ${movie.poster && movie.poster!=='N/A' ? `<img src="${movie.poster}">` :
-        '<div style="height:300px; background:#eee; display:flex;align-items:center;justify-content:center;">Нет изображения</div>'}
+      <img src="${movie.poster && movie.poster !== 'N/A' ? movie.poster : defaultPoster}" alt="poster">
       <div class="card-body">
         <div class="card-title">${movie.title}</div>
-        <div>${movie.year||'—'}</div>
+        <div>${movie.year || '—'}</div>
       </div>
     </div>
   `).join('');
 }
+
 
 async function showDetails(id) {
    window.location.href = `details.html?id=${id}`;
