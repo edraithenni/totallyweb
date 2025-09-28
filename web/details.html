@@ -2,10 +2,75 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Детали фильма</title>
+  <title>Loading...</title>
+  <link href="https://fonts.cdnfonts.com/css/so-bad" rel="stylesheet">
 </head>
+<style>
+   body { font-family: "So Bad", sans-serif; margin: 0; background: #000000; color: #333; }
+   header {
+        background: url('src/hat.png') repeat center top;
+        height: 120px;
+        background-size: auto;
+       
+        display: flex;
+        align-items: center;
+      
+    }
+
+    nav {
+        padding-left: 20px; 
+    }
+      .movie-container {
+        display: flex;
+        gap: 40px;
+        padding: 40px 20px;
+        align-items: flex-start;
+        max-width: 1200px;
+      
+    }
+
+    .movie-poster {
+        flex-shrink: 1;
+    }
+
+    .movie-poster img {
+        width: 350px;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .movie-info {
+        flex: 1;
+    }
+
+    .movie-info h2 {
+        font-size: 36px;
+        margin-bottom: 20px;
+        color: #ffc659;
+    }
+
+    .movie-info p {
+        font-size: 20px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .movie-info b {
+        color: #8dd9ff;
+    }
+
+    nav button.primary { background: #584fdb; color: #8dd9ff;border-radius: 0; border: 2px solid #ffc659;
+    outline: 2px solid #fb5255; cursor: pointer; 
+    }
+</style>
 <body>
-  <div id="movieDetails">Загрузка...</div>
+  <header>
+    <nav>
+      <button id="btnBack" onclick="history.back()" class="primary">Back</button>
+    </nav>
+  </header>
+  <div id="movieDetails">Loading...</div>
 
   <script>
     async function loadDetails() {
@@ -14,7 +79,8 @@
       const id = params.get("id");
 
       if (!id) {
-        document.getElementById("movieDetails").innerText = "Не указан фильм";
+        document.getElementById("movieDetails").innerText = "No id for the movie";
+        document.title = "Movie Not Found";
         return;
       }
 
@@ -22,18 +88,32 @@
         const res = await fetch(`/api/movies/${id}`);
         const movie = await res.json();
 
+
+        document.title = movie.title;
         document.getElementById("movieDetails").innerHTML = `
-          <h2>${movie.title}</h2>
-          <p><b>Год:</b> ${movie.year || '—'}</p>
-          <p><b>Описание:</b> ${movie.plot || 'Нет описания'}</p>
-          <img src="${movie.poster}" style="width:200px">
+         <div class="movie-container">
+            <div class="movie-poster">
+              <img src="${movie.poster}" alt="${movie.title}">
+            </div>
+            <div class="movie-info">
+              <h2>${movie.title}</h2>
+              <p><b>Year:</b> ${movie.year || '—'}</p>
+              <p><b>Description:</b> ${movie.plot || 'No description yet'}</p>
+              <p><b>Genre:</b> ${movie.genre || '—'}</p>
+              <p><b>Director:</b> ${movie.director || '—'}</p>
+              <p><b>Rating:</b> ${movie.rating || '—'}</p>
+            </div>
         `;
       } catch (err) {
-        document.getElementById("movieDetails").innerText = "Ошибка загрузки деталей";
+        document.getElementById("movieDetails").innerText = "Error loading details";
       }
     }
 
     loadDetails();
+
+    
+
+
   </script>
 </body>
 </html>
