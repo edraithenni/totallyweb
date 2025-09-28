@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Totally cats</title>
@@ -148,10 +148,15 @@ document.getElementById('btnRegister').onclick = () => {
   window.location.href = 'auth.html';
 };
 
-document.getElementById('btnProfile').onclick = async () => {
-   window.location.href = "profile.html";
-};
 
+document.getElementById("btnProfile").onclick = async () => {
+  try {
+    const me = await api('/api/users/me'); 
+    window.location.href = `/static/profile.html?id=${me.id}`;
+  } catch {
+    alert("Error retrieving profile");
+  }
+};
 document.getElementById('btnLogout').onclick = async () => {
   try {
     await api('/api/auth/logout','POST');

@@ -36,18 +36,11 @@
       box-shadow:0 1px 4px rgba(0,0,0,.12);
       cursor:pointer;
     }
-    .avatar:hover {
-      transform: scale(1.05);
-    }
-
+    .avatar:hover { transform: scale(1.05); }
     .bio { white-space:pre-wrap; margin-top:.5rem; color:#333; }
     .muted { color:#666; font-size:.9rem; }
     button { cursor:pointer; padding:.45rem .75rem; border-radius:6px; border:1px solid #d0d6de; background:#fff; }
-    .btn-danger { background:#fff0f0; border-color:#f5c2c2; }
     input[type="file"] { display:none; }
-
-
-
     .modal {
       display: none;
       position: fixed;
@@ -107,89 +100,71 @@
       border-radius: 20px;
       cursor: pointer;
     }
-
   </style>
 </head>
 <body>
   <div class="profile-card">
     <h1 id="profileTitle">Loading...</h1>
-
     <div class="avatar-row">
-      <img id="avatarImg" class="avatar"" src="/static/src/default_pfp.png" />
-      <input id="avatarInput" type="file" accept="image/*" style="display: none">
-        <div id="uploadStatus" class="muted"></div>
-      </div>
+      <img id="avatarImg" class="avatar" src="/static/src/default_pfp.png" />
+      <input id="avatarInput" type="file" accept="image/*" style="display: none;">
+      <div id="uploadStatus" class="muted"></div>
     </div>
-
     <div id="profileContent">Loading...</div>
-
     <hr>
     <h3>Bio</h3>
     <div id="bioBlock" class="bio muted">Loading...</div>
 
-      <div id="avatarModal" class="modal">
-    <div class="close-modal">&times;</div>
-    <div class="modal-content">
-      <img id="modalAvatar" src="" alt="Аватар">
+    <div id="avatarModal" class="modal">
+      <div class="close-modal">&times;</div>
+      <div class="modal-content">
+        <img id="modalAvatar" src="" alt="Аватар">
+      </div>
+      <div class="avatar-options">
+        <button id="changeAvatarBtn">Change pfp</button>
+        <button id="deleteAvatarBtn">Delete pfp</button>
+      </div>
     </div>
-    <div class="avatar-options">
-      <button id="changeAvatarBtn">Change pfp</button>
-      <button id="deleteAvatarBtn">Delete pfp</button>
-    </div>
-  
-  </div>
 
   <script>
-    function escapeHtml(s) {
-      if (s === null || s === undefined) return "";
-      return String(s)
-        .replaceAll('&','&amp;')
-        .replaceAll('<','&lt;')
-        .replaceAll('>','&gt;')
-        .replaceAll('"','&quot;')
-        .replaceAll("'",'&#39;');
-    }
+    function escapeHtml(s) { if (!s) return ""; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
 
-     function openAvatarModal(avatarUrl) {
-      document.getElementById('modalAvatar').src = avatarUrl;
-      document.getElementById('avatarModal').style.display = 'block';
-      document.body.style.overflow = 'hidden'; 
-
-    const avatarPath = new URL(avatarUrl, window.location.origin).pathname;
-    
-    const deleteBtn = document.getElementById('deleteAvatarBtn');
-    if (avatarPath === "/static/src/default_pfp.png") {
-        deleteBtn.style.display = 'none';
-    } else {
-        deleteBtn.style.display = 'block';
-    }
-    }
-
-    function closeAvatarModal() {
-      document.getElementById('avatarModal').style.display = 'none';
-      document.body.style.overflow = 'auto'; 
-    }
+    let currentUserId = null;
+    let viewingProfileId = null;
 
     async function loadProfile() {
       try {
-        const res = await fetch("/api/users/me", { credentials: "include" });
+        const params = new URLSearchParams(window.location.search);
+        viewingProfileId = params.get("id");
+
+        const resMe = await fetch("/api/users/me", { credentials: "include" });
+        if (!resMe.ok) throw new Error("Ошибка загрузки текущего пользователя");
+        const me = await resMe.json();
+        currentUserId = me.id;
+
+        if (!viewingProfileId || viewingProfileId === "null" || viewingProfileId === "undefined") {
+          viewingProfileId = currentUserId;
+          window.history.replaceState(null, "", `/static/profile.html?id=${currentUserId}`);
+        }
+
+        const res = await fetch(`/api/users/${viewingProfileId}`, { credentials: "include" });
         if (!res.ok) throw new Error("Ошибка HTTP " + res.status);
         const user = await res.json();
 
         document.getElementById("profileTitle").textContent = escapeHtml(user.name || "Your profile");
-
         const avatarUrl = user.avatar && user.avatar !== "" ? user.avatar : "/static/src/default_pfp.png";
         document.getElementById("avatarImg").src = avatarUrl;
-
-        document.getElementById("profileContent").innerHTML = `
-          <p><b>Email:</b> ${escapeHtml(user.email || "—")}</p>
-        `;
-
+        document.getElementById("profileContent").innerHTML = `<p><b>Email:</b> ${escapeHtml(user.email || "—")}</p>`;
         document.getElementById("bioBlock").textContent = user.description || "—";
+
+        const isOwnProfile = String(currentUserId) === String(viewingProfileId);
+        document.getElementById("changeAvatarBtn").style.display = isOwnProfile ? "block" : "none";
+        document.getElementById("deleteAvatarBtn").style.display = isOwnProfile ? "block" : "none";
+        document.getElementById("avatarInput").style.display ="none";
+
       } catch (err) {
         console.error("Ошибка загрузки профиля:", err);
-        document.getElementById("profileContent").innerHTML =
-          "<p>Не удалось загрузить данные профиля</p>";
+        document.getElementById("profileContent").innerHTML = "<p>Не удалось загрузить данные профиля</p>";
         document.getElementById("bioBlock").textContent = "—";
       }
     }
@@ -200,14 +175,8 @@
     avatarInput.addEventListener('change', async (evt) => {
       const file = evt.target.files[0];
       if (!file) return;
-      if (!file.type.startsWith('image/')) {
-        uploadStatus.textContent = "Пожалуйста, выберите изображение.";
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        uploadStatus.textContent = "Файл слишком большой (макс 5 MB).";
-        return;
-      }
+      if (!file.type.startsWith('image/')) { uploadStatus.textContent = "Пожалуйста, выберите изображение."; return; }
+      if (file.size > 5 * 1024 * 1024) { uploadStatus.textContent = "Файл слишком большой (макс 5 MB)."; return; }
 
       const reader = new FileReader();
       reader.onload = () => { document.getElementById("avatarImg").src = reader.result; };
@@ -223,21 +192,14 @@
           credentials: 'include',
           body: form
         });
-        if (!resp.ok) {
-          const text = await resp.text();
-          throw new Error(`Ошибка сервера ${resp.status}: ${text}`);
-        }
+        if (!resp.ok) throw new Error("Ошибка сервера " + resp.status);
         const data = await resp.json();
-        if (data.avatar) {
-          document.getElementById("avatarImg").src = data.avatar;
-          uploadStatus.textContent = "Аватар обновлён.";
-        } else {
-          uploadStatus.textContent = "Аватар загружен, но сервер не вернул URL.";
-        }
+        document.getElementById("avatarImg").src = data.avatar || "/static/src/default_pfp.png";
+        uploadStatus.textContent = "Аватар обновлён.";
       } catch (err) {
         console.error(err);
         uploadStatus.textContent = "Ошибка при загрузке аватара.";
-        loadProfile(); 
+        loadProfile();
       } finally {
         avatarInput.value = "";
         setTimeout(()=>uploadStatus.textContent="", 3000);
@@ -248,15 +210,12 @@
       if (!confirm("Are you sure you wanna delete avatar?")) return;
       uploadStatus.textContent = "Deleting...";
       try {
-        const resp = await fetch('/api/users/me/avatar', {
-          method: 'DELETE',
-          credentials: 'include'
-        });
+        const resp = await fetch('/api/users/me/avatar', { method: 'DELETE', credentials: 'include' });
         if (!resp.ok) throw new Error("Ошибка сервера " + resp.status);
         const data = await resp.json();
         const newAvatar = (data.avatar && data.avatar !== "") ? data.avatar : "/static/src/default_pfp.png";
         document.getElementById("avatarImg").src = newAvatar;
-        closeAvatarModal(); 
+        closeAvatarModal();
         uploadStatus.textContent = "Аватар удалён.";
       } catch (err) {
         console.error(err);
@@ -266,37 +225,28 @@
       }
     });
 
-     document.getElementById("avatarImg").addEventListener('click', function() {
-      const avatarUrl = this.src;
-      if (avatarUrl && avatarUrl !== "/static/src/default_pfp.png") {
-        openAvatarModal(avatarUrl);
-      } else {
-        
-        avatarInput.click();
-      }
+    function openAvatarModal(avatarUrl) {
+      document.getElementById('modalAvatar').src = avatarUrl;
+      document.getElementById('avatarModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      const isOwnProfile = String(currentUserId) === String(viewingProfileId);
+      document.getElementById('deleteAvatarBtn').style.display = (isOwnProfile && avatarUrl !== "/static/src/default_pfp.png") ? "block" : "none";
+      document.getElementById('changeAvatarBtn').style.display = isOwnProfile ? "block" : "none";
+    }
+
+    function closeAvatarModal() {
+      document.getElementById('avatarModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    document.getElementById("avatarImg").addEventListener('click', function() {
+      openAvatarModal(this.src);
     });
 
-
-     document.querySelector('.close-modal').addEventListener('click', closeAvatarModal);
-    document.getElementById('changeAvatarBtn').addEventListener('click', () => {
-      closeAvatarModal();
-      avatarInput.click();
-    });
-
-    
-    document.getElementById('avatarModal').addEventListener('click', function(e) {
-      if (e.target === this) {
-        closeAvatarModal();
-      }
-    });
-
-    // ESC
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        closeAvatarModal();
-      }
-    });
-
+    document.querySelector('.close-modal').addEventListener('click', closeAvatarModal);
+    document.getElementById('changeAvatarBtn').addEventListener('click', () => { closeAvatarModal(); avatarInput.click(); });
+    document.getElementById('avatarModal').addEventListener('click', function(e) { if (e.target === this) closeAvatarModal(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeAvatarModal(); });
 
     loadProfile();
   </script>
