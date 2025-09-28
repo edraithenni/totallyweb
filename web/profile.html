@@ -7,17 +7,24 @@
   <style>
     body {
       font-family: system-ui, sans-serif;
-      background: #f4f6f9;
+     background-image: 
+        linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3)),
+        url('https://textures.neocities.org/textures/abstract-brown-and-grey/027C.jpg');
+    background-repeat: repeat;
+    background-size: 200px 200px;
       margin: 0;
       padding: 2rem;
     }
     .profile-card {
       max-width: 600px;
       margin: 0 auto;
-      background: white;
-      border-radius: 10px;
+      background: url('https://textures.neocities.org/textures/abstract-pink-and-blue/137.GIF') repeat;
+      background-size: 100px 100px;
+      border-radius: 0;
       padding: 1.5rem;
       box-shadow: 0 2px 6px rgba(0,0,0,.15);
+      background-color: rgba(71, 71, 71, 0.5);
+      background-blend-mode: lighten;
     }
     h1 { margin-top: 0; }
     .avatar-row {
@@ -100,6 +107,35 @@
       border-radius: 20px;
       cursor: pointer;
     }
+
+    /* === playlists styles === */
+    .playlists-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .playlist-card {
+      background: #fff;
+      border-radius: 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,.1);
+      overflow: hidden;
+      text-align: center;
+      cursor: pointer;
+      transition: transform .2s;
+    }
+    .playlist-card:hover {
+      transform: scale(1.05);
+    }
+    .playlist-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+    }
+    .playlist-card .title {
+      padding: .5rem;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -114,6 +150,11 @@
     <hr>
     <h3>Bio</h3>
     <div id="bioBlock" class="bio muted">Loading...</div>
+
+    <!-- playlists section -->
+    <hr>
+    <h3>Playlists</h3>
+    <div id="playlistsBlock" class="playlists-grid">Loading playlists...</div>
 
     <div id="avatarModal" class="modal">
       <div class="close-modal">&times;</div>
@@ -162,12 +203,60 @@
         document.getElementById("deleteAvatarBtn").style.display = isOwnProfile ? "block" : "none";
         document.getElementById("avatarInput").style.display ="none";
 
+        // === load playlists after profile ===
+        await loadPlaylists(viewingProfileId);
+
       } catch (err) {
         console.error("Ошибка загрузки профиля:", err);
         document.getElementById("profileContent").innerHTML = "<p>Не удалось загрузить данные профиля</p>";
         document.getElementById("bioBlock").textContent = "—";
       }
     }
+
+    async function loadPlaylists(userId) {
+  const block = document.getElementById("playlistsBlock");
+  block.innerHTML = "Loading playlists...";
+  try {
+    const res = await fetch(`/api/users/${userId}/playlists`, { credentials: "include" });
+    if (!res.ok) throw new Error("Ошибка HTTP " + res.status);
+    const data = await res.json();
+
+    const playlists = Array.isArray(data) ? data : data.playlists || [];
+
+    if (!playlists.length) {
+      block.innerHTML = "<p class='muted'>No playlists yet</p>";
+      return;
+    }
+
+    block.innerHTML = "";
+    playlists.forEach(pl => {
+  const card = document.createElement("div");
+  card.className = "playlist-card";
+
+  let iconUrl = "";
+  if (pl.name === "watch-later") iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-yellow.gif";
+  else if (pl.name === "watched") iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-green.gif";
+  else if (pl.name === "liked") iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-red.gif";
+
+  card.innerHTML = `
+    <img src="${pl.cover || '/static/playlists/collection-placeholder.png'}" alt="">
+    <div class="title">
+      ${escapeHtml(pl.name)}
+      ${iconUrl ? `<img src="${iconUrl}" style="width:16px; height:16px; margin-left:4px; vertical-align:middle;">` : ""}
+    </div>
+  `;
+
+  card.addEventListener("click", () => {
+    window.location.href = `/static/playlist.html?id=${pl.id}`;
+  });
+  block.appendChild(card);
+});
+  } catch (err) {
+    console.error("Ошибка загрузки плейлистов:", err);
+    block.innerHTML = "<p class='muted'>Не удалось загрузить плейлисты</p>";
+  }
+}
+
 
     const avatarInput = document.getElementById("avatarInput");
     const uploadStatus = document.getElementById("uploadStatus");
