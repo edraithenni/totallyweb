@@ -3,42 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <title>Auth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
+    
     body {
-      font-family: system-ui, sans-serif;
-      background: #f4f6f9;
+      font-family: 'DotGothic16';
       margin: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
+      background: url('https://toot.melonland.net/319680-pixel-art-space.jpg') ;
+      
     }
     .card {
-      background: white;
+      background: #0a1b31;
+      border:1px solid rgb(66, 65, 72);
       padding: 2rem;
-      border-radius: 10px;
+      border-radius: 0;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       width: 350px;
+      color: #40f;
     }
     h2 { margin-top: 0; }
     input {
-      width: 100%;
+      width: 90%;
       padding: .6rem 1rem;
       margin-bottom: .8rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      border-radius: 0;
+      background: rgb(59, 59, 116);
+      border: 1px solid rgb(104, 102, 117);
       font-size: 1rem;
+      font-family: 'DotGothic16';
+      
+      
     }
     button {
       width: 100%;
       padding: .6rem 1rem;
       border: none;
-      border-radius: 8px;
-      background: #3182ce;
-      color: white;
+      border-radius: 0;
+      background: rgb(44, 44, 122);
+      font-family: 'DotGothic16';
+      color: #40f;
       font-size: 1rem;
       cursor: pointer;
+     
     }
     .switch {
       margin-top: 1rem;
@@ -52,7 +65,7 @@
       border: 1px solid #b2f5ea;
       padding: .5rem;
       margin-bottom: .8rem;
-      border-radius: 6px;
+      border-radius: 0;
       color: #22543d;
       font-size: .9rem;
     }
@@ -62,13 +75,13 @@
   <div class="card">
     <!-- Registration -->
     <div id="registerForm">
-      <h2>Регистрация</h2>
+      <h2>Register</h2>
       <div id="regMsg" class="msg hidden"></div>
-      <input id="regName" type="text" placeholder="Имя" required>
+      <input id="regName" type="text" placeholder="Name" required>
       <input id="regEmail" type="email" placeholder="Email">
-      <input id="regPass" type="password" placeholder="Пароль">
-      <button onclick="register()">Зарегистрироваться</button>
-      <div class="switch" onclick="showForm('loginForm')">Уже есть аккаунт? Войти</div>
+      <input id="regPass" type="password" placeholder="Password">
+      <button onclick="register()">Sign up</button>
+      <div class="switch" onclick="showForm('loginForm')">Already have an account? Log in</div>
     </div>
 
     <!-- Verifiction -->
