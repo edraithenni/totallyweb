@@ -149,12 +149,48 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
       padding: .5rem;
       font-weight: 600;
     }
+    /* === Notifications === */
+    #notifBtn {
+  background:#3a3a90; 
+  border:none; 
+  border-radius:6px; 
+  position:relative; 
+  padding:4px;
+}
+#notifBtn img { display:block; }
+#notifCount {
+  display:none; 
+  position:absolute; 
+  top:-5px; 
+  right:-5px; 
+  background:red; 
+  color:white; 
+  border-radius:50%; 
+  padding:0 6px; 
+  font-size:0.75rem;
+}
     
   </style>
 </head>
 <body>
   <div class="profile-card">
     <h1 id="profileTitle">Loading...</h1>
+
+    <!-- Notification bell -->
+    <div style="position: absolute; top: 1rem; right: 1rem;">
+     <button id="notifBtn">
+  <img src="/static/src/mail-pink.png" alt="Уведомления" style="width:35px; height:35px;">
+  <span id="notifCount">0</span>
+</button>
+
+        <span id="notifCount" style="display:none; position:absolute; top:-8px; right:-8px; background:red; color:white; border-radius:50%; padding:0 6px; font-size:0.75rem;">0</span>
+      </button>
+      <div id="notifMenu" style="display:none; position:absolute; right:0; top:2rem; background:#24203e; color:#fff; border:1px solid #3a3a90; border-radius:6px; min-width:250px; max-height:300px; overflow-y:auto; box-shadow:0 4px 12px rgba(0,0,0,.3); z-index:100;">
+        <p style="padding:0.5rem; margin:0; border-bottom:1px solid #3a3a90;">Notifications</p>
+        <ul id="notifList"></ul>
+      </div>
+    </div>
+
     <div class="avatar-row">
       <img id="avatarImg" class="avatar" src="/static/src/default_pfp.png" />
       <input id="avatarInput" type="file" accept="image/*" style="display: none;">
@@ -186,6 +222,27 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
 
     let currentUserId = null;
     let viewingProfileId = null;
+
+    // Notifications state
+  const notifBtn = document.getElementById("notifBtn");
+  const notifMenu = document.getElementById("notifMenu");
+  const notifList = document.getElementById("notifList");
+  const notifCountSpan = document.getElementById("notifCount");
+  let notifCount = 0;
+
+  function addNotification(msg) {
+    const li = document.createElement("li");
+    li.textContent = msg;
+    notifList.prepend(li);
+    notifCount++;
+    notifCountSpan.textContent = notifCount;
+    notifCountSpan.style.display = "inline";
+  }
+
+  notifBtn.addEventListener("click", () => {
+    notifMenu.style.display = notifMenu.style.display === "block" ? "none" : "block";
+    if (notifMenu.style.display === "block") { notifCount = 0; notifCountSpan.style.display = "none"; }
+  });
 
     async function loadProfile() {
       try {
@@ -351,7 +408,18 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
     document.getElementById('avatarModal').addEventListener('click', function(e) { if (e.target === this) closeAvatarModal(); });
     document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeAvatarModal(); });
 
-    loadProfile();
+    // === WebSocket ===
+  let ws = null;
+  function initWS() {
+    ws = new WebSocket(`ws://localhost:8080/ws?user_id=${currentUserId}`);
+    ws.onmessage = (event)=>{
+      const data = event.data;
+      addNotification(data);
+    };
+    ws.onclose = ()=>{ console.log("WS closed"); setTimeout(initWS, 2000); };
+  }
+
+  loadProfile().then(()=>initWS());
   </script>
 </body>
 </html>
