@@ -148,7 +148,79 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
     .playlist-card .title {
       padding: .5rem;
       font-weight: 600;
+
     }
+    .review-card {
+      background: #2b264d;
+      border: 1px solid #3a3a90;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      color: #f1f1f1;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      transition: transform .2s;
+    }
+
+    .review-card:hover {
+      transform: scale(1.02);
+    }
+
+    .review-card .movie-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: #ffb3ff;
+    }
+
+    .review-card .rating {
+      margin: 0.5rem 0;
+    }
+
+    .btn {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-weight: 600;
+  border: none;
+  transition: all 0.2s ease;
+  }
+
+  .btn-edit {
+    background-color: #3a3a90;
+    border-radius: 0;
+    color: white;
+  }
+  .btn-edit:hover {
+    background-color: #5656b0;
+    border-radius: 0;
+  }
+
+  .btn-save {
+    background-color: #28a745;
+    border-radius: 0;
+    color: white;
+  }
+  .btn-save:hover {
+    background-color: #218838;
+    border-radius: 0;
+  }
+
+  .btn-cancel {
+    background-color: #dc3545;
+    border-radius: 0;
+    color: white;
+  }
+  .btn-cancel:hover {
+    background-color: #c82333;
+    border-radius: 0;
+  }
+
+#bioEditContainer button {
+  margin-right: 0.5rem;
+}
+
+
+
     /* === Notifications === */
     #notifBtn {
   background:#3a3a90; 
@@ -200,6 +272,13 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
     <hr>
     <h3>Bio</h3>
     <div id="bioBlock" class="bio muted">Loading...</div>
+    <button id="editBioBtn" class="btn btn-edit">Edit</button>
+    <div id="bioEditContainer" style="display:none;">
+      <textarea id="bioTextarea" rows="4" style="width:100%;"></textarea>
+      <button id="saveBioBtn" class="btn btn-save">Save</button>
+      <button id="cancelBioBtn" class="btn btn-cancel">Cancel</button>
+    </div>
+
 
     <!-- playlists section -->
     <hr>
@@ -216,6 +295,12 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
         <button id="deleteAvatarBtn">Delete pfp</button>
       </div>
     </div>
+
+        <!-- reviews section -->
+    <hr>
+    <h3>Reviews</h3>
+    <div id="reviewsBlock">Loading reviews...</div>
+
 
   <script>
     function escapeHtml(s) { if (!s) return ""; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
@@ -266,20 +351,27 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
         document.getElementById("profileTitle").textContent = escapeHtml(user.name || "Your profile");
         const avatarUrl = user.avatar && user.avatar !== "" ? user.avatar : "/static/src/default_pfp.png";
         document.getElementById("avatarImg").src = avatarUrl;
-        document.getElementById("profileContent").innerHTML = `<p><b>Email:</b> ${escapeHtml(user.email || "—")}</p>`;
+        //document.getElementById("profileContent").innerHTML = `<p><b>Email:</b> ${escapeHtml(user.email || "—")}</p>`;
+        const isOwnProfile = String(currentUserId) === String(viewingProfileId);
+        const emailDisplay = isOwnProfile ? escapeHtml(user.email || "—") : "—";
+
+        document.getElementById("profileContent").innerHTML = `<p><b>Email:</b> ${emailDisplay}</p>`;
+
         document.getElementById("bioBlock").textContent = user.description || "—";
 
-        const isOwnProfile = String(currentUserId) === String(viewingProfileId);
+       // const isOwnProfile = String(currentUserId) === String(viewingProfileId);
         document.getElementById("changeAvatarBtn").style.display = isOwnProfile ? "block" : "none";
         document.getElementById("deleteAvatarBtn").style.display = isOwnProfile ? "block" : "none";
         document.getElementById("avatarInput").style.display ="none";
 
         // === load playlists after profile ===
         await loadPlaylists(viewingProfileId);
+        await loadReviews(viewingProfileId);
+
 
       } catch (err) {
-        console.error("Ошибка загрузки профиля:", err);
-        document.getElementById("profileContent").innerHTML = "<p>Не удалось загрузить данные профиля</p>";
+        console.error("Failed to load profile:", err);
+        document.getElementById("profileContent").innerHTML = "<p>Failed to load profile data</p>";
         document.getElementById("bioBlock").textContent = "—";
       }
     }
@@ -323,10 +415,44 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
   block.appendChild(card);
 });
   } catch (err) {
-    console.error("Ошибка загрузки плейлистов:", err);
-    block.innerHTML = "<p class='muted'>Не удалось загрузить плейлисты</p>";
+    console.error("Failed to load playlists:", err);
+    block.innerHTML = "<p class='muted'>Failed to load playlists data</p>";
   }
 }
+
+  async function loadReviews(userId) {
+  const block = document.getElementById("reviewsBlock");
+  block.innerHTML = "Loading reviews...";
+  try {
+    const res = await fetch(`/api/users/${userId}/reviews`, { credentials: "include" });
+    if (!res.ok) throw new Error("Ошибка HTTP " + res.status);
+    const reviews = await res.json();
+
+    if (!reviews.length) {
+      block.innerHTML = "<p class='muted'>No reviews yet</p>";
+      return;
+    }
+
+    block.innerHTML = "";
+    reviews.forEach(rv => {
+      const div = document.createElement("div");
+      div.className = "review-card";
+      div.style.cssText = "background:#000000; margin:0.2rem 0; padding:0.5rem; border-radius:0; color:#fff; border: 2px solid #3a3a90;";
+
+      div.innerHTML = `
+        <p><b>Movie:</b> ${escapeHtml(rv.movie_title.toString())}</p>
+        <p><b>Rating:</b> ⭐ ${rv.rating}/10</p>
+        <p>${escapeHtml(rv.content)}</p>
+      `;
+
+      block.appendChild(div);
+    });
+  } catch (err) {
+    console.error("Error while loading reviews:", err);
+    block.innerHTML = "<p class='muted'>Failed to load reviews</p>";
+  }
+}
+
 
 
     const avatarInput = document.getElementById("avatarInput");
@@ -418,6 +544,46 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
     };
     ws.onclose = ()=>{ console.log("WS closed"); setTimeout(initWS, 2000); };
   }
+
+   const bioBlock = document.getElementById("bioBlock");
+  const editBioBtn = document.getElementById("editBioBtn");
+  const bioEditContainer = document.getElementById("bioEditContainer");
+  const bioTextarea = document.getElementById("bioTextarea");
+  const saveBioBtn = document.getElementById("saveBioBtn");
+  const cancelBioBtn = document.getElementById("cancelBioBtn");
+
+  editBioBtn.addEventListener("click", () => {
+    bioTextarea.value = bioBlock.textContent !== "—" ? bioBlock.textContent : "";
+    bioBlock.style.display = "none";
+    editBioBtn.style.display = "none";
+    bioEditContainer.style.display = "block";
+  });
+
+  cancelBioBtn.addEventListener("click", () => {
+    bioEditContainer.style.display = "none";
+    bioBlock.style.display = "block";
+    editBioBtn.style.display = "inline-block";
+  });
+
+  saveBioBtn.addEventListener("click", async () => {
+    const newBio = bioTextarea.value.trim();
+    try {
+      const resp = await fetch("/api/users/me", {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: newBio })
+      });
+      if (!resp.ok) throw new Error("Update error");
+      bioBlock.textContent = newBio || "—";
+      bioEditContainer.style.display = "none";
+      bioBlock.style.display = "block";
+      editBioBtn.style.display = "inline-block";
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update bio.");
+    }
+  });
 
   loadProfile().then(()=>initWS());
   </script>
