@@ -86,22 +86,22 @@
 
     <!-- Verifiction -->
     <div id="verifyForm" class="hidden">
-      <h2>Подтверждение</h2>
+      <h2>Confirmation</h2>
       <div id="verMsg" class="msg hidden"></div>
       <input id="verEmail" type="email" placeholder="Email">
-      <input id="verCode" type="text" placeholder="Код из письма">
-      <button onclick="verify()">Подтвердить</button>
-      <div class="switch" onclick="showForm('loginForm')">Перейти ко входу</div>
+      <input id="verCode" type="text" placeholder="Verification code(sent to email)">
+      <button onclick="verify()">Confirm</button>
+      <div class="switch" onclick="showForm('loginForm')">Go to Log in</div>
     </div>
 
     <!-- Login -->
     <div id="loginForm" class="hidden">
-      <h2>Вход</h2>
+      <h2>Log in</h2>
       <div id="logMsg" class="msg hidden"></div>
       <input id="logEmail" type="email" placeholder="Email">
-      <input id="logPass" type="password" placeholder="Пароль">
-      <button onclick="login()">Войти</button>
-      <div class="switch" onclick="showForm('registerForm')">Нет аккаунта? Регистрация</div>
+      <input id="logPass" type="password" placeholder="Password">
+      <button onclick="login()">Log in</button>
+      <div class="switch" onclick="showForm('registerForm')">Don't have an account? Register</div>
     </div>
   </div>
 
@@ -131,11 +131,11 @@
 
     document.getElementById('verEmail').value = email;
     showForm('verifyForm');
-    console.log('Показываем форму верификации', document.getElementById('verifyForm'));
-    showMsg('verMsg', 'Регистрация успешна! Введите код подтверждения.');
+    console.log('Showing verification form...', document.getElementById('verifyForm'));
+    showMsg('verMsg', 'Registered succesfully, enter your verification code.');
 
   } catch (err) {
-    alert('Ошибка регистрации: ' + err.message);
+    alert('Registration error: ' + err.message);
   }
 }
 
@@ -149,11 +149,11 @@
           body: JSON.stringify({ email, code })
         });
         if (!res.ok) throw new Error(await res.text());
-        showMsg('verMsg', 'Email подтвержден! Теперь войдите.');
+        showMsg('verMsg', 'Email confirmed! Please sign in.');
         showForm('loginForm');
         document.getElementById('logEmail').value = email;
       } catch (err) {
-        alert('Ошибка подтверждения: ' + err.message);
+        alert('Confirmation error: ' + err.message);
       }
     }
 

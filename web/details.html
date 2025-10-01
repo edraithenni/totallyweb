@@ -148,6 +148,7 @@
         const movie = await res.json();
 
         document.title = movie.title;
+
         document.getElementById("movieDetails").innerHTML = `
          <div class="movie-container">
             <div class="movie-poster">
@@ -160,12 +161,67 @@
               <p><b>Genre:</b> ${movie.genre || '—'}</p>
               <p><b>Director:</b> ${movie.director || '—'}</p>
               <p><b>Rating:</b> ${movie.rating || '—'}</p>
+              <div style="margin-top:12px;">
+                <button id="btnAddPlaylist" style="padding:6px 12px; background:#584fdb; color:#8dd9ff; border:2px solid #ffc659; cursor:pointer;">
+                  Add to Playlist
+                </button>
+                <select id="selectPlaylist" style="display:none; margin-left:10px; padding:4px;">
+                  <option value="">Select playlist</option>
+                </select>
+              </div>
             </div>
             <div class="movie-gif">
-    <img src="https://images.melonland.net/?url=https%3A%2F%2Fi.imgur.com%2FhWxzM0d.gif&w=1200&fit=inside&we&q=85&il&n=-1&default=1" alt="Movie gif">
-  </div>
+              <img src="https://images.melonland.net/?url=https%3A%2F%2Fi.imgur.com%2FhWxzM0d.gif&w=1200&fit=inside&we&q=85&il&n=-1&default=1" alt="Movie gif">
+            </div>
         </div>
         `;
+
+        const btnAdd = document.getElementById("btnAddPlaylist");
+        const select = document.getElementById("selectPlaylist");
+
+        btnAdd.addEventListener("click", () => {
+          select.style.display = select.style.display === "none" ? "inline-block" : "none";
+        });
+
+        select.addEventListener("change", async () => {
+          const playlistId = select.value;
+          if (!playlistId) return;
+
+          try {
+            const res = await fetch(`/api/playlists/${playlistId}/add`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ movie_id: movie.id })
+            });
+
+            if (!res.ok) {
+              const err = await res.json();
+              alert("Error adding movie: " + (err.error || "unknown"));
+            } else {
+              alert("Movie added to playlist!");
+              if (window.location.pathname.includes("profile.html")) {
+                loadPlaylists(currentUserId); 
+              }
+            }
+            select.style.display = "none";
+            select.value = "";
+          } catch (err) {
+            alert("Failed to add movie to playlist");
+          }
+        });
+
+        const playlistsRes = await fetch("/api/users/me/playlists", { credentials: "include" });
+        if (playlistsRes.ok) {
+          const data = await playlistsRes.json();
+          select.innerHTML = `<option value="">Select playlist</option>`;
+          data.playlists.forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p.id;
+            opt.textContent = p.name;
+            select.appendChild(opt);
+          });
+        }
 
         loadReviews(id);
 

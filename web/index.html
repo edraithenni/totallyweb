@@ -160,7 +160,7 @@ document.getElementById("btnProfile").onclick = async () => {
 document.getElementById('btnLogout').onclick = async () => {
   try {
     await api('/api/auth/logout','POST');
-    alert('Вы вышли');
+    alert('you logged out');
     setAuthUI(false);
   } catch(err){ alert(err.message); }
 };
