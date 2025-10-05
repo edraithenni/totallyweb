@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Profile</title>
+<link href="https://fonts.cdnfonts.com/css/so-normal" rel="stylesheet">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
     body {
-      font-family: system-ui, sans-serif;
+      font-family: 'So Normal', system-ui;
     background:#000000;
     background-repeat: repeat;
     background-size: 200px 200px;
@@ -17,7 +18,7 @@
       position: relative;
       max-width: 600px;
       margin: 0 auto;
-     background: #24203e;
+     background-image: url("src/skeleton.jpg");
       padding: 1.5rem;
       box-shadow: 0 2px 6px rgba(0,0,0,.15);
     
@@ -56,8 +57,13 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
       cursor:pointer;
     }
     .avatar:hover { transform: scale(1.05); }
-    .bio { white-space:pre-wrap; margin-top:.5rem; color:#333; }
-    .muted { color:#666; font-size:.9rem; }
+    .bio { 
+    white-space: pre-wrap; 
+    margin-top: .5rem; 
+    color: #333; 
+}
+
+    .muted { color:#282222; font-size: 25px; }
     button { cursor:pointer; padding:.45rem .75rem; border-radius:6px; border:1px solid #d0d6de; background:#fff; }
     input[type="file"] { display:none; }
     .modal {
@@ -241,6 +247,9 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
   padding:0 6px; 
   font-size:0.75rem;
 }
+#bioTextarea {
+    font-size: 20px;
+}
     
   </style>
 </head>
@@ -303,6 +312,8 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
 
 
   <script>
+
+
     function escapeHtml(s) { if (!s) return ""; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
 
     let currentUserId = null;
@@ -391,18 +402,30 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
       return;
     }
 
+    
+
     block.innerHTML = "";
     playlists.forEach(pl => {
   const card = document.createElement("div");
   card.className = "playlist-card";
 
   let iconUrl = "";
-  if (pl.name === "watch-later") iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-yellow.gif";
-  else if (pl.name === "watched") iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-green.gif";
-  else if (pl.name === "liked") iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-red.gif";
+  let defaultCover  = "/static/src/default-playlist.jpg";
+
+ if (pl.name === "watch-later") {
+  iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-yellow.gif";
+  defaultCover = "/static/src/watch-later-playlist.jpg";
+} else if (pl.name === "watched") {
+  iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-green.gif";
+  defaultCover = "/static/src/watched-playlist.jpg";
+} else if (pl.name === "liked") {
+  iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-red.gif";
+  defaultCover = "/static/src/liked-playlist.jpg";
+}
+
 
   card.innerHTML = `
-    <img src="${pl.cover || '/static/playlists/collection-placeholder.png'}" alt="">
+    <img src="${pl.cover || defaultCover}" alt="">
     <div class="title">
       ${escapeHtml(pl.name)}
       ${iconUrl ? `<img src="${iconUrl}" style="width:20px; height:20px; margin-left:4px; vertical-align:middle;">` : ""}
