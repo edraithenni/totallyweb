@@ -2,199 +2,191 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link href="https://fonts.cdnfonts.com/css/so-normal" rel="stylesheet">
   <title>Playlist</title>
-  <style>
+<style>
+:root {
+    --bg-primary: #0d0d1a;
+    --bg-secondary: #1a1a2e;
+    --window-bg: #16161d;
+    --accent-1: #9370DB;
+    --accent-2: #BA55D3;
+    --accent-3: #663399;
+    --accent-4: #4B0082;
+    --border-light: #483D8B;
+    --border-dark: #301934;
+    --text-primary: #E6E6FA;
+    --text-secondary: #DDA0DD;
+    --crystal-1: #4B0082;
+    --crystal-2: #800080;
+    --crystal-3: #8B008B;
+    --rune-glow: #9400D3;
+    --shadow-purple: #2d1b2d;
+    --void-essence: #120321;
+}
+@font-face {
+  font-family: 'Basiic';
+  src: url('./src/basiic.ttf') format('truetype');
+  font-style: normal;
+    font-weight: 400;
+    text-rendering: optimizeLegibility;
+}
+
 /* Base Styles */
-body, html {
+body {
     margin: 0;
-    padding: 0;
-    background-color: #0a0a2a;
-    color: #d0d0ff;
-    font-family: "MS Gothic", "Lucida Console", Monaco, monospace;
-    cursor: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAAAAB3RJTUUH5gMFABcuVeXYtQAAABNJREFUOMNj+P//P8PgAUaPgVEwZAEAIe8FryJKPK8AAAAASUVORK5CYII='), auto;
-    overflow-x: hidden;
-    font-size: 14px;
-    line-height: 1.4;
-    height: 100%;
+    padding: 20px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Basiic', sans-serif;
+    min-height: 100vh;
 }
 
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #000040;
-    border: 1px solid #004080;
-}
-::-webkit-scrollbar-thumb {
-    background: #00a0c0;
-    border: 1px solid #00f0ff;
-}
-
-/* Background Pattern */
-body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><path d="M20,100 Q50,50 100,80 Q150,110 180,100 Q150,150 100,120 Q50,90 20,100 Z" fill="none" stroke="rgba(120,160,255,0.1)" stroke-width="1"/></svg>');
-    background-size: 200px 200px;
-    opacity: 0.3;
-    z-index: -1;
-    pointer-events: none;
-}
-
-/* Playlist Container */
+/* Playlist Window */
 .playlist-container {
-    max-width: 960px;
-    margin: 20px auto;
-    padding: 15px;
-    background-color: rgba(10, 10, 50, 0.85);
-    border: 1px solid #364f8a;
-    box-shadow: 0 0 15px rgba(0, 200, 255, 0.2);
+    font-family: 'Basiic', sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--window-bg);
+    border: 2px solid var(--border-light);
+    box-shadow: 0 0 20px var(--shadow-purple);
+    overflow: hidden;
+    position: relative;
 }
 
 /* Playlist Header */
 .playlist-header {
+    font-family: 'Basiic', sans-serif;
     display: flex;
     align-items: center;
-    margin-bottom: 30px;
-    padding: 15px;
-    background: linear-gradient(to bottom, #000030, #000060);
-    border: 1px solid #364f8a;
-    box-shadow: 0 0 10px rgba(0, 150, 255, 0.3);
-}
-.playlist-header img {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    margin-right: 25px;
-    border: 1px solid #4080c0;
-}
-.playlist-info h1 {
-    color: #c0c0ff;
-    text-shadow: 0 0 5px #00a0ff, 0 0 10px #0060ff;
-    font-family: "Times New Roman", serif;
-    font-size: 28px;
-    margin: 0 0 10px 0;
-    letter-spacing: 2px;
-}
-.playlist-info p {
-    color: #a0c0ff;
-    margin: 5px 0;
+    padding: 10px;
+    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    border-bottom: 2px solid var(--border-light);
+    color: var(--window-bg);
 }
 
-/* Movies List */
+/* Playlist Info */
+.playlist-info h1 {
+    font-family: 'Basiic', sans-serif;
+    font-weight: bold;
+    font-size: 18px;
+    color: var(--accent-2);
+    margin: 0 0 5px 0;
+}
+
+.playlist-info p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Movies List Grid */
 .movies-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 10px;
+    background: var(--bg-secondary);
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
 /* Movie Item */
 .movie-item {
     display: flex;
-    gap: 20px;
-    padding: 15px;
-    background: rgba(0, 20, 60, 0.7);
-    border: 1px solid #364f8a;
-    box-shadow: 0 0 8px rgba(0, 100, 200, 0.2);
+    gap: 10px;
+    padding: 10px;
+    background: var(--window-bg);
+    border: 1px solid var(--border-light);
     transition: all 0.3s ease;
 }
 .movie-item:hover {
-    border-color: #00a0ff;
-    transform: translateX(3px);
+    box-shadow: 0 0 10px var(--accent-1);
+    transform: scale(1.02);
 }
+
+/* Movie Poster */
 .movie-poster {
-    width: 120px;
-    height: 180px;
+    width: 100px;
+    height: 150px;
+    border: 1px solid var(--border-light);
     object-fit: cover;
-    border: 1px solid #4080c0;
-    cursor: pointer;
 }
+
+/* Movie Content */
 .movie-content {
     flex: 1;
     display: flex;
     flex-direction: column;
 }
+
+/* Movie Title */
 .movie-title {
-    font-size: 22px;
-    color: #c0c0ff;
-    margin: 0 0 8px 0;
+    font-family: 'Basiic', sans-serif;
+    color: var(--accent-2);
+    font-size: 16px;
     font-weight: bold;
+    margin: 0 0 5px 0;
     cursor: pointer;
-    text-shadow: 0 0 3px #0080ff;
 }
 .movie-title:hover {
-    color: #00ffff;
-    text-shadow: 0 0 8px #00a0ff;
+    text-shadow: 0 0 5px var(--rune-glow);
 }
-.movie-meta {
-    color: #80a0c0;
-    font-size: 14px;
-    margin-bottom: 5px;
-}
+
+/* Movie Description */
 .movie-description {
-    background: rgba(0, 0, 40, 0.6);
-    padding: 10px;
-    border: 1px solid #4080c0;
-    color: #a0b0e0;
+    font-family: 'Basiic', sans-serif;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    padding: 8px;
     font-size: 14px;
-    line-height: 1.6;
-    margin-top: 10px;
-}
-.movie-description.empty {
-    color: #666;
-    font-style: italic;
+    color: var(--text-primary);
 }
 
 /* Buttons */
 .btn {
-    padding: 6px 12px;
-    border: none;
+    padding: 5px 10px;
+    font-size: 12px;
+    background: var(--window-bg);
+    color: var(--accent-1);
+    border: 1px solid var(--border-light);
     cursor: pointer;
-    font-family: inherit;
-    font-size: 14px;
-    transition: all 0.2s;
-}
-.btn-save {
-    background: #00a0c0;
-    color: #000000;
-}
-.btn-cancel {
-    background: #ffb3ff;
-    color: #000000;
-}
-.btn-edit {
-    background: #0a0a2a;
-    color: #00a0c0;
-    border: 1px solid #00a0c0;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 .btn:hover {
-    opacity: 0.8;
+    background: var(--accent-3);
+    color: var(--text-primary);
 }
 
-/* Rating */
-.rating {
-    color: #ffb3ff;
-    font-size: 16px;
-    margin: 5px 0;
+/* Slot Styling */
+slot {
+    display: block;
+    will-change: transform;
+    font-family: 'Basiic', sans-serif;
+    color: var(--accent-1);
+    transition: transform 0.5s ease;
+}
+:host(:read-write) > slot {
+    transform: none !important;
+    color: var(--accent-2);
+}
+@media print, (prefers-reduced-motion) {
+    slot { transform: none !important; }
 }
 
-/* Footer (optional) */
-.footer {
-    text-align: center;
-    font-size: 12px;
-    color: #6080c0;
-    padding: 10px;
-    margin-top: 20px;
-    border-top: 1px solid #304080;
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--accent-1);
+    border: 1px solid var(--border-light);
 }
 </style>
+
+
 
 </head>
 <body>
