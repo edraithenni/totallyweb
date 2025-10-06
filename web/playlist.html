@@ -190,25 +190,26 @@
   async function saveDescription(movieId) {
     const description = document.querySelector(`#textarea-${movieId}`).value;
     try {
-      const res = await fetch(`/api/playlists/${playlistId}/movies/${movieId}/description`, {
+        const res = await fetch(`/api/playlists/${playlistId}/movies/${movieId}/description`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ description })
-      });
-      if (res.ok) {
-        const descElement = document.querySelector(`#edit-${movieId}`).previousElementSibling;
-        descElement.textContent = description || 'No description added yet.';
-        descElement.className = `movie-description ${!description ? 'empty' : ''}`;
-        cancelEdit(movieId);
-      } else {
-        alert('Failed to save description');
-      }
+        });
+        if (res.ok) {
+            const descElement = document.querySelector(`#desc-${movieId}`);
+            descElement.textContent = description || 'No description added yet.';
+            descElement.className = `movie-description ${!description ? 'empty' : ''}`;
+            cancelEdit(movieId);
+        } else {
+            alert('Failed to save description');
+        }
     } catch (err) {
-      console.error(err);
-      alert('Error saving description');
+        console.error(err);
+        alert('Error saving description');
     }
-  }
+ }
+
 
   function escapeHtml(text) {
     if (!text) return '';
@@ -278,17 +279,19 @@ function getMovieId(movie) {
               ${movie.rating ? `<div class="rating">⭐ ${movie.rating}/10</div>` : ''}
               <div class="movie-meta">${movie.genres || ''}</div>
             </div>
-            <div class="movie-description ${!movie.user_description ? 'empty' : ''}">
-              ${escapeHtml(movie.user_description || movie.description || 'No description added yet.')}
+            <div class="movie-description ${!movie.description ? 'empty' : ''}" id="desc-${movieId}">
+                ${escapeHtml(movie.description || 'No description added yet.')}
             </div>
+
             ${currentUserId === playlistOwnerId ? `
               <button class="btn btn-edit" onclick="editDescription('${movieId}')">Edit Description</button>
               <div class="edit-description" id="edit-${movieId}" style="display: none;">
-                <textarea id="textarea-${movieId}">${escapeHtml(movie.user_description || movie.description || '')}</textarea>
+                <textarea id="textarea-${movieId}">${escapeHtml(movie.description || '')}</textarea>
                 <div class="edit-buttons">
-                  <button class="btn btn-save" onclick="saveDescription('${movieId}')">Save</button>
-                  <button class="btn btn-cancel" onclick="cancelEdit('${movieId}')">Cancel</button>
+                    <button class="btn btn-save" onclick="saveDescription('${movieId}')">Save</button>
+                    <button class="btn btn-cancel" onclick="cancelEdit('${movieId}')">Cancel</button>
                 </div>
+
               </div>
             ` : ''}
           </div>
