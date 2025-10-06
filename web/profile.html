@@ -31,7 +31,7 @@
      background-color: #0A1B31;
       padding: 1.5rem;
       box-shadow: 0 2px 6px rgba(0,0,0,.15);
-    
+    padding-top: 130px;
       border: 2px solid #3f3d40;
       background-blend-mode: lighten;
     }
@@ -41,7 +41,7 @@
   top: 0;
   left: 0;
   width: 100%;       
-  height: 150px;     
+  height: 120px;     
   overflow: hidden;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
@@ -53,6 +53,8 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  z-index: 1; 
+
 }
 
    
@@ -70,12 +72,28 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
   border-bottom-right-radius: 0;
 }
     h1 { margin-top: 0; }
-    .avatar-row {
-      display:flex;
-      gap:1rem;
-      align-items:center;
-      margin-bottom:1rem;
-    }
+  .avatar-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.name-and-email {
+  flex: 1;
+}
+
+.name {
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+  margin-left: 0;
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+#profileContent {
+  margin: 0;
+}
     .avatar {
       width:96px;
       height:96px;
@@ -87,12 +105,13 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
       cursor:pointer;
       z-index: 1; 
     }
+  
     .avatar:hover { transform: scale(1.05); }
     .bio { 
     white-space: pre-wrap; 
     margin-top: .5rem; 
     background-color: #000000 ;
-    color: #d8d3da; 
+    color: #ffffff; 
 }
 
     .muted { color:#282222; font-size: 25px; }
@@ -299,8 +318,7 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
       <img id="profileHeaderImg" src="https://64.media.tumblr.com/6720afe4b23fff20fb0a55a8733db945/147bfebdf112f180-c6/s400x600/b6f51cddbdd98ddab9e322b88807158dac343608.gifv" alt="Profile header">
   </div>
 
-    <h1 id="profileTitle">Loading...</h1>
-
+  
     <!-- Notification bell -->
     <div style="position: absolute; top: 1rem; right: 1rem;">
      <button id="notifBtn">
@@ -317,11 +335,14 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
     </div>
 
     <div class="avatar-row">
-      <img id="avatarImg" class="avatar" src="/static/src/default_pfp.png" />
-      <input id="avatarInput" type="file" accept="image/*" style="display: none;">
-      <div id="uploadStatus" class="muted"></div>
-    </div>
+  <img id="avatarImg" class="avatar" src="/static/src/default_pfp.png" />
+  <div class="name-and-email">
+    <h1 id="profileTitle" class="name">Loading...</h1>
     <div id="profileContent">Loading...</div>
+  </div>
+  <input id="avatarInput" type="file" accept="image/*" style="display: none;">
+  <div id="uploadStatus" class="muted"></div>
+</div>
     <hr>
     <h3>Bio</h3>
     <div id="bioBlock" class="bio muted">Loading...</div>

@@ -3,50 +3,154 @@
 <head>
   <meta charset="UTF-8">
   <title>Playlist</title>
-  <link rel="stylesheet" href="styles.css">
   <style>
+    body {
+      background: #000000;
+      color: #ffffff;
+      font-family: 'Basiic', sans-serif;
+      margin: 0;
+      padding: 2rem;
+    }
     .playlist-container {
       max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
+      margin: 0 auto;
     }
     .playlist-header {
       display: flex;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #0A1B31;
+      border: 2px solid #3f3d40;
     }
     .playlist-header img {
+      width: 150px;
+      height: 150px;
+      border-radius: 0;
+      object-fit: cover;
+      margin-right: 25px;
+      border: 2px solid #41D3D2;
+    }
+    .playlist-info h1 {
+      color: #41D3D2;
+      margin: 0 0 10px 0;
+      font-size: 28px;
+    }
+    .playlist-info p {
+      color: #9C9CC9;
+      margin: 5px 0;
+    }
+    .movies-list {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+    .movie-item {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      background: #0F1C24;
+      border: 1px solid #41D3D2;
+      border-radius: 0;
+      transition: all 0.3s ease;
+    }
+    .movie-item:hover {
+      border-color: #ffb3ff;
+      transform: translateX(5px);
+    }
+    .movie-poster {
       width: 120px;
-      height: 120px;
-      border-radius: 12px;
+      height: 180px;
       object-fit: cover;
-      margin-right: 20px;
+      flex-shrink: 0;
+      border: 1px solid #3a3a90;
+      cursor: pointer;
     }
-    .movie-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 15px;
+    .movie-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
-    .movie-card {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 10px;
-      background: #fff;
-      text-align: center;
-    }
-    .movie-card img {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-      border-radius: 8px;
+    .movie-header {
+      margin-bottom: 15px;
     }
     .movie-title {
+      font-size: 22px;
+      color: #ffffff;
+      margin: 0 0 8px 0;
       font-weight: bold;
-      margin: 8px 0 4px;
+      cursor: pointer;
     }
-    .movie-year {
-      font-size: 0.9em;
-      color: gray;
+    .movie-title:hover {
+      color: #ffb3ff;
+    }
+    .movie-meta {
+      color: #9C9CC9;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+    .movie-description {
+      background: #000000;
+      padding: 15px;
+      border: 1px solid #3a3a90;
+      border-radius: 0;
+      color: #ffffff;
+      font-size: 16px;
+      line-height: 1.5;
+      margin-top: 10px;
+    }
+    .movie-description.empty {
+      color: #666;
+      font-style: italic;
+    }
+    .edit-description {
+      margin-top: 10px;
+    }
+    .edit-description textarea {
+      width: 100%;
+      height: 100px;
+      background: #000000;
+      color: #ffffff;
+      border: 1px solid #41D3D2;
+      padding: 10px;
+      font-family: inherit;
+      font-size: 16px;
+      resize: vertical;
+    }
+    .edit-buttons {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn-save {
+      background: #41D3D2;
+      color: #000000;
+    }
+    .btn-cancel {
+      background: #ffb3ff;
+      color: #000000;
+    }
+    .btn-edit {
+      background: #000000;
+      color: #41D3D2;
+      border: 1px solid #41D3D2;
+      margin-top: 10px;
+    }
+    .btn:hover {
+      opacity: 0.8;
+    }
+    .rating {
+      color: #ffb3ff;
+      font-size: 16px;
+      margin: 5px 0;
     }
   </style>
 </head>
@@ -54,58 +158,150 @@
   <div class="playlist-container">
     <div class="playlist-header">
       <img id="playlist-cover" src="" alt="Playlist Cover">
-      <div>
-        <h2 id="playlist-name"></h2>
-        <p id="playlist-owner"></p>
+      <div class="playlist-info">
+        <h1 id="playlist-name">Loading...</h1>
+        <p id="playlist-owner">Loading...</p>
+        <p id="movie-count">Loading...</p>
       </div>
     </div>
-    <div class="movie-list" id="movies"></div>
+    <div class="movies-list" id="movies">Loading movies...</div>
   </div>
 
   <script>
-    async function loadPlaylist() {
-      const params = new URLSearchParams(window.location.search);
-      const playlistId = params.get("id");
-      if (!playlistId) {
-        document.querySelector(".playlist-container").innerHTML = "<p>Playlist ID missing</p>";
+  let currentUserId = null;
+  let playlistOwnerId = null;
+  let playlistId = null;
+
+  function goToMovie(movieId) {
+    if (!movieId) return alert('Movie ID is missing');
+    window.location.href = `details.html?id=${encodeURIComponent(movieId)}`;
+  }
+
+  function editDescription(movieId) {
+    document.querySelector(`#edit-${movieId}`).style.display = 'block';
+    document.querySelector(`[onclick="editDescription('${movieId}')"]`).style.display = 'none';
+  }
+
+  function cancelEdit(movieId) {
+    document.querySelector(`#edit-${movieId}`).style.display = 'none';
+    document.querySelector(`[onclick="editDescription('${movieId}')"]`).style.display = 'block';
+  }
+
+  async function saveDescription(movieId) {
+    const description = document.querySelector(`#textarea-${movieId}`).value;
+    try {
+      const res = await fetch(`/api/playlists/${playlistId}/movies/${movieId}/description`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ description })
+      });
+      if (res.ok) {
+        const descElement = document.querySelector(`#edit-${movieId}`).previousElementSibling;
+        descElement.textContent = description || 'No description added yet.';
+        descElement.className = `movie-description ${!description ? 'empty' : ''}`;
+        cancelEdit(movieId);
+      } else {
+        alert('Failed to save description');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error saving description');
+    }
+  }
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+function getMovieId(movie) {
+  if (!movie) return null;
+  return movie.ID; 
+}
+
+
+  async function loadPlaylist() {
+    const params = new URLSearchParams(window.location.search);
+    playlistId = params.get("id");
+    if (!playlistId) {
+      document.querySelector(".playlist-container").innerHTML = "<p>Playlist ID missing</p>";
+      return;
+    }
+
+    try {
+      const userRes = await fetch("/api/users/me", { credentials: "include" });
+      if (userRes.ok) {
+        const user = await userRes.json();
+        currentUserId = user.id;
+      }
+
+      const res = await fetch(`/api/playlists/${playlistId}`, { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to load playlist");
+      const playlist = await res.json();
+
+      playlistOwnerId = playlist.owner_id;
+      document.getElementById("playlist-cover").src = playlist.cover || "/static/playlists/collection-placeholder.png";
+      document.getElementById("playlist-name").textContent = playlist.name;
+      document.getElementById("playlist-owner").textContent = `By ${playlist.owner_name || `User ${playlist.owner_id}`}`;
+
+      const moviesArray = playlist.movies || playlist.Movies || [];
+      document.getElementById("movie-count").textContent = `${moviesArray.length} movies`;
+
+      const moviesDiv = document.getElementById("movies");
+      moviesDiv.innerHTML = "";
+
+      if (moviesArray.length === 0) {
+        moviesDiv.innerHTML = "<p style='text-align: center; color: #9C9CC9; padding: 40px;'>No movies in this playlist yet</p>";
         return;
       }
 
-      try {
-        const res = await fetch(`/api/playlists/${playlistId}`, { credentials: "include" });
-        if (!res.ok) throw new Error("Failed to load playlist");
-        const playlist = await res.json();
+      moviesArray.forEach((movie) => {
+        const movieId = getMovieId(movie);
+        const clickable = !!movieId;
 
-        document.getElementById("playlist-cover").src = playlist.cover || "/static/playlists/collection-placeholder.png";
-        document.getElementById("playlist-name").textContent = playlist.name;
-        document.getElementById("playlist-owner").textContent = "Owner ID: " + playlist.owner_id;
-
-        const moviesDiv = document.getElementById("movies");
-        moviesDiv.innerHTML = "";
-
-        const moviesArray = playlist.movies || playlist.Movies || [];
-        if (moviesArray.length === 0) {
-            moviesDiv.innerHTML = "<p>No movies in this playlist yet</p>";
-        } else {
-         moviesArray.forEach(movie => {
-            const card = document.createElement("div");
-            card.className = "movie-card";
-            card.innerHTML = `
-            <img src="${movie.poster || "/static/movies/poster-placeholder.png"}" alt="${movie.title}">
-             <div class="movie-title">${movie.title}</div>
-            <div class="movie-year">${movie.year}</div>
-            `;
-            moviesDiv.appendChild(card);
-        });
-        }
-
-      } catch (err) {
-        console.error(err);
-        document.querySelector(".playlist-container").innerHTML = "<p>Error loading playlist</p>";
-      }
+        const movieItem = document.createElement("div");
+        movieItem.className = "movie-item";
+        movieItem.innerHTML = `
+          <img src="${movie.poster || movie.poster_url || "/static/movies/poster-placeholder.png"}" 
+               alt="${movie.title}" 
+               class="movie-poster"
+               ${clickable ? `onclick="goToMovie('${movieId}')"` : ''}>
+          <div class="movie-content">
+            <div class="movie-header">
+              <h3 class="movie-title" ${clickable ? `onclick="goToMovie('${movieId}')"` : ''}>
+                ${escapeHtml(movie.title)}
+              </h3>
+              <div class="movie-meta">${movie.year || movie.release_year || 'Unknown year'}</div>
+              ${movie.rating ? `<div class="rating">⭐ ${movie.rating}/10</div>` : ''}
+              <div class="movie-meta">${movie.genres || ''}</div>
+            </div>
+            <div class="movie-description ${!movie.user_description ? 'empty' : ''}">
+              ${escapeHtml(movie.user_description || movie.description || 'No description added yet.')}
+            </div>
+            ${currentUserId === playlistOwnerId ? `
+              <button class="btn btn-edit" onclick="editDescription('${movieId}')">Edit Description</button>
+              <div class="edit-description" id="edit-${movieId}" style="display: none;">
+                <textarea id="textarea-${movieId}">${escapeHtml(movie.user_description || movie.description || '')}</textarea>
+                <div class="edit-buttons">
+                  <button class="btn btn-save" onclick="saveDescription('${movieId}')">Save</button>
+                  <button class="btn btn-cancel" onclick="cancelEdit('${movieId}')">Cancel</button>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+        moviesDiv.appendChild(movieItem);
+      });
+    } catch (err) {
+      console.error(err);
+      document.querySelector(".playlist-container").innerHTML = "<p>Error loading playlist</p>";
     }
+  }
 
-    loadPlaylist();
-  </script>
+  loadPlaylist();
+</script>
 </body>
 </html>
