@@ -5,87 +5,63 @@
   <link href="https://fonts.cdnfonts.com/css/so-normal" rel="stylesheet">
   <title>Playlist</title>
 <style>
-:root {
-    --bg-primary: #0d0d1a;
-    --bg-secondary: #1a1a2e;
-    --window-bg: #16161d;
-    --accent-1: #9370DB;
-    --accent-2: #BA55D3;
-    --accent-3: #663399;
-    --accent-4: #4B0082;
-    --border-light: #483D8B;
-    --border-dark: #301934;
-    --text-primary: #E6E6FA;
-    --text-secondary: #DDA0DD;
-    --crystal-1: #4B0082;
-    --crystal-2: #800080;
-    --crystal-3: #8B008B;
-    --rune-glow: #9400D3;
-    --shadow-purple: #2d1b2d;
-    --void-essence: #120321;
-}
-@font-face {
-  font-family: 'Basiic';
-  src: url('./src/basiic.ttf') format('truetype');
-  font-style: normal;
-    font-weight: 400;
-    text-rendering: optimizeLegibility;
+@import url('https://fonts.googleapis.com/css2?family=Liberation+Mono:wght@400;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* Base Styles */
 body {
-    margin: 0;
-    padding: 20px;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: 'Basiic', sans-serif;
+    font-family: 'Liberation Mono', monospace;
+    background: #000000;
+    color: #c9c9c9;
+    line-height: 1.4;
+    font-size: 13px;
     min-height: 100vh;
 }
 
-/* Playlist Window */
+/* Playlist Container */
 .playlist-container {
-    font-family: 'Basiic', sans-serif;
     max-width: 900px;
-    margin: 0 auto;
-    background: var(--window-bg);
-    border: 2px solid var(--border-light);
-    box-shadow: 0 0 20px var(--shadow-purple);
+    margin: 20px auto;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    box-shadow: 0 0 10px rgba(74, 158, 255, 0.2);
     overflow: hidden;
-    position: relative;
+    border-radius: 0;
 }
 
 /* Playlist Header */
 .playlist-header {
-    font-family: 'Basiic', sans-serif;
     display: flex;
     align-items: center;
+    gap: 10px;
     padding: 10px;
-    background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
-    border-bottom: 2px solid var(--border-light);
-    color: var(--window-bg);
+    background: linear-gradient(90deg, #3b3b3b, #3b3b3b);
+    border-bottom: 1px solid #333;
+    color: #fff;
 }
 
 /* Playlist Info */
 .playlist-info h1 {
-    font-family: 'Basiic', sans-serif;
     font-weight: bold;
-    font-size: 18px;
-    color: var(--accent-2);
-    margin: 0 0 5px 0;
+    font-size: 16px;
+    color: #fff;
 }
-
 .playlist-info p {
-    color: var(--text-secondary);
-    margin: 0;
+    color: #c9c9c9;
+    font-size: 12px;
 }
 
-/* Movies List Grid */
+/* Movies List */
 .movies-list {
     display: grid;
     grid-template-columns: 1fr;
     gap: 10px;
     padding: 10px;
-    background: var(--bg-secondary);
+    background: #0f0f0f;
     max-height: 70vh;
     overflow-y: auto;
 }
@@ -95,12 +71,15 @@ body {
     display: flex;
     gap: 10px;
     padding: 10px;
-    background: var(--window-bg);
-    border: 1px solid var(--border-light);
-    transition: all 0.3s ease;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 0;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 .movie-item:hover {
-    box-shadow: 0 0 10px var(--accent-1);
+    border-color: #434642;
+    box-shadow: 0 0 5px rgba(74, 158, 255, 0.2);
     transform: scale(1.02);
 }
 
@@ -108,8 +87,9 @@ body {
 .movie-poster {
     width: 100px;
     height: 150px;
-    border: 1px solid var(--border-light);
     object-fit: cover;
+    border: 1px solid #333;
+    border-radius: 0;
 }
 
 /* Movie Content */
@@ -121,69 +101,103 @@ body {
 
 /* Movie Title */
 .movie-title {
-    font-family: 'Basiic', sans-serif;
-    color: var(--accent-2);
-    font-size: 16px;
     font-weight: bold;
-    margin: 0 0 5px 0;
+    color: #fff;
+    font-size: 13px;
     cursor: pointer;
+    margin-bottom: 5px;
 }
 .movie-title:hover {
-    text-shadow: 0 0 5px var(--rune-glow);
+    color: #434642;
+}
+
+/* Movie Meta */
+.movie-meta {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 5px;
 }
 
 /* Movie Description */
 .movie-description {
-    font-family: 'Basiic', sans-serif;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-light);
-    padding: 8px;
-    font-size: 14px;
-    color: var(--text-primary);
+    font-size: 11px;
+    line-height: 1.5;
+    margin-top: 5px;
+    padding: 6px;
+    background: #0f0f0f;
+    border: 1px solid #333;
+    color: #c9c9c9;
+    border-radius: 0;
 }
 
 /* Buttons */
 .btn {
-    padding: 5px 10px;
-    font-size: 12px;
-    background: var(--window-bg);
-    color: var(--accent-1);
-    border: 1px solid var(--border-light);
+    background: #333;
+    color: #c9c9c9;
+    border: 1px solid #555;
+    padding: 6px 12px;
+    font-size: 11px;
     cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
     margin-top: 5px;
+    border-radius: 0;
+    transition: all 0.2s;
 }
 .btn:hover {
-    background: var(--accent-3);
-    color: var(--text-primary);
+    background: #434642;
+    color: #fff;
+    border-color: #434642;
 }
 
-/* Slot Styling */
-slot {
-    display: block;
-    will-change: transform;
-    font-family: 'Basiic', sans-serif;
-    color: var(--accent-1);
-    transition: transform 0.5s ease;
+/* Edit Description Section */
+.edit-description {
+    margin-top: 5px;
 }
-:host(:read-write) > slot {
-    transform: none !important;
-    color: var(--accent-2);
+.edit-description textarea {
+    width: 100%;
+    background: #0f0f0f;
+    border: 1px solid #333;
+    color: #c9c9c9;
+    padding: 6px;
+    font-family: 'Liberation Mono', monospace;
+    font-size: 12px;
+    border-radius: 0;
 }
-@media print, (prefers-reduced-motion) {
-    slot { transform: none !important; }
+.edit-buttons {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
+/* Scrollbar Styling */
+.movies-list::-webkit-scrollbar,
+.edit-description textarea::-webkit-scrollbar {
     width: 12px;
 }
-::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
+.movies-list::-webkit-scrollbar-track,
+.edit-description textarea::-webkit-scrollbar-track {
+    background: #0f0f0f;
 }
-::-webkit-scrollbar-thumb {
-    background: var(--accent-1);
-    border: 1px solid var(--border-light);
+.movies-list::-webkit-scrollbar-thumb,
+.edit-description textarea::-webkit-scrollbar-thumb {
+    background: #434642;
+    border: 1px solid #333;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .playlist-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .movies-list {
+        grid-template-columns: 1fr;
+        max-height: none;
+    }
+}
+
+
 </style>
 
 
