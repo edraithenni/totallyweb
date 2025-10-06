@@ -6,8 +6,18 @@
 <link href="https://fonts.cdnfonts.com/css/so-normal" rel="stylesheet">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
+   
+@font-face {
+  font-family: 'Basiic';
+  src: url('./src/basiic.ttf') format('truetype');
+  font-style: normal;
+    font-weight: 400;
+    text-rendering: optimizeLegibility;
+}
     body {
-      font-family: 'So Normal', system-ui;
+      
+       font-family: 'Basiic', sans-serif;
+       color: #9C9CC9;
     background:#000000;
     background-repeat: repeat;
     background-size: 200px 200px;
@@ -18,13 +28,33 @@
       position: relative;
       max-width: 600px;
       margin: 0 auto;
-     background-image: url("src/skeleton.jpg");
+     background-color: #0A1B31;
       padding: 1.5rem;
       box-shadow: 0 2px 6px rgba(0,0,0,.15);
     
-      border: 2px solid #3a3a90;
+      border: 2px solid #3f3d40;
       background-blend-mode: lighten;
     }
+
+.profile-header {
+  position: absolute; 
+  top: 0;
+  left: 0;
+  width: 100%;       
+  height: 150px;     
+  overflow: hidden;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  z-index: 0;  
+}
+
+.profile-header img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
    
     .profile-card::after {
   content: "";
@@ -55,12 +85,14 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
       border:2px solid #fff;
       box-shadow:0 1px 4px rgba(0,0,0,.12);
       cursor:pointer;
+      z-index: 1; 
     }
     .avatar:hover { transform: scale(1.05); }
     .bio { 
     white-space: pre-wrap; 
     margin-top: .5rem; 
-    color: #333; 
+    background-color: #000000 ;
+    color: #d8d3da; 
 }
 
     .muted { color:#282222; font-size: 25px; }
@@ -135,7 +167,9 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
       margin-top: 1rem;
     }
     .playlist-card {
-      background-color: #cd77ff ;
+      background-color: #0F1C24 ;
+      color: #41D3D2;
+      border: 1px solid #41D3D2;
       border-radius: 0;
       box-shadow: 0 2px 5px rgba(0,0,0,.1);
       overflow: hidden;
@@ -192,17 +226,19 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
   }
 
   .btn-edit {
-    background-color: #ffb3ff;
+    background-color: #000000;
+    font-family: 'Basiic';
     border-radius: 0;
     color: white;
   }
   .btn-edit:hover {
-    background-color: #5656b0;
+    background-color: #41D3D2;
     border-radius: 0;
   }
 
   .btn-save {
-    background-color: #ffb3ff;
+    font-family: 'Basiic';
+    background-color: #41D3D2;
     border-radius: 0;
     color: white;
   }
@@ -212,6 +248,7 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
   }
 
   .btn-cancel {
+    font-family: 'Basiic';
     background-color: #ffb3ff;
     border-radius: 0;
     color: white;
@@ -229,7 +266,8 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
 
     /* === Notifications === */
     #notifBtn {
-  background:#3a3a90; 
+  background:#000000; 
+  border: 1px solid #41D3D2;
   border:none; 
   border-radius:0; 
   position:relative; 
@@ -254,7 +292,13 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
   </style>
 </head>
 <body>
+  
+
   <div class="profile-card">
+    <div class="profile-header">
+      <img id="profileHeaderImg" src="https://64.media.tumblr.com/6720afe4b23fff20fb0a55a8733db945/147bfebdf112f180-c6/s400x600/b6f51cddbdd98ddab9e322b88807158dac343608.gifv" alt="Profile header">
+  </div>
+
     <h1 id="profileTitle">Loading...</h1>
 
     <!-- Notification bell -->
@@ -346,7 +390,7 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
         viewingProfileId = params.get("id");
 
         const resMe = await fetch("/api/users/me", { credentials: "include" });
-        if (!resMe.ok) throw new Error("Ошибка загрузки текущего пользователя");
+        if (!resMe.ok) throw new Error("Error loading current user");
         const me = await resMe.json();
         currentUserId = me.id;
 
@@ -356,7 +400,7 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
         }
 
         const res = await fetch(`/api/users/${viewingProfileId}`, { credentials: "include" });
-        if (!res.ok) throw new Error("Ошибка HTTP " + res.status);
+        if (!res.ok) throw new Error("HTTP error" + res.status);
         const user = await res.json();
 
         document.getElementById("profileTitle").textContent = escapeHtml(user.name || "Your profile");
@@ -392,7 +436,7 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
   block.innerHTML = "Loading playlists...";
   try {
     const res = await fetch(`/api/users/${userId}/playlists`, { credentials: "include" });
-    if (!res.ok) throw new Error("Ошибка HTTP " + res.status);
+    if (!res.ok) throw new Error("HTTP error" + res.status);
     const data = await res.json();
 
     const playlists = Array.isArray(data) ? data : data.playlists || [];
@@ -448,7 +492,7 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
   block.innerHTML = "Loading reviews...";
   try {
     const res = await fetch(`/api/users/${userId}/reviews`, { credentials: "include" });
-    if (!res.ok) throw new Error("Ошибка HTTP " + res.status);
+    if (!res.ok) throw new Error("HTTP error" + res.status);
     const reviews = await res.json();
 
     if (!reviews.length) {
@@ -484,14 +528,14 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
     avatarInput.addEventListener('change', async (evt) => {
       const file = evt.target.files[0];
       if (!file) return;
-      if (!file.type.startsWith('image/')) { uploadStatus.textContent = "Пожалуйста, выберите изображение."; return; }
-      if (file.size > 5 * 1024 * 1024) { uploadStatus.textContent = "Файл слишком большой (макс 5 MB)."; return; }
+      if (!file.type.startsWith('image/')) { uploadStatus.textContent = "Please select the picture."; return; }
+      if (file.size > 5 * 1024 * 1024) { uploadStatus.textContent = "Dile is too big(max 5MB)."; return; }
 
       const reader = new FileReader();
       reader.onload = () => { document.getElementById("avatarImg").src = reader.result; };
       reader.readAsDataURL(file);
 
-      uploadStatus.textContent = "Загрузка…";
+      uploadStatus.textContent = "Loading…";
       const form = new FormData();
       form.append('avatar', file);
 
@@ -501,13 +545,13 @@ background-image: url('https://forum.melonland.net/Themes/pimp-my-classic/images
           credentials: 'include',
           body: form
         });
-        if (!resp.ok) throw new Error("Ошибка сервера " + resp.status);
+        if (!resp.ok) throw new Error("Server error" + resp.status);
         const data = await resp.json();
         document.getElementById("avatarImg").src = data.avatar || "/static/src/default_pfp.png";
-        uploadStatus.textContent = "Аватар обновлён.";
+        uploadStatus.textContent = "Avatar updated.";
       } catch (err) {
         console.error(err);
-        uploadStatus.textContent = "Ошибка при загрузке аватара.";
+        uploadStatus.textContent = "Error loading avatar.";
         loadProfile();
       } finally {
         avatarInput.value = "";
