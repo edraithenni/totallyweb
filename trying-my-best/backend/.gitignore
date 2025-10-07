@@ -1,0 +1,27 @@
+
+*.exe
+*.out
+*.app
+
+bin/
+dist/
+
+*.test
+*.prof
+*.trace
+
+vendor/    # if using vendor mode
+
+coverage.html
+coverage.out
+
+.idea/
+.vscode/
+*.swp
+*.swo
+
+.DS_Store
+Thumbs.db
+
+go.work
+go.work.sum
