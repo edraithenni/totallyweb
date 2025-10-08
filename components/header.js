@@ -33,7 +33,7 @@ export default function Header() {
       </Head>
 
       <header>
-        <h1>Totally cats</h1>
+        <h1 onClick={() => (window.location.href = "/search")}>Totally cats</h1>
         <nav>
           {!loggedIn ? (
             <>

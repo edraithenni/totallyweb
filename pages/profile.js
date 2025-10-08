@@ -6,7 +6,7 @@ import PlaylistCard from "../components/PlaylistCard";
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [playlists, setPlaylists] = useState([]);
-  const [reviews, setReviews] = useState([]); // Инициализируем пустым массивом
+  const [reviews, setReviews] = useState([]);
   const [bioEdit, setBioEdit] = useState(false);
   const [bioText, setBioText] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("/src/default_pfp.png");
@@ -45,7 +45,7 @@ export default function ProfilePage() {
         }
       } catch (err) {
         console.error("Error loading profile:", err);
-        setReviews([]); // Убедимся, что reviews всегда массив
+        setReviews([]);
       } finally {
         setLoading(false);
       }
@@ -56,18 +56,10 @@ export default function ProfilePage() {
         const res = await fetch(`/api/users/${userId}/playlists`, { credentials: "include" });
         if (res.ok) {
           const data = await res.json();
-          // Обрабатываем разные форматы ответа
-          if (Array.isArray(data)) {
-            setPlaylists(data);
-          } else if (data && Array.isArray(data.playlists)) {
-            setPlaylists(data.playlists);
-          } else if (data && data.data && Array.isArray(data.data)) {
-            setPlaylists(data.data);
-          } else {
-            setPlaylists([]);
-          }
-        } else {
-          setPlaylists([]);
+          if (Array.isArray(data)) setPlaylists(data);
+          else if (data.playlists) setPlaylists(data.playlists);
+          else if (data.data) setPlaylists(data.data);
+          else setPlaylists([]);
         }
       } catch (error) {
         console.error("Error loading playlists:", error);
@@ -80,18 +72,10 @@ export default function ProfilePage() {
         const res = await fetch(`/api/users/${userId}/reviews`, { credentials: "include" });
         if (res.ok) {
           const data = await res.json();
-          // Обрабатываем разные форматы ответа
-          if (Array.isArray(data)) {
-            setReviews(data);
-          } else if (data && Array.isArray(data.reviews)) {
-            setReviews(data.reviews);
-          } else if (data && data.data && Array.isArray(data.data)) {
-            setReviews(data.data);
-          } else {
-            setReviews([]);
-          }
-        } else {
-          setReviews([]);
+          if (Array.isArray(data)) setReviews(data);
+          else if (data.reviews) setReviews(data.reviews);
+          else if (data.data) setReviews(data.data);
+          else setReviews([]);
         }
       } catch (error) {
         console.error("Error loading reviews:", error);
@@ -101,6 +85,54 @@ export default function ProfilePage() {
 
     loadProfile();
   }, []);
+
+  // === Восстановлено: уведомления с WebSocket ===
+  useEffect(() => {
+    const notifBtn = document.getElementById("notifBtn");
+    const notifMenu = document.getElementById("notifMenu");
+    const notifList = document.getElementById("notifList");
+    const notifCountSpan = document.getElementById("notifCount");
+    let notifCount = 0;
+
+    function addNotification(msg) {
+      const li = document.createElement("li");
+      li.textContent = msg;
+      notifList.prepend(li);
+      notifCount++;
+      notifCountSpan.textContent = notifCount;
+      notifCountSpan.style.display = "inline";
+    }
+
+    if (notifBtn && notifMenu) {
+      notifBtn.addEventListener("click", () => {
+        notifMenu.style.display = notifMenu.style.display === "block" ? "none" : "block";
+        if (notifMenu.style.display === "block") {
+          notifCount = 0;
+          notifCountSpan.style.display = "none";
+        }
+      });
+    }
+
+    let ws;
+    async function initWS() {
+      try {
+        const meRes = await fetch("/api/users/me", { credentials: "include" });
+        const me = await meRes.json();
+        if (!me?.id) return;
+        ws = new WebSocket(`ws://localhost:8080/ws?user_id=${me.id}`);
+        ws.onmessage = (event) => addNotification(event.data);
+        ws.onclose = () => setTimeout(initWS, 2000);
+      } catch (err) {
+        console.error("WebSocket error:", err);
+      }
+    }
+    initWS();
+
+    return () => {
+      if (ws) ws.close();
+    };
+  }, []);
+  // === Конец восстановления уведомлений ===
 
   const isOwnProfile = currentUserId && viewingProfileId && currentUserId === viewingProfileId;
 
@@ -133,11 +165,31 @@ export default function ProfilePage() {
       <div className="profile-card">
         <div className="profile-header"></div>
 
+        {/* === Уведомления === */}
+        <div className="notif-container">
+          <button id="notifBtn" className="notif-btn">
+            <img src="/src/mail-pink.png" alt="Notifications" />
+            <span id="notifCount" className="notif-count">0</span>
+          </button>
+          <div id="notifMenu" className="notif-menu">
+            <p>Notifications</p>
+            <ul id="notifList"></ul>
+          </div>
+        </div>
+
         <div className="avatar-row">
           <img className="avatar" src={avatarUrl} alt="avatar" />
           <div className="name-and-email">
             <h1 className="name">{user?.name || "Loading..."}</h1>
-            <div><b>Email:</b> {isOwnProfile ? user?.email || "—" : "—"}</div>
+
+            {/* Исправлено: email теперь отображается корректно */}
+            {isOwnProfile ? (
+              <div className="email">
+                <b>Email:</b> {user?.email || "—"}
+              </div>
+            ) : (
+              <div className="email muted">Private</div>
+            )}
           </div>
         </div>
 
@@ -145,26 +197,28 @@ export default function ProfilePage() {
         <h3>Bio</h3>
         {!bioEdit && <div className="bio">{bioText}</div>}
         {bioEdit && (
-          <div>
+          <div className="bio-edit">
             <textarea
-              style={{ width: "100%", fontSize: 20 }}
+              style={{ width: "100%", fontSize: 18 }}
               value={bioText}
               onChange={(e) => setBioText(e.target.value)}
             />
-            <button onClick={handleBioSave} className="btn btn-save">Save</button>
-            <button onClick={() => setBioEdit(false)} className="btn btn-cancel">Cancel</button>
+            <div className="bio-buttons">
+              <button onClick={handleBioSave} className="btn btn-save">Save</button>
+              <button onClick={() => setBioEdit(false)} className="btn btn-cancel">Cancel</button>
+            </div>
           </div>
         )}
+
+        {/* Исправлено: кнопка "Edit" теперь снова активна */}
         {!bioEdit && isOwnProfile && (
-          <button onClick={() => setBioEdit(true)} className="btn btn-edit">
-            Edit
-          </button>
+          <button onClick={() => setBioEdit(true)} className="btn btn-edit">Edit</button>
         )}
 
         <hr />
         <h3>Playlists</h3>
         <div className="playlists-grid">
-          {!playlists || playlists.length === 0 ? (
+          {(!playlists || playlists.length === 0) ? (
             <p className="muted">No playlists yet</p>
           ) : (
             playlists.map((pl) => (
@@ -180,7 +234,7 @@ export default function ProfilePage() {
         <hr />
         <h3>Reviews</h3>
         <div>
-          {!reviews || reviews.length === 0 ? (
+          {(!reviews || reviews.length === 0) ? (
             <p className="muted">No reviews yet</p>
           ) : (
             reviews.map((rv) => (
@@ -193,7 +247,6 @@ export default function ProfilePage() {
                   rating: rv.rating,
                   content: rv.content,
                   created_at: rv.created_at,
-                  // Добавляем все необходимые поля для ReviewCard
                   ...rv
                 }}
               />
@@ -206,8 +259,6 @@ export default function ProfilePage() {
         @font-face {
           font-family: 'Basiic';
           src: url('/src/basiic.ttf') format('truetype');
-          font-weight: 400;
-          font-style: normal;
         }
 
         .profile-card {
@@ -234,6 +285,58 @@ export default function ProfilePage() {
           z-index: 0;
         }
 
+        /* === уведомления === */
+        .notif-container {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          z-index: 5;
+        }
+        .notif-btn {
+          position: relative;
+          background: #000;
+          border: 1px solid #41d3d2;
+          padding: 4px;
+        }
+        .notif-btn img {
+          width: 35px;
+          height: 35px;
+        }
+        .notif-count {
+          display: none;
+          position: absolute;
+          top: -5px;
+          right: -5px;
+          background: red;
+          color: white;
+          padding: 0 6px;
+          font-size: 0.75rem;
+        }
+        .notif-menu {
+          display: none;
+          position: absolute;
+          right: 0;
+          top: 2.5rem;
+          background: #24203e;
+          color: #fff;
+          border: 1px solid #3a3a90;
+          min-width: 250px;
+          max-height: 300px;
+          overflow-y: auto;
+          box-shadow: 0 4px 12px rgba(0,0,0,.3);
+          font-family: 'Basiic', sans-serif;
+        }
+        .notif-menu p {
+          padding: 0.5rem;
+          margin: 0;
+          border-bottom: 1px solid #3a3a90;
+        }
+        .notif-menu ul {
+          list-style: none;
+          margin: 0;
+          padding: 0.5rem;
+        }
+
         .avatar-row {
           display: flex;
           gap: 1rem;
@@ -250,13 +353,17 @@ export default function ProfilePage() {
           object-fit: cover;
           border: 2px solid #fff;
           background: #000;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
         }
 
         .name {
           margin: 0;
-          color: #ffffff;
+          color: #fff;
           font-size: 1.8rem;
+        }
+
+        .email {
+          color: #9c9cc9;
+          margin-top: 4px;
         }
 
         .bio {
@@ -267,9 +374,18 @@ export default function ProfilePage() {
           color: #fff;
         }
 
-        .muted {
-          color: #5c5c5c;
-          font-size: 1rem;
+        .bio-edit {
+          margin-top: 0.5rem;
+        }
+        .bio-buttons {
+          margin-top: 0.5rem;
+        }
+
+        .playlists-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+          gap: 1rem;
+          margin-top: 1rem;
         }
 
         .btn {
@@ -281,37 +397,24 @@ export default function ProfilePage() {
         }
 
         .btn-edit {
-          background-color: #000;
+          background: #000;
           color: #fff;
           border: 1px solid #41d3d2;
         }
 
         .btn-save {
-          background-color: #41d3d2;
+          background: #41d3d2;
           color: #000;
           border: 1px solid #41d3d2;
         }
 
         .btn-cancel {
-          background-color: #ffb3ff;
+          background: #ffb3ff;
           color: #000;
           border: 1px solid #ffb3ff;
-        }
-
-        .playlists-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-          gap: 1rem;
-          margin-top: 1rem;
-        }
-
-        .loading {
-          text-align: center;
-          padding: 2rem;
-          color: #9c9cc9;
-          font-family: 'Basiic', sans-serif;
         }
       `}</style>
     </>
   );
+
 }
