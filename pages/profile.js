@@ -6,55 +6,96 @@ import PlaylistCard from "../components/PlaylistCard";
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [playlists, setPlaylists] = useState([]);
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState([]); // Инициализируем пустым массивом
   const [bioEdit, setBioEdit] = useState(false);
   const [bioText, setBioText] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("/src/default_pfp.png");
   const [currentUserId, setCurrentUserId] = useState(null);
   const [viewingProfileId, setViewingProfileId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadProfile() {
       try {
+        setLoading(true);
         const params = new URLSearchParams(window.location.search);
         let profileId = params.get("id");
 
         const resMe = await fetch("/api/users/me", { credentials: "include" });
-        const me = await resMe.json();
-        setCurrentUserId(me.id);
+        if (resMe.ok) {
+          const me = await resMe.json();
+          setCurrentUserId(me.id);
 
-        if (!profileId) {
-          profileId = me.id;
-          window.history.replaceState(null, "", `/profile?id=${profileId}`);
+          if (!profileId) {
+            profileId = me.id;
+            window.history.replaceState(null, "", `/profile?id=${profileId}`);
+          }
+          setViewingProfileId(profileId);
+
+          const res = await fetch(`/api/users/${profileId}`, { credentials: "include" });
+          if (res.ok) {
+            const data = await res.json();
+            setUser(data);
+            setBioText(data.description || "—");
+            setAvatarUrl(data.avatar || "/src/default_pfp.png");
+
+            await loadPlaylists(profileId);
+            await loadReviews(profileId);
+          }
         }
-        setViewingProfileId(profileId);
-
-        const res = await fetch(`/api/users/${profileId}`, { credentials: "include" });
-        const data = await res.json();
-        setUser(data);
-        setBioText(data.description || "—");
-        setAvatarUrl(data.avatar || "/src/default_pfp.png");
-
-        loadPlaylists(profileId);
-        loadReviews(profileId);
       } catch (err) {
-        console.error(err);
+        console.error("Error loading profile:", err);
+        setReviews([]); // Убедимся, что reviews всегда массив
+      } finally {
+        setLoading(false);
       }
     }
 
     async function loadPlaylists(userId) {
-      const res = await fetch(`/api/users/${userId}/playlists`, { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
-        setPlaylists(data.playlists || []);
+      try {
+        const res = await fetch(`/api/users/${userId}/playlists`, { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          // Обрабатываем разные форматы ответа
+          if (Array.isArray(data)) {
+            setPlaylists(data);
+          } else if (data && Array.isArray(data.playlists)) {
+            setPlaylists(data.playlists);
+          } else if (data && data.data && Array.isArray(data.data)) {
+            setPlaylists(data.data);
+          } else {
+            setPlaylists([]);
+          }
+        } else {
+          setPlaylists([]);
+        }
+      } catch (error) {
+        console.error("Error loading playlists:", error);
+        setPlaylists([]);
       }
     }
 
     async function loadReviews(userId) {
-      const res = await fetch(`/api/users/${userId}/reviews`, { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
-        setReviews(data);
+      try {
+        const res = await fetch(`/api/users/${userId}/reviews`, { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          // Обрабатываем разные форматы ответа
+          if (Array.isArray(data)) {
+            setReviews(data);
+          } else if (data && Array.isArray(data.reviews)) {
+            setReviews(data.reviews);
+          } else if (data && data.data && Array.isArray(data.data)) {
+            setReviews(data.data);
+          } else {
+            setReviews([]);
+          }
+        } else {
+          setReviews([]);
+        }
+      } catch (error) {
+        console.error("Error loading reviews:", error);
+        setReviews([]);
       }
     }
 
@@ -76,6 +117,15 @@ export default function ProfilePage() {
       console.error(err);
     }
   };
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="loading">Loading...</div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -114,31 +164,41 @@ export default function ProfilePage() {
         <hr />
         <h3>Playlists</h3>
         <div className="playlists-grid">
-          {playlists.length === 0 && <p className="muted">No playlists yet</p>}
-          {playlists.map((pl) => (
-            <PlaylistCard
-              key={pl.id}
-              playlist={pl}
-              onClick={() => (window.location.href = `/playlist?id=${pl.id}`)}
-            />
-          ))}
+          {!playlists || playlists.length === 0 ? (
+            <p className="muted">No playlists yet</p>
+          ) : (
+            playlists.map((pl) => (
+              <PlaylistCard
+                key={pl.id}
+                playlist={pl}
+                onClick={() => (window.location.href = `/playlist?id=${pl.id}`)}
+              />
+            ))
+          )}
         </div>
 
         <hr />
         <h3>Reviews</h3>
         <div>
-          {reviews.length === 0 && <p className="muted">No reviews yet</p>}
-          {reviews.map((rv) => (
-            <ReviewCard
-              key={rv.id}
-              review={{
-                user_id: rv.user_id,
-                movie_title: rv.movie_title,
-                rating: rv.rating,
-                content: rv.content,
-              }}
-            />
-          ))}
+          {!reviews || reviews.length === 0 ? (
+            <p className="muted">No reviews yet</p>
+          ) : (
+            reviews.map((rv) => (
+              <ReviewCard
+                key={rv.id}
+                review={{
+                  id: rv.id,
+                  user_id: rv.user_id,
+                  movie_title: rv.movie_title,
+                  rating: rv.rating,
+                  content: rv.content,
+                  created_at: rv.created_at,
+                  // Добавляем все необходимые поля для ReviewCard
+                  ...rv
+                }}
+              />
+            ))
+          )}
         </div>
       </div>
 
@@ -243,6 +303,13 @@ export default function ProfilePage() {
           grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
           gap: 1rem;
           margin-top: 1rem;
+        }
+
+        .loading {
+          text-align: center;
+          padding: 2rem;
+          color: #9c9cc9;
+          font-family: 'Basiic', sans-serif;
         }
       `}</style>
     </>

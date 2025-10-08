@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Header from "../components/header";
 import ReviewCard from "../components/ReviewCard";
+import AddToPlaylistButton from "../components/AddToPlaylistButton";
 
 export default function DetailsPage() {
   const [movie, setMovie] = useState(null);
@@ -13,6 +14,7 @@ export default function DetailsPage() {
 
   useEffect(() => {
     if (!movieId) return;
+    
     fetch(`/api/movies/${movieId}`)
       .then(res => res.json())
       .then(setMovie)
@@ -59,6 +61,7 @@ export default function DetailsPage() {
       <div className="movie-container">
         <div className="movie-poster">
           <img src={movie.poster} alt={movie.title} />
+          <AddToPlaylistButton movieId={movieId} movieTitle={movie.title} />
         </div>
         <div className="movie-info">
           <h2>{movie.title}</h2>
@@ -95,6 +98,11 @@ export default function DetailsPage() {
           max-width: 1200px;
           margin: 0 auto;
         }
+        .movie-poster {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
         .movie-poster img {
           width: 350px;
           height: auto;
@@ -107,6 +115,7 @@ export default function DetailsPage() {
         .movie-info p { font-size: 20px; line-height: 1.6; margin-bottom: 15px; }
         .movie-info b { color: #8dd9ff; }
         .movie-gif { width: 250px; flex-shrink: 0; }
+
         .reviews-section {
           max-width: 800px;
           margin: 20px auto;
