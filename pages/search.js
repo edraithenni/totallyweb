@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { useState } from "react";
 import Header from "../components/header";
+import HudScene from "../components/HudScene"; // 👈 3D-сцена
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -22,6 +23,8 @@ export default function SearchPage() {
     }
   }
 
+  const showHud = !query.trim() && movies.length === 0 && !loading; // 👈 логика показа 3D-сцены
+
   return (
     <>
       <Head>
@@ -29,7 +32,19 @@ export default function SearchPage() {
         <title>Totally cats</title>
       </Head>
 
-      <div style={{ fontFamily: '"So Bad", sans-serif', background: "#000", color: "#8dd9ff", minHeight: "100vh" }}>
+      {/* 👇 показываем только если нет поиска и фильмов */}
+      {showHud && <HudScene />}
+
+      <div
+        style={{
+          fontFamily: '"So Bad", sans-serif',
+          background: "transparent", // 3D видно за контентом
+          color: "#8dd9ff",
+          minHeight: "100vh",
+          position: "relative",
+          zIndex: 1, // контент поверх 3D
+        }}
+      >
         <Header />
 
         <div style={{ maxWidth: 600, margin: "2rem auto", display: "flex", gap: ".5rem" }}>
@@ -46,7 +61,10 @@ export default function SearchPage() {
               color: "#8dd9ff",
             }}
           />
-          <button onClick={searchMovies} style={{ background: "#584fdb", color: "#8dd9ff", padding: ".6rem 1rem" }}>
+          <button
+            onClick={searchMovies}
+            style={{ background: "#584fdb", color: "#8dd9ff", padding: ".6rem 1rem" }}
+          >
             {loading ? "Loading..." : "Search"}
           </button>
         </div>
