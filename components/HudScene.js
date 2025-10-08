@@ -27,7 +27,6 @@ function StarField({ mouse }) {
     const t = state.clock.getElapsedTime();
 
     if (ref.current) {
-      // ускорим вращение
       ref.current.rotation.x = t * 0.5 + mouse[1] * 0.6;
       ref.current.rotation.y = t * 0.7 + mouse[0] * 0.6;
     }
@@ -72,38 +71,59 @@ export default function StarWindow() {
   }, []);
 
   return (
-    <div
-      style={{
-        width: "32vw",
-        height: "32vh",
-        position: "fixed",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        background: "black",
-        border: "1px solid rgba(190,190,190,0.4)",
-        boxShadow: "0 0 30px rgba(200,200,200,0.2)",
-        overflow: "hidden",
-        zIndex: 50,
-      }}
-    >
-      <Canvas
-        camera={{ position: [0, 0, 1], fov: 75 }}
-        style={{ background: "black" }}
+    <>
+      <div
+        style={{
+          width: "32vw",
+          height: "32vh",
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          background: "black",
+          border: "1px solid rgba(190,190,190,0.4)",
+          boxShadow: "0 0 30px rgba(200,200,200,0.2)",
+          overflow: "hidden",
+          zIndex: 50,
+        }}
       >
-        <StarField mouse={mouse} />
-      </Canvas>
+        <Canvas
+          camera={{ position: [0, 0, 1], fov: 75 }}
+          style={{ background: "black" }}
+        >
+          <StarField mouse={mouse} />
+        </Canvas>
+
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAG0lEQVR4Xu3BAQ0AAADCIPunNsN+YAAAAAAAAAD4HAGMgAAGpIHOIAAAAASUVORK5CYII=')",
+            opacity: 0.08,
+            pointerEvents: "none",
+          }}
+        />
+      </div>
+
       {}
       <div
         style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAG0lEQVR4Xu3BAQ0AAADCIPunNsN+YAAAAAAAAAD4HAGMgAAGpIHOIAAAAASUVORK5CYII=')",
-          opacity: 0.08,
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, 20vh)", 
+          color: "rgba(200,200,200,0.7)",
+          fontFamily: "'Courier New', monospace",
+          fontStyle: "italic",
+          fontSize: "1rem",
           pointerEvents: "none",
+          zIndex: 50,
+          textAlign: "center",
         }}
-      />
-    </div>
+      >
+        Neural pathways through digital space...
+      </div>
+    </>
   );
 }
