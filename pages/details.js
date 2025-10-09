@@ -89,9 +89,15 @@ export default function DetailsPage() {
       </div>
 
       <style jsx>{`
-        body, html { margin: 0; font-family: "So Bad", sans-serif; color: #333; background: #000; }
+        @font-face {
+          font-family: 'Basiic';
+          src: url('/src/basiic.ttf') format('truetype');
+        }
+
+        body, html { margin: 0; font-family: "Basiic", sans-serif; color: #333; background: #000; }
         .movie-container {
           display: flex;
+          font-family: 'Basiic', sans-serif;
           gap: 40px;
           padding: 40px 20px;
           align-items: flex-start;
@@ -113,18 +119,20 @@ export default function DetailsPage() {
         .movie-info { flex: 1; }
         .movie-info h2 { font-size: 36px; margin-bottom: 20px; color: #ffc659; }
         .movie-info p { font-size: 20px; line-height: 1.6; margin-bottom: 15px; }
-        .movie-info b { color: #8dd9ff; }
+        .movie-info b { color: #4f4f4fff; }
         .movie-gif { width: 250px; flex-shrink: 0; }
 
         .reviews-section {
+          font-family: 'Basiic', sans-serif;
           max-width: 800px;
           margin: 20px auto;
           padding: 20px;
           border-top: 2px solid #584fdb;
           color: #8dd9ff;
         }
-        .reviews-section h3 { font-size: 28px; color: #ffc659; margin-bottom: 15px; }
+        .reviews-section h3 { font-family: 'Basiic', sans-serif; font-size: 28px; color: #ffc659; margin-bottom: 15px; }
         .review-form {
+          font-family: 'Basiic', sans-serif;
           margin-top: 20px;
           padding: 15px;
           border: 2px solid #d03e78;
@@ -136,22 +144,24 @@ export default function DetailsPage() {
           color: #d03e78;
         }
         .review-form textarea, .review-form input {
-          width: 95%;
+          font-family: 'Basiic', sans-serif;
+          width: 100%;
           margin-bottom: 10px;
           padding: 8px;
           background: #222;
           border: 1px solid #d03e78;
           color: #fff;
-          font-family: "So Bad", sans-serif;
+          font-family: 'Basiic', sans-serif;
         }
         .review-form button {
-          background: #584fdb;
-          color: #8dd9ff;
-          border: 2px solid #ffc659;
+
+          background: #47101bff;
+          color: #d03e78;
+          border: 2px solid #d03e78;
           outline: 2px solid #fb5255;
           cursor: pointer;
           padding: 6px 12px;
-          font-family: "So Bad", sans-serif;
+          font-family: 'Basiic', sans-serif;
         }
       `}</style>
     </>

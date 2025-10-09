@@ -77,7 +77,7 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
       if (res.ok) {
         const result = await res.json();
         console.log('Add to playlist success:', result);
-        alert("🎬 Movie added to playlist!");
+        alert("Movie added to playlist!");
         setShowPlaylistModal(false);
       } else {
         const errorText = await res.text();
@@ -178,7 +178,7 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
         onClick={openModal}
         disabled={isLoading}
       >
-        <span className="btn-icon">🎵</span>
+        <span className="btn-icon"></span>
         <span className="btn-text">Add to Playlist</span>
         <div className="btn-gradient"></div>
       </button>
@@ -246,14 +246,19 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
       )}
 
       <style jsx>{`
+       @font-face {
+          font-family: 'Basiic';
+          src: url('/src/basiic.ttf') format('truetype');
+        }
+
         .add-to-playlist-btn {
           position: relative;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #fb5255 0%, #d03e78 100%);
           color: white;
           border: none;
           padding: 12px 24px;
-          border-radius: 8px;
-          font-family: "So Bad", sans-serif;
+          border-radius: 0px;
+          font-family: 'Basiic', sans-serif;
           font-size: 16px;
           font-weight: 600;
           cursor: pointer;
@@ -327,7 +332,7 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
           border: 2px solid;
           border-image: linear-gradient(135deg, #667eea, #764ba2) 1;
           padding: 30px;
-          border-radius: 12px;
+          border-radius: 0px;
           max-width: 500px;
           width: 100%;
           max-height: 80vh;
@@ -362,7 +367,7 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
           border: 1px solid #f56565;
           color: #feb2b2;
           padding: 12px;
-          border-radius: 6px;
+          border-radius: 0px;
           margin-bottom: 15px;
           font-size: 14px;
           line-height: 1.4;
@@ -389,9 +394,9 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
           padding: 12px;
           background: #2d3748;
           border: 1px solid #4a5568;
-          border-radius: 6px;
+          border-radius: 0px;
           color: white;
-          font-family: "So Bad", sans-serif;
+          font-family: 'Basiic', sans-serif;
           transition: all 0.3s ease;
         }
 
@@ -410,9 +415,9 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
           color: white;
           border: none;
           padding: 12px 20px;
-          border-radius: 6px;
+          border-radius: 0px;
           cursor: pointer;
-          font-family: "So Bad", sans-serif;
+          font-family: 'Basiic', sans-serif;
           font-weight: 600;
           transition: all 0.3s ease;
           white-space: nowrap;
@@ -442,14 +447,14 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
           font-style: italic;
           padding: 20px;
           background: rgba(45, 55, 72, 0.5);
-          border-radius: 6px;
+          border-radius: 0px;
         }
 
         .playlist-list {
           max-height: 200px;
           overflow-y: auto;
           border: 1px solid #4a5568;
-          border-radius: 6px;
+          border-radius: 0px;
           background: #2d3748;
         }
 
@@ -487,7 +492,7 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
           background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
           color: white;
           border: none;
-          border-radius: 6px;
+          border-radius: 0px;
           cursor: pointer;
           font-family: "So Bad", sans-serif;
           font-weight: 600;
@@ -500,7 +505,7 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
           background: linear-gradient(135deg, #d69e2e 0%, #ed8936 100%);
           color: white;
           border: none;
-          border-radius: 6px;
+          border-radius: 0px;
           cursor: pointer;
           font-family: "So Bad", sans-serif;
           font-weight: 600;
@@ -531,7 +536,7 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
 
         .playlist-list::-webkit-scrollbar-thumb {
           background: #667eea;
-          border-radius: 3px;
+          border-radius: 0px;
         }
 
         .playlist-list::-webkit-scrollbar-thumb:hover {

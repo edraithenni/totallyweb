@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { useState } from "react";
 import Header from "../components/header";
-import HudScene from "../components/HudScene"; // 👈 3D-сцена
+import HudScene from "../components/HudScene"; 
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -23,7 +23,7 @@ export default function SearchPage() {
     }
   }
 
-  const showHud = !query.trim() && movies.length === 0 && !loading; // 👈 логика показа 3D-сцены
+  const showHud = !query.trim() && movies.length === 0 && !loading; 
 
   return (
     <>
@@ -32,17 +32,22 @@ export default function SearchPage() {
         <title>Totally cats</title>
       </Head>
 
-      {/* 👇 показываем только если нет поиска и фильмов */}
-      {showHud && <HudScene />}
+      {}
+      {showHud && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 0 }}>
+            <HudScene />
+        </div>
+        )}
+
 
       <div
         style={{
           fontFamily: '"So Bad", sans-serif',
-          background: "transparent", // 3D видно за контентом
+          background: "transparent", 
           color: "#8dd9ff",
           minHeight: "100vh",
           position: "relative",
-          zIndex: 1, // контент поверх 3D
+          zIndex: 1, 
         }}
       >
         <Header />
@@ -57,13 +62,15 @@ export default function SearchPage() {
               flex: 1,
               padding: ".6rem 1rem",
               border: "1px solid #ccc",
-              backgroundColor: "#cd77ff",
+              backgroundColor: "#333333ff",
               color: "#8dd9ff",
+              fontFamily: "'Courier New', monospace",
+              fontStyle: "italic",
             }}
           />
           <button
             onClick={searchMovies}
-            style={{ background: "#584fdb", color: "#8dd9ff", padding: ".6rem 1rem" }}
+            style={{ background: "#584fdb", color: "#8dd9ff", padding: ".6rem 1rem", fontFamily: "'Courier New', monospace",}}
           >
             {loading ? "Loading..." : "Search"}
           </button>
