@@ -130,7 +130,7 @@ export default function StarWindow() {
           position: "fixed",
           bottom: "35vh",       
           right: "43vw",
-          color: "#ffffff",    
+          color: "#9eb897",    
           fontFamily: "'Courier New', monospace",
           fontSize: "3px",     
           whiteSpace: "pre",    
