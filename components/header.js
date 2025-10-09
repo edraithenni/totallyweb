@@ -35,23 +35,54 @@ export default function Header() {
       <header>
         <h1 onClick={() => (window.location.href = "/search")}>Totally cats</h1>
         <nav>
+          {}
+          <button
+            className="secondary"
+            onClick={() => (window.location.href = "/SearchUsers")}
+          >
+            Find users
+          </button>
+
           {!loggedIn ? (
             <>
-              <button className="primary" onClick={() => setSignOpen(true)}>Sign in</button>
-              <button className="secondary" onClick={() => (window.location.href = "/auth")}>Sign up</button>
+              <button className="primary" onClick={() => setSignOpen(true)}>
+                Sign in
+              </button>
+              <button
+                className="secondary"
+                onClick={() => (window.location.href = "/auth")}
+              >
+                Sign up
+              </button>
             </>
           ) : (
             <>
-              <button className="secondary" onClick={() => (window.location.href = "/profile")}>Profile</button>
-              <button className="secondary" onClick={logout}>Log out</button>
+              <button
+                className="secondary"
+                onClick={() => (window.location.href = "/profile")}
+              >
+                Profile
+              </button>
+              <button className="secondary" onClick={logout}>
+                Log out
+              </button>
             </>
           )}
         </nav>
       </header>
 
-      <SignInModal open={signOpen} onClose={() => setSignOpen(false)} onSuccess={() => setLoggedIn(true)} />
+      <SignInModal
+        open={signOpen}
+        onClose={() => setSignOpen(false)}
+        onSuccess={() => setLoggedIn(true)}
+      />
 
       <style jsx>{`
+        @font-face {
+          font-family: 'Basiic';
+          src: url('/src/basiic.ttf') format('truetype');
+        }
+
         header {
           background: url('/src/hat.png') repeat center top;
           height: 120px;

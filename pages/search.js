@@ -70,7 +70,7 @@ export default function SearchPage() {
           />
           <button
             onClick={searchMovies}
-            style={{ background: "#584fdb", color: "#8dd9ff", padding: ".6rem 1rem", fontFamily: "'Courier New', monospace",}}
+            style={{ background: "#a9a9a9ff", color: "#8dd9ff", padding: ".6rem 1rem", fontFamily: "'Courier New', monospace",}}
           >
             {loading ? "Loading..." : "Search"}
           </button>
