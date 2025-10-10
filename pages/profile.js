@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Header from "../components/header";
 import ReviewCard from "../components/ReviewCard";
 import PlaylistCard from "../components/PlaylistCard";
+import FollowButton from "../components/FollowButton"; 
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -98,11 +99,9 @@ export default function ProfilePage() {
     loadProfile();
   }, []);
 
-  // Исправленная логика определения своего профиля
   const isOwnProfile = currentUserId && viewingProfileId && 
                       currentUserId.toString() === viewingProfileId.toString();
 
-  // === Восстановлено: уведомления с WebSocket ===
   useEffect(() => {
     const notifBtn = document.getElementById("notifBtn");
     const notifMenu = document.getElementById("notifMenu");
@@ -192,7 +191,14 @@ export default function ProfilePage() {
         <div className="avatar-row">
           <img className="avatar" src={avatarUrl} alt="avatar" />
           <div className="name-and-email">
-            <h1 className="name">{user?.name || "Loading..."}</h1>
+            <div className="name-header">
+              <h1 className="name">{user?.name || "Loading..."}</h1>
+
+              <FollowButton 
+                userId={viewingProfileId} 
+                currentUserId={currentUserId} 
+              />
+            </div>
 
             {isOwnProfile ? (
               <div className="email">
@@ -365,6 +371,13 @@ export default function ProfilePage() {
           background: #000;
         }
 
+        .name-header {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+        }
+
         .name {
           margin: 0;
           color: #fff;
@@ -422,6 +435,44 @@ export default function ProfilePage() {
           background: #ffb3ff;
           color: #000;
           border: 1px solid #ffb3ff;
+        }
+
+        /* Стили для FollowButton */
+        .follow-btn {
+          padding: 0.4rem 1rem;
+          border: 1px solid;
+          cursor: pointer;
+          font-family: 'Basiic', sans-serif;
+          font-size: 0.9rem;
+          transition: all 0.3s ease;
+          border-radius: 0;
+        }
+
+        .follow-btn.follow {
+          background: #41d3d2;
+          color: #000;
+          border-color: #41d3d2;
+        }
+
+        .follow-btn.follow:hover {
+          background: #30c3c2;
+          border-color: #30c3c2;
+        }
+
+        .follow-btn.unfollow {
+          background: #ffb3ff;
+          color: #000;
+          border-color: #ffb3ff;
+        }
+
+        .follow-btn.unfollow:hover {
+          background: #ff99ff;
+          border-color: #ff99ff;
+        }
+
+        .follow-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
         }
       `}</style>
     </>
