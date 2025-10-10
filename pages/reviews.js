@@ -1,7 +1,7 @@
-// components/ReviewCardFixed.js
+// components/ReviewCard.js
 import { useState } from "react";
 
-export default function ReviewCardFixed({ review, showMovieLink = false, showUserLink = false }) {
+export default function ReviewCard({ review, showMovieLink = false, showUserLink = false }) {
   const [expanded, setExpanded] = useState(false);
   
   const maxLength = 200;
@@ -22,7 +22,7 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
   };
 
   const filledStars = safeRating();
-  const emptyStars = Math.max(0, 10 - filledStars); // Гарантируем, что не будет отрицательного значения
+  const emptyStars = 10 - filledStars;
 
   const formatDate = (dateString) => {
     if (!dateString) return "Unknown date";
@@ -34,6 +34,16 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
       });
     } catch {
       return "Invalid date";
+    }
+  };
+
+  // Безопасное создание звезд для 10-балльной системы
+  const renderStars = () => {
+    try {
+      return "★".repeat(filledStars) + "☆".repeat(emptyStars);
+    } catch (error) {
+      console.error("Error rendering stars:", error);
+      return "☆☆☆☆☆☆☆☆☆☆";
     }
   };
 
@@ -80,10 +90,10 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
         </div>
       </div>
 
-      {/* Рейтинг для 10-балльной системы - ИСПРАВЛЕННАЯ СТРОКА */}
+      {/* Рейтинг для 10-балльной системы */}
       <div className="review-rating">
         <div className="stars">
-          {"★".repeat(filledStars)}{"☆".repeat(emptyStars)}
+          {renderStars()}
         </div>
         <span className="rating-text">{safeRating()}/10</span>
       </div>
@@ -188,7 +198,7 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
 
         .movie-title {
           color: #ffb3ff;
-          font-weight: bold;
+          fontWeight: bold;
         }
 
         .review-rating {
@@ -200,8 +210,8 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
 
         .stars {
           color: #ffb3ff;
-          font-size: 1.1rem;
-          letter-spacing: -0.5px;
+          font-size: 1.1rem; /* Немного уменьшил размер для 10 звезд */
+          letter-spacing: -0.5px; /* Чтобы звезды были ближе друг к другу */
         }
 
         .rating-text {
@@ -267,7 +277,7 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
           }
 
           .stars {
-            font-size: 1rem;
+            font-size: 1rem; /* Еще меньше на мобильных */
           }
         }
       `}</style>

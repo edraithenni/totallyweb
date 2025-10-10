@@ -51,37 +51,51 @@ export default function ProfilePage() {
       }
     }
 
-    async function loadPlaylists(userId) {
-      try {
-        const res = await fetch(`/api/users/${userId}/playlists`, { credentials: "include" });
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data)) setPlaylists(data);
-          else if (data.playlists) setPlaylists(data.playlists);
-          else if (data.data) setPlaylists(data.data);
-          else setPlaylists([]);
-        }
-      } catch (error) {
-        console.error("Error loading playlists:", error);
+   async function loadPlaylists(userId) {
+  try {
+    const res = await fetch(`/api/users/${userId}/playlists`, { credentials: "include" });
+    if (res.ok) {
+      const data = await res.json();
+      // Добавляем проверку на null и undefined
+      if (!data) {
         setPlaylists([]);
+        return;
       }
+      if (Array.isArray(data)) setPlaylists(data);
+      else if (data.playlists) setPlaylists(data.playlists);
+      else if (data.data) setPlaylists(data.data);
+      else setPlaylists([]);
+    } else {
+      setPlaylists([]);
     }
+  } catch (error) {
+    console.error("Error loading playlists:", error);
+    setPlaylists([]);
+  }
+}
 
-    async function loadReviews(userId) {
-      try {
-        const res = await fetch(`/api/users/${userId}/reviews`, { credentials: "include" });
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data)) setReviews(data);
-          else if (data.reviews) setReviews(data.reviews);
-          else if (data.data) setReviews(data.data);
-          else setReviews([]);
-        }
-      } catch (error) {
-        console.error("Error loading reviews:", error);
+  async function loadReviews(userId) {
+  try {
+    const res = await fetch(`/api/users/${userId}/reviews`, { credentials: "include" });
+    if (res.ok) {
+      const data = await res.json();
+      // Добавляем проверку на null и undefined
+      if (!data) {
         setReviews([]);
+        return;
       }
+      if (Array.isArray(data)) setReviews(data);
+      else if (data.reviews) setReviews(data.reviews);
+      else if (data.data) setReviews(data.data);
+      else setReviews([]);
+    } else {
+      setReviews([]);
     }
+  } catch (error) {
+    console.error("Error loading reviews:", error);
+    setReviews([]);
+  }
+}
 
     loadProfile();
   }, []);
