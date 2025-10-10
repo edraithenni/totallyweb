@@ -51,54 +51,56 @@ export default function ProfilePage() {
       }
     }
 
-   async function loadPlaylists(userId) {
-  try {
-    const res = await fetch(`/api/users/${userId}/playlists`, { credentials: "include" });
-    if (res.ok) {
-      const data = await res.json();
-      // Добавляем проверку на null и undefined
-      if (!data) {
+    async function loadPlaylists(userId) {
+      try {
+        const res = await fetch(`/api/users/${userId}/playlists`, { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          if (!data) {
+            setPlaylists([]);
+            return;
+          }
+          if (Array.isArray(data)) setPlaylists(data);
+          else if (data.playlists) setPlaylists(data.playlists);
+          else if (data.data) setPlaylists(data.data);
+          else setPlaylists([]);
+        } else {
+          setPlaylists([]);
+        }
+      } catch (error) {
+        console.error("Error loading playlists:", error);
         setPlaylists([]);
-        return;
       }
-      if (Array.isArray(data)) setPlaylists(data);
-      else if (data.playlists) setPlaylists(data.playlists);
-      else if (data.data) setPlaylists(data.data);
-      else setPlaylists([]);
-    } else {
-      setPlaylists([]);
     }
-  } catch (error) {
-    console.error("Error loading playlists:", error);
-    setPlaylists([]);
-  }
-}
 
-  async function loadReviews(userId) {
-  try {
-    const res = await fetch(`/api/users/${userId}/reviews`, { credentials: "include" });
-    if (res.ok) {
-      const data = await res.json();
-      // Добавляем проверку на null и undefined
-      if (!data) {
+    async function loadReviews(userId) {
+      try {
+        const res = await fetch(`/api/users/${userId}/reviews`, { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          if (!data) {
+            setReviews([]);
+            return;
+          }
+          if (Array.isArray(data)) setReviews(data);
+          else if (data.reviews) setReviews(data.reviews);
+          else if (data.data) setReviews(data.data);
+          else setReviews([]);
+        } else {
+          setReviews([]);
+        }
+      } catch (error) {
+        console.error("Error loading reviews:", error);
         setReviews([]);
-        return;
       }
-      if (Array.isArray(data)) setReviews(data);
-      else if (data.reviews) setReviews(data.reviews);
-      else if (data.data) setReviews(data.data);
-      else setReviews([]);
-    } else {
-      setReviews([]);
     }
-  } catch (error) {
-    console.error("Error loading reviews:", error);
-    setReviews([]);
-  }
-}
 
     loadProfile();
   }, []);
+
+  // Исправленная логика определения своего профиля
+  const isOwnProfile = currentUserId && viewingProfileId && 
+                      currentUserId.toString() === viewingProfileId.toString();
 
   // === Восстановлено: уведомления с WebSocket ===
   useEffect(() => {
@@ -146,9 +148,6 @@ export default function ProfilePage() {
       if (ws) ws.close();
     };
   }, []);
-  // === Конец восстановления уведомлений ===
-
-  const isOwnProfile = currentUserId && viewingProfileId && currentUserId === viewingProfileId;
 
   const handleBioSave = async () => {
     try {
@@ -179,7 +178,6 @@ export default function ProfilePage() {
       <div className="profile-card">
         <div className="profile-header"></div>
 
-        {/* === Уведомления === */}
         <div className="notif-container">
           <button id="notifBtn" className="notif-btn">
             <img src="/src/mail-pink.png" alt="Notifications" />
@@ -196,7 +194,6 @@ export default function ProfilePage() {
           <div className="name-and-email">
             <h1 className="name">{user?.name || "Loading..."}</h1>
 
-            {/* Исправлено: email теперь отображается корректно */}
             {isOwnProfile ? (
               <div className="email">
                 <b>Email:</b> {user?.email || "—"}
@@ -224,7 +221,6 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* Исправлено: кнопка "Edit" теперь снова активна */}
         {!bioEdit && isOwnProfile && (
           <button onClick={() => setBioEdit(true)} className="btn btn-edit">Edit</button>
         )}
@@ -430,5 +426,4 @@ export default function ProfilePage() {
       `}</style>
     </>
   );
-
 }

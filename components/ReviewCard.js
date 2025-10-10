@@ -9,7 +9,6 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
   const displayContent = expanded ? review.content : 
     needsTruncation ? review.content.substring(0, maxLength) + "..." : (review.content || "No content");
 
-  // Безопасная валидация рейтинга для 10-балльной системы
   const safeRating = () => {
     try {
       const rating = Number(review.rating);
@@ -22,7 +21,7 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
   };
 
   const filledStars = safeRating();
-  const emptyStars = Math.max(0, 10 - filledStars); // Гарантируем, что не будет отрицательного значения
+  const emptyStars = Math.max(0, 10 - filledStars); 
 
   const formatDate = (dateString) => {
     if (!dateString) return "Unknown date";
@@ -39,7 +38,6 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
 
   return (
     <div className="review-card">
-      {/* Заголовок с информацией о пользователе и фильме */}
       <div className="review-header">
         <div className="user-info">
           {showUserLink ? (
@@ -80,7 +78,7 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
         </div>
       </div>
 
-      {/* Рейтинг для 10-балльной системы - ИСПРАВЛЕННАЯ СТРОКА */}
+      
       <div className="review-rating">
         <div className="stars">
           {"★".repeat(filledStars)}{"☆".repeat(emptyStars)}
@@ -88,7 +86,7 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
         <span className="rating-text">{safeRating()}/10</span>
       </div>
 
-      {/* Контент отзыва */}
+    
       <div className="review-content">
         <p>{displayContent}</p>
         {needsTruncation && (
@@ -101,7 +99,7 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
         )}
       </div>
 
-      {/* Футер с мета-информацией */}
+
       <div className="review-footer">
         <span className="review-date">{formatDate(review.created_at)}</span>
         
