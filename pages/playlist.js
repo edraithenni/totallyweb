@@ -161,7 +161,7 @@ export default function PlaylistPage() {
       <style jsx global>{`
   @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=IBM+Plex+Mono&display=swap');
   :root {
     --terminal-green: #8a2be2;
     --terminal-dim-green: #5e1c99;
@@ -190,6 +190,8 @@ export default function PlaylistPage() {
 
     --font-terminal: 'VT323', 'Share Tech Mono', monospace;
     --font-header: 'VT323', 'Share Tech Mono', monospace;
+    --font-body: 'IBM Plex Mono', 'Courier New', monospace;
+    --font-terminal1: 'VT323', 'Share Tech Mono', 'IBM Plex Mono', monospace;
   }
 
   * {
@@ -253,7 +255,7 @@ export default function PlaylistPage() {
     font-size: 2rem;
     text-shadow: var(--glow-medium);
     
-    font-family: var(--font-header);
+    font-family: var(--font-body);
   }
 
   .playlist-info p {
