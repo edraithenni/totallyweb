@@ -1,5 +1,6 @@
-// components/ReviewCardFixed.js
+
 import { useState } from "react";
+import Link from "next/link";
 
 export default function ReviewCardFixed({ review, showMovieLink = false, showUserLink = false }) {
   const [expanded, setExpanded] = useState(false);
@@ -40,41 +41,21 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
     <div className="review-card">
       <div className="review-header">
         <div className="user-info">
-          {showUserLink ? (
-            <a 
-              href={`/profile?id=${review.user_id}`}
-              className="user-link"
-            >
-              <img 
+          <Link href={`/profile?id=${review.user_id}`} className="user-link">
+            <img 
                 src={review.user_avatar || "/src/default_pfp.png"} 
                 alt={review.user_name || "User"} 
                 className="user-avatar"
-              />
-              <span className="user-name">{review.user_name || "Unknown User"}</span>
-            </a>
-          ) : (
-            <>
-              <img 
-                src={review.user_avatar || "/src/default_pfp.png"} 
-                alt={review.user_name || "User"} 
-                className="user-avatar"
-              />
-              <span className="user-name">{review.user_name || "Unknown User"}</span>
-            </>
-          )}
+            />
+            <span className="user-name">{review.user_name || "Unknown User"}</span>
+           </Link>
+
         </div>
         
         <div className="movie-info">
-          {showMovieLink && review.movie_id ? (
-            <a 
-              href={`/movie?id=${review.movie_id}`}
-              className="movie-link"
-            >
-              {review.movie_title || "Unknown Movie"}
-            </a>
-          ) : (
-            <span className="movie-title">{review.movie_title || "Unknown Movie"}</span>
-          )}
+          <Link href={`/details?id=${review.movie_id}`} className="movie-link">
+            {review.movie_title || "Unknown Movie"}
+            </Link>
         </div>
       </div>
 
@@ -150,6 +131,7 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
           display: flex;
           align-items: center;
           gap: 0.5rem;
+          
           text-decoration: none;
           color: inherit;
         }
@@ -168,6 +150,9 @@ export default function ReviewCardFixed({ review, showMovieLink = false, showUse
         .user-name {
           color: #fff;
           font-weight: bold;
+          top: -10px; 
+          margin-left: 0.4rem; 
+          position: relative;
         }
 
         .movie-info {
