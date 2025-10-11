@@ -64,7 +64,7 @@ export default function PlaylistPage() {
         if (!res.ok) throw new Error("Failed to load playlist");
         const data = await res.json();
         setPlaylist(data);
-        setPlaylistOwnerId(data.owner_id);
+        setPlaylistOwnerId(data.ownerId);
         setMovies(data.movies || data.Movies || []);
       } catch (err) {
         console.error(err);
@@ -93,7 +93,7 @@ export default function PlaylistPage() {
           />
           <div className="playlist-info">
             <h1 id="playlist-name">{playlist?.name || "Loading..."}</h1>
-            <p id="playlist-owner">By {playlist?.owner_name || `User ${playlist?.owner_id}`}</p>
+            <p id="playlist-owner">By {playlist?.owner_name || `User ${playlist?.ownerId}`}</p>
             <p id="movie-count">{movies.length} movies</p>
           </div>
         </div>
@@ -145,10 +145,13 @@ export default function PlaylistPage() {
                     </div>
                   ) : (
                     <p
-                      className={`movie-description ${!movie.description ? "empty" : ""}`}
-                      onClick={() => currentUserId === playlistOwnerId && (setEditingMovie(movie.ID), setEditText(movie.description || ""))}
-                    >
-                      {escapeHtml(movie.description || "No description added yet. Click to edit.")}
+                        className={`movie-description ${!movie.description ? "empty" : ""}`}
+                        onClick={() => currentUserId === playlistOwnerId && (setEditingMovie(movie.ID), setEditText(movie.description || ""))}
+                        >
+                        {escapeHtml(
+                        movie.description ||
+                        (currentUserId === playlistOwnerId ? "No description added yet. Click to edit." : "")
+                        )}
                     </p>
                   )}
                 </div>
