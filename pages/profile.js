@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Header from "../components/header";
 import ReviewCard from "../components/ReviewCard";
 import PlaylistCard from "../components/PlaylistCard";
-import FollowButton from "../components/FollowButton"; 
+import FollowButton from "../components/FollowButton";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -10,10 +10,16 @@ export default function ProfilePage() {
   const [reviews, setReviews] = useState([]);
   const [bioEdit, setBioEdit] = useState(false);
   const [bioText, setBioText] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("/src/default_pfp.png");
+  const [avatarUrl, setAvatarUrl] = useState("/public/src/default_pfp.png");
   const [currentUserId, setCurrentUserId] = useState(null);
   const [viewingProfileId, setViewingProfileId] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState("");
+  const [previewUrl, setPreviewUrl] = useState("");
+  const fileInputRef = useRef(null);
+  const modalAvatarRef = useRef(null);
 
   useEffect(() => {
     async function loadProfile() {
@@ -33,103 +39,198 @@ export default function ProfilePage() {
           }
           setViewingProfileId(profileId);
 
-          // ИСПРАВЛЕНИЕ: Ждем пока установится currentUserId перед загрузкой профиля
           const res = await fetch(`/api/users/${profileId}`, { credentials: "include" });
           if (res.ok) {
             const data = await res.json();
             setUser(data);
             setBioText(data.description || "—");
-            setAvatarUrl(data.avatar || "/src/default_pfp.png");
-
+            if (data.avatar && data.avatar !== "") setAvatarUrl(data.avatar);
+            else setAvatarUrl(`/src/default_pfp.png`);
             await loadPlaylists(profileId);
             await loadReviews(profileId);
+          } else {
+            setPlaylists([]);
+            setReviews([]);
           }
         }
       } catch (err) {
         console.error("Error loading profile:", err);
+        setPlaylists([]);
         setReviews([]);
       } finally {
         setLoading(false);
       }
     }
-
-    async function loadPlaylists(userId) {
-      try {
-        const res = await fetch(`/api/users/${userId}/playlists`, { credentials: "include" });
-        if (res.ok) {
-          const data = await res.json();
-          if (!data) {
-            setPlaylists([]);
-            return;
-          }
-          if (Array.isArray(data)) setPlaylists(data);
-          else if (data.playlists) setPlaylists(data.playlists);
-          else if (data.data) setPlaylists(data.data);
-          else setPlaylists([]);
-        } else {
-          setPlaylists([]);
-        }
-      } catch (error) {
-        console.error("Error loading playlists:", error);
-        setPlaylists([]);
-      }
+async function loadPlaylists(userId) {
+  try {
+    const res = await fetch(`/api/users/${userId}/playlists`, { credentials: "include" });
+    if (!res.ok) {
+      console.warn("loadPlaylists: bad status", res.status);
+      setPlaylists([]);
+      return;
     }
 
-    async function loadReviews(userId) {
-      try {
-        const res = await fetch(`/api/users/${userId}/reviews`, { credentials: "include" });
-        if (res.ok) {
-          const data = await res.json();
-          if (!data) {
-            setReviews([]);
-            return;
-          }
-          if (Array.isArray(data)) setReviews(data);
-          else if (data.reviews) setReviews(data.reviews);
-          else if (data.data) setReviews(data.data);
-          else setReviews([]);
-        } else {
-          setReviews([]);
-        }
-      } catch (error) {
-        console.error("Error loading reviews:", error);
-        setReviews([]);
-      }
+    const data = await res.json().catch((e) => {
+      console.warn("loadPlaylists: invalid JSON", e);
+      return null;
+    });
+
+    if (!data) {
+      setPlaylists([]);
+      return;
     }
+
+    if (Array.isArray(data)) {
+      setPlaylists(data);
+    } else if (Array.isArray(data.playlists)) {
+      setPlaylists(data.playlists);
+    } else if (Array.isArray(data.data)) {
+      setPlaylists(data.data);
+    } else {
+      console.warn("loadPlaylists: unexpected payload shape", data);
+      setPlaylists([]);
+    }
+  } catch (error) {
+    console.error("Error loading playlists:", error);
+    setPlaylists([]);
+  }
+}
+
+async function loadReviews(userId) {
+  try {
+    const res = await fetch(`/api/users/${userId}/reviews`, { credentials: "include" });
+    if (!res.ok) {
+      console.warn("loadReviews: bad status", res.status);
+      setReviews([]);
+      return;
+    }
+
+    const data = await res.json().catch((e) => {
+      console.warn("loadReviews: invalid JSON", e);
+      return null;
+    });
+
+    if (!data) {
+      setReviews([]);
+      return;
+    }
+
+    if (Array.isArray(data)) {
+      setReviews(data);
+    } else if (Array.isArray(data.reviews)) {
+      setReviews(data.reviews);
+    } else if (Array.isArray(data.data)) {
+      setReviews(data.data);
+    } else {
+      console.warn("loadReviews: unexpected payload shape", data);
+      setReviews([]);
+    }
+  } catch (error) {
+    console.error("Error loading reviews:", error);
+    setReviews([]);
+  }
+}
+
 
     loadProfile();
   }, []);
 
-  // ИСПРАВЛЕНИЕ: Добавляем toString() для надежного сравнения
-  const isOwnProfile = currentUserId && viewingProfileId && 
-                      currentUserId.toString() === viewingProfileId.toString();
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.style.overflow = modalOpen ? "hidden" : "auto";
+  }, [modalOpen]);
+
+  const isOwnProfile =
+    currentUserId && viewingProfileId && currentUserId.toString() === viewingProfileId.toString();
+
+  const onAvatarClick = () => {
+    setPreviewUrl(avatarUrl);
+    setModalOpen(true);
+  };
+
+  const handleFileChange = async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    setUploadStatus("Please select an image file.");
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    setUploadStatus("File is too big (max 5MB).");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    setPreviewUrl(reader.result);
+  };
+  reader.readAsDataURL(file);
+
+  setUploadStatus("Uploading...");
+  const form = new FormData();
+  form.append("avatar", file);
+
+  try {
+    const resp = await fetch("/api/users/me/avatar", {
+      method: "POST",
+      credentials: "include",
+      body: form,
+    });
+    if (!resp.ok) throw new Error("Server error " + resp.status);
+    const data = await resp.json();
+    
+    const newAvatar = (data?.avatar && data.avatar !== "")
+      ? data.avatar
+      : `/uploads/${viewingProfileId}/avatar.png?${Date.now()}`;
+
+    setAvatarUrl(newAvatar);
+    setPreviewUrl(newAvatar);
+
+
+    setUser(prev => ({ ...prev, avatar: newAvatar }));
+
+    setUploadStatus("Avatar updated.");
+  } catch (err) {
+    console.error(err);
+    setUploadStatus("Error uploading avatar.");
+  } finally {
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setTimeout(() => setUploadStatus(""), 3000);
+  }
+};
+
+const handleDeleteAvatar = async () => {
+  if (!confirm("Are you sure you want to delete avatar?")) return;
+  setUploadStatus("Deleting...");
+  try {
+    const resp = await fetch("/api/users/me/avatar", {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (!resp.ok) throw new Error("Server error " + resp.status);
+    const data = await resp.json();
+
+    const newAvatar = (data?.avatar && data.avatar !== "")
+        ? data.avatar
+        : "/src/default_pfp.png";
+
+    setAvatarUrl(newAvatar);
+    setPreviewUrl(newAvatar);
+    setUser(prev => ({ ...prev, avatar: newAvatar })); 
+
+    setModalOpen(false);
+    setUploadStatus("Avatar deleted.");
+  } catch (err) {
+    console.error(err);
+    setUploadStatus("Error deleting avatar.");
+  } finally {
+    setTimeout(() => setUploadStatus(""), 2500);
+  }
+};
+
+
 
   useEffect(() => {
-    const notifBtn = document.getElementById("notifBtn");
-    const notifMenu = document.getElementById("notifMenu");
-    const notifList = document.getElementById("notifList");
-    const notifCountSpan = document.getElementById("notifCount");
-    let notifCount = 0;
-
-    function addNotification(msg) {
-      const li = document.createElement("li");
-      li.textContent = msg;
-      notifList.prepend(li);
-      notifCount++;
-      notifCountSpan.textContent = notifCount;
-      notifCountSpan.style.display = "inline";
-    }
-
-    if (notifBtn && notifMenu) {
-      notifBtn.addEventListener("click", () => {
-        notifMenu.style.display = notifMenu.style.display === "block" ? "none" : "block";
-        if (notifMenu.style.display === "block") {
-          notifCount = 0;
-          notifCountSpan.style.display = "none";
-        }
-      });
-    }
-
     let ws;
     async function initWS() {
       try {
@@ -137,14 +238,23 @@ export default function ProfilePage() {
         const me = await meRes.json();
         if (!me?.id) return;
         ws = new WebSocket(`ws://localhost:8080/ws?user_id=${me.id}`);
-        ws.onmessage = (event) => addNotification(event.data);
+        ws.onmessage = (event) => {
+          const notifList = document.getElementById("notifList");
+          const notifCountSpan = document.getElementById("notifCount");
+          if (notifList && notifCountSpan) {
+            const li = document.createElement("li");
+            li.textContent = event.data;
+            notifList.prepend(li);
+            notifCountSpan.textContent = Number(notifCountSpan.textContent || 0) + 1;
+            notifCountSpan.style.display = "inline";
+          }
+        };
         ws.onclose = () => setTimeout(initWS, 2000);
       } catch (err) {
         console.error("WebSocket error:", err);
       }
     }
     initWS();
-
     return () => {
       if (ws) ws.close();
     };
@@ -191,16 +301,21 @@ export default function ProfilePage() {
         </div>
 
         <div className="avatar-row">
-          <img className="avatar" src={avatarUrl} alt="avatar" />
+          <img
+            id="avatarImg"
+            className="avatar"
+            src={avatarUrl}
+            alt="avatar"
+            onClick={onAvatarClick}
+            style={{ cursor: "pointer" }}
+          />
           <div className="name-and-email">
             <div className="name-header">
               <h1 className="name">{user?.name || "Loading..."}</h1>
-
-              {/* ИСПРАВЛЕНИЕ: Добавляем ключ для принудительного пересоздания компонента */}
-              <FollowButton 
+              <FollowButton
                 key={`follow-${viewingProfileId}-${currentUserId}`}
-                userId={viewingProfileId} 
-                currentUserId={currentUserId} 
+                userId={viewingProfileId}
+                currentUserId={currentUserId}
               />
             </div>
 
@@ -213,6 +328,16 @@ export default function ProfilePage() {
             )}
           </div>
         </div>
+
+        <div id="uploadStatus" className="upload-status">{uploadStatus}</div>
+        <input
+          ref={fileInputRef}
+          id="avatarInput"
+          type="file"
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={handleFileChange}
+        />
 
         <hr />
         <h3>Bio</h3>
@@ -253,31 +378,36 @@ export default function ProfilePage() {
 
         <hr />
         <h3>Reviews</h3>
-        <div>
-          {(!reviews || reviews.length === 0) ? (
-            <p className="muted">No reviews yet</p>
-          ) : (
-            reviews.map((rv) => (
-              <ReviewCard
-                key={rv.id}
-                review={{
-                  id: rv.id,
-                  user_id: rv.user_id,
-                  movie_title: rv.movie_title,
-                  rating: rv.rating,
-                  content: rv.content,
-                  created_at: rv.created_at,
-                  user_name: user?.name, 
-                 ...rv
-                }}
-              />
-            ))
-          )}
+       
+<div>
+  {(!reviews || reviews.length === 0) ? (
+    <p className="muted">No reviews yet</p>
+  ) : (
+    reviews.map((rv) => {
+      const reviewWithAvatar = { ...rv, user_avatar: avatarUrl, user_name: user?.name };
+      return <ReviewCard key={rv.id} review={reviewWithAvatar} />;
+    })
+  )}
+</div>
+
+      </div>
+
+      <div id="avatarModal" className={`modal ${modalOpen ? "open" : ""}`}>
+        <div className="modal-content">
+          <div className="close-modal" onClick={() => setModalOpen(false)}>&times;</div>
+          <img id="modalAvatar" ref={modalAvatarRef} src={previewUrl} alt="Avatar preview" />
+          <div className="avatar-options">
+            {isOwnProfile && (
+              <>
+                <button id="changeAvatarBtn" onClick={() => fileInputRef.current?.click()} className="btn btn-edit">Change pfp</button>
+                <button id="deleteAvatarBtn" onClick={handleDeleteAvatar} className="btn btn-cancel">Delete pfp</button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
       <style jsx>{`
-        /* Стили остаются без изменений */
         @font-face {
           font-family: 'Basiic';
           src: url('/src/basiic.ttf') format('truetype');
@@ -301,8 +431,7 @@ export default function ProfilePage() {
           left: 0;
           width: 100%;
           height: 120px;
-          background: url('/src/tumblr_6720afe4b23fff20fb0a55a8733db945_b6f51cdd_400.webp')
-            repeat center top;
+          background: url('/src/tumblr_6720afe4b23fff20fb0a55a8733db945_b6f51cdd_400.webp') repeat center top;
           background-size: auto;
           z-index: 0;
         }
@@ -332,30 +461,6 @@ export default function ProfilePage() {
           color: white;
           padding: 0 6px;
           font-size: 0.75rem;
-        }
-        .notif-menu {
-          display: none;
-          position: absolute;
-          right: 0;
-          top: 2.5rem;
-          background: #24203e;
-          color: #fff;
-          border: 1px solid #3a3a90;
-          min-width: 250px;
-          max-height: 300px;
-          overflow-y: auto;
-          box-shadow: 0 4px 12px rgba(0,0,0,.3);
-          font-family: 'Basiic', sans-serif;
-        }
-        .notif-menu p {
-          padding: 0.5rem;
-          margin: 0;
-          border-bottom: 1px solid #3a3a90;
-        }
-        .notif-menu ul {
-          list-style: none;
-          margin: 0;
-          padding: 0.5rem;
         }
 
         .avatar-row {
@@ -402,13 +507,6 @@ export default function ProfilePage() {
           color: #fff;
         }
 
-        .bio-edit {
-          margin-top: 0.5rem;
-        }
-        .bio-buttons {
-          margin-top: 0.5rem;
-        }
-
         .playlists-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -440,6 +538,48 @@ export default function ProfilePage() {
           background: #ffb3ff;
           color: #000;
           border: 1px solid #ffb3ff;
+        }
+
+        .modal {
+          display: none;
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.8);
+          justify-content: center;
+          align-items: center;
+          z-index: 999;
+        }
+        .modal.open { display: flex; }
+        .modal-content {
+          position: relative;
+          background: #0a1b31;
+          padding: 1rem;
+          border-radius: 10px;
+          text-align: center;
+        }
+        .modal-content img {
+          max-width: 90vw;
+          max-height: 80vh;
+          border-radius: 10px;
+        }
+        .close-modal {
+          position: absolute;
+          top: 10px;
+          right: 20px;
+          color: white;
+          cursor: pointer;
+          font-size: 2rem;
+        }
+        .avatar-options {
+          margin-top: 10px;
+          display: flex;
+          gap: 10px;
+          justify-content: center;
+        }
+        .upload-status {
+          color: #41d3d2;
+          font-size: 14px;
+          margin-top: 8px;
         }
       `}</style>
     </>

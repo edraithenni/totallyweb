@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-export default function ReviewCardFixed({ review, showMovieLink = false, showUserLink = false }) {
+export default function ReviewCard({ review, showMovieLink = false, showUserLink = false }) {
   const [expanded, setExpanded] = useState(false);
   
   const maxLength = 200;
