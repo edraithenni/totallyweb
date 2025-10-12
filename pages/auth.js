@@ -128,21 +128,29 @@ export default function AuthPage() {
     setLogMsg("");
   }
 
-  async function register() {
+    async function register() {
+    setRegMsg("");
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: regName, email: regEmail, password: regPass }),
       });
-      if (!res.ok) throw new Error(await res.text());
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Registration failed");
+      }
+
+  
       setVerEmail(regEmail);
       showForm("verify");
-      setVerMsg("Registered succesfully, enter your verification code.");
+      setVerMsg("✅ Registered successfully! Enter your verification code below.");
     } catch (err) {
-      alert("Registration error: " + (err.message || err));
+      setRegMsg("❌ Registration error: " + (err.message || "Unknown error"));
     }
   }
+
 
   async function verify() {
     try {
@@ -161,23 +169,39 @@ export default function AuthPage() {
   }
 
   async function login() {
+    setLogMsg(""); 
+
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: logEmail, password: logPass }),
       });
-      if (!res.ok) throw new Error(await res.text());
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Login failed");
+      }
+
       const data = await res.json().catch(() => ({}));
       try {
         if (data.token) localStorage.setItem("token", data.token);
       } catch {}
+
+  
+      setLogMsg("✅ Login successful! Redirecting...");
       const base = window.location.pathname.startsWith("/app") ? "/app" : "";
-      window.location.href = `${base}/search`;
+
+     
+      setTimeout(() => {
+        window.location.href = `${base}/search`;
+      }, 1000);
     } catch (err) {
-      alert("Login error: " + (err.message || err));
+   
+      setLogMsg("❌ Login error: " + (err.message || "Unknown error"));
     }
   }
+
 
   return (
     <>
@@ -204,13 +228,16 @@ export default function AuthPage() {
           justifyContent: "center",
           backgroundColor: "transparent",
           position: "relative",
-          zIndex: 10, // поверх фона
+          zIndex: 10,
         }}
       >
         <div className="card">
           <div style={{ display: active === "register" ? "block" : "none" }}>
             <h2>Register</h2>
-            <div className={`msg ${regMsg ? "" : "hidden"}`}>{regMsg}</div>
+            <div className={`msg ${regMsg.includes("error") ? "error" : "success"} ${regMsg ? "" : "hidden"}`}>
+  {regMsg}
+</div>
+
             <input
               value={regName}
               onChange={(e) => setRegName(e.target.value)}
@@ -263,7 +290,8 @@ export default function AuthPage() {
 
           <div style={{ display: active === "login" ? "block" : "none" }}>
             <h2>Log in</h2>
-            <div className={`msg ${logMsg ? "" : "hidden"}`}>{logMsg}</div>
+            <div className={`msg ${logMsg.includes("error") ? "error" : "success"} ${logMsg ? "" : "hidden"}`}> {logMsg}</div>
+
             <input
               value={logEmail}
               onChange={(e) => setLogEmail(e.target.value)}
@@ -334,6 +362,18 @@ export default function AuthPage() {
           color: #22543d;
           font-size: 0.9rem;
         }
+          .msg.error {
+  background: #ffe6e6;
+  border: 1px solid #ffb2b2;
+  color: #8b0000;
+}
+
+.msg.success {
+  background: #e6ffed;
+  border: 1px solid #b2f5c8;
+  color: #22543d;
+}
+
       `}</style>
     </>
   );
