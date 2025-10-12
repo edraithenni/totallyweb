@@ -6,14 +6,22 @@ export default function FollowButton({ userId, currentUserId }) {
   const [loading, setLoading] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
 
-  // Проверяем статус подписки при загрузке
+  // ОСНОВНОЕ ИСПРАВЛЕНИЕ: Добавляем проверку на одинаковые ID
+  const isOwnProfile = currentUserId && userId && currentUserId.toString() === userId.toString();
+  
+  // Если это собственный профиль - сразу выходим
+  if (isOwnProfile) {
+    return null;
+  }
+
   useEffect(() => {
+    // Двойная проверка на случай race condition
+    if (!currentUserId || !userId || currentUserId.toString() === userId.toString()) {
+      setCheckingStatus(false);
+      return;
+    }
+    
     async function checkFollowStatus() {
-      if (!currentUserId || !userId || currentUserId === userId) {
-        setCheckingStatus(false);
-        return;
-      }
-      
       try {
         const res = await fetch(`/api/users/${userId}/is-following`, {
           credentials: "include"
@@ -23,8 +31,6 @@ export default function FollowButton({ userId, currentUserId }) {
           const data = await res.json();
           setIsFollowing(data.isFollowing);
         } else if (res.status === 401) {
-          // Если не авторизован для проверки, оставляем состояние по умолчанию (false)
-          // Фактический статус узнаем при попытке подписки
           console.log("Not authorized to check follow status");
         }
       } catch (error) {
@@ -38,7 +44,7 @@ export default function FollowButton({ userId, currentUserId }) {
   }, [userId, currentUserId]);
 
   const handleFollow = async () => {
-    if (loading || checkingStatus) return;
+    if (loading || checkingStatus || !currentUserId || !userId || currentUserId.toString() === userId.toString()) return;
     
     setLoading(true);
     try {
@@ -49,13 +55,11 @@ export default function FollowButton({ userId, currentUserId }) {
       });
 
       if (res.ok) {
-        // Успешное изменение статуса подписки
         setIsFollowing(!isFollowing);
       } else if (res.status === 400) {
-        // Обрабатываем случай "already following"
         const data = await res.json();
         if (data.error === "already following") {
-          setIsFollowing(true); // Обновляем состояние - мы подписаны
+          setIsFollowing(true);
         }
       }
     } catch (error) {
@@ -65,15 +69,11 @@ export default function FollowButton({ userId, currentUserId }) {
     }
   };
 
-  // Не показываем кнопку если:
-  // - это собственный профиль
-  // - пользователь не авторизован
-  // - ID не загружены
-  if (!currentUserId || !userId || currentUserId === userId) {
+  // ФИНАЛЬНАЯ ПРОВЕРКА: на всякий случай
+  if (!currentUserId || !userId || currentUserId.toString() === userId.toString()) {
     return null;
   }
 
-  // Показываем загрузку пока проверяем статус
   if (checkingStatus) {
     return (
       <button className="follow-btn loading" disabled>
@@ -93,6 +93,7 @@ export default function FollowButton({ userId, currentUserId }) {
   );
 }
 
+// Стили остаются без изменений
 const styles = `
   .follow-btn {
     padding: 0.4rem 1rem;

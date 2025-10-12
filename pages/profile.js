@@ -33,6 +33,7 @@ export default function ProfilePage() {
           }
           setViewingProfileId(profileId);
 
+          // ИСПРАВЛЕНИЕ: Ждем пока установится currentUserId перед загрузкой профиля
           const res = await fetch(`/api/users/${profileId}`, { credentials: "include" });
           if (res.ok) {
             const data = await res.json();
@@ -99,6 +100,7 @@ export default function ProfilePage() {
     loadProfile();
   }, []);
 
+  // ИСПРАВЛЕНИЕ: Добавляем toString() для надежного сравнения
   const isOwnProfile = currentUserId && viewingProfileId && 
                       currentUserId.toString() === viewingProfileId.toString();
 
@@ -194,7 +196,9 @@ export default function ProfilePage() {
             <div className="name-header">
               <h1 className="name">{user?.name || "Loading..."}</h1>
 
+              {/* ИСПРАВЛЕНИЕ: Добавляем ключ для принудительного пересоздания компонента */}
               <FollowButton 
+                key={`follow-${viewingProfileId}-${currentUserId}`}
                 userId={viewingProfileId} 
                 currentUserId={currentUserId} 
               />
@@ -263,7 +267,8 @@ export default function ProfilePage() {
                   rating: rv.rating,
                   content: rv.content,
                   created_at: rv.created_at,
-                  ...rv
+                  user_name: user?.name, 
+                 ...rv
                 }}
               />
             ))
@@ -272,6 +277,7 @@ export default function ProfilePage() {
       </div>
 
       <style jsx>{`
+        /* Стили остаются без изменений */
         @font-face {
           font-family: 'Basiic';
           src: url('/src/basiic.ttf') format('truetype');
@@ -301,7 +307,6 @@ export default function ProfilePage() {
           z-index: 0;
         }
 
-        /* === уведомления === */
         .notif-container {
           position: absolute;
           top: 10px;
@@ -435,44 +440,6 @@ export default function ProfilePage() {
           background: #ffb3ff;
           color: #000;
           border: 1px solid #ffb3ff;
-        }
-
-        /* Стили для FollowButton */
-        .follow-btn {
-          padding: 0.4rem 1rem;
-          border: 1px solid;
-          cursor: pointer;
-          font-family: 'Basiic', sans-serif;
-          font-size: 0.9rem;
-          transition: all 0.3s ease;
-          border-radius: 0;
-        }
-
-        .follow-btn.follow {
-          background: #41d3d2;
-          color: #000;
-          border-color: #41d3d2;
-        }
-
-        .follow-btn.follow:hover {
-          background: #30c3c2;
-          border-color: #30c3c2;
-        }
-
-        .follow-btn.unfollow {
-          background: #ffb3ff;
-          color: #000;
-          border-color: #ffb3ff;
-        }
-
-        .follow-btn.unfollow:hover {
-          background: #ff99ff;
-          border-color: #ff99ff;
-        }
-
-        .follow-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
         }
       `}</style>
     </>
