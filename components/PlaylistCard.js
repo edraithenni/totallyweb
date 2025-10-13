@@ -6,14 +6,15 @@ export default function PlaylistCard({ playlist, onClick }) {
 
   if (playlist.name === "watch-later") {
     iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-yellow.gif";
-    defaultCover = "public/src/watch-later-playlist.jpg";
+    defaultCover = "/src/watch-later-playlist.jpg";
   } else if (playlist.name === "watched") {
     iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-green.gif";
-    defaultCover = "public/src/watched-playlist.jpg";
+    defaultCover = "/src/watched-playlist.jpg";
   } else if (playlist.name === "liked") {
     iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-red.gif";
-    defaultCover = "public/src/liked-playlist.jpg";
+    defaultCover = "/src/liked-playlist.jpg";
   }
+  
 
   return (
     <div className="playlist-card" onClick={onClick}>

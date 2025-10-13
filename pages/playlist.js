@@ -116,7 +116,7 @@ export default function PlaylistPage() {
             <h2>You got:</h2>
             <div className="random-card" onClick={() => goToMovie(randomMovie.ID)}>
             <img
-                src={randomMovie.poster || randomMovie.poster_url || "/static/movies/poster-placeholder.png"}
+                src={randomMovie.poster || randomMovie.poster_url || "/movies/poster-placeholder.png"}
                 alt={randomMovie.title}
             />
             <h3>{randomMovie.title}</h3>
@@ -128,7 +128,8 @@ export default function PlaylistPage() {
         <div className="playlist-header">
           <img
             id="playlist-cover"
-            src={playlist?.cover || "/static/playlists/collection-placeholder.png"}
+            src={playlist?.cover || "/src/default-playlist.jpg"}
+            style={{ width: "150px", height: "150px", objectFit: "cover", borderRadius: "8px" }}
             alt="Playlist Cover"
           />
           <div className="playlist-info">
@@ -156,7 +157,7 @@ export default function PlaylistPage() {
             movies.map((movie) => (
               <div className="movie-item" key={movie.ID}>
                 <img
-                  src={movie.poster || movie.poster_url || "/static/movies/poster-placeholder.png"}
+                  src={movie.poster || movie.poster_url || "/movies/poster-placeholder.png"}
                   alt={movie.title}
                   className="movie-poster"
                   onClick={() => goToMovie(movie.ID)}
