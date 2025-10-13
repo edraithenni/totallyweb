@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 
 export default function FollowButton({ userId, currentUserId, followers, setFollowers }) {
+  if (!currentUserId) return null;
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
@@ -80,7 +81,7 @@ export default function FollowButton({ userId, currentUserId, followers, setFoll
 
 const styles = `
   .follow-btn {
-    padding: 0.4rem 1rem;
+    padding: 0.2rem 1rem;
     border: 1px solid;
     cursor: pointer;
     font-family: 'Basiic', sans-serif;
@@ -90,25 +91,26 @@ const styles = `
   }
 
   .follow-btn.follow {
-    background: #41d3d2;
+    background: #595f52ff;
     color: #000;
-    border-color: #41d3d2;
+    border-color: #595f52ff;
   }
 
   .follow-btn.follow:hover {
-    background: #30c3c2;
-    border-color: #30c3c2;
+    background: #556b3bff;
+    color: #61E0F4;
+    border-color: #556b3bff;
   }
 
   .follow-btn.unfollow {
-    background: #ffb3ff;
+    background: #cab3ffff;
     color: #000;
-    border-color: #ffb3ff;
   }
 
   .follow-btn.unfollow:hover {
-    background: #ff99ff;
-    border-color: #ff99ff;
+    background: #908bd2ff;
+    color: #61E0F4;
+    border-color: #908bd2ff;
   }
 
   .follow-btn:disabled {
