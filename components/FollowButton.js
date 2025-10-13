@@ -1,40 +1,29 @@
 // components/FollowButton.js
 import { useState, useEffect } from "react";
 
-export default function FollowButton({ userId, currentUserId }) {
+export default function FollowButton({ userId, currentUserId, followers, setFollowers }) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
 
-  // ОСНОВНОЕ ИСПРАВЛЕНИЕ: Добавляем проверку на одинаковые ID
   const isOwnProfile = currentUserId && userId && currentUserId.toString() === userId.toString();
-  
-  // Если это собственный профиль - сразу выходим
-  if (isOwnProfile) {
-    return null;
-  }
+  if (isOwnProfile) return null;
 
   useEffect(() => {
-    // Двойная проверка на случай race condition
-    if (!currentUserId || !userId || currentUserId.toString() === userId.toString()) {
+    if (!currentUserId || !userId) {
       setCheckingStatus(false);
       return;
     }
     
     async function checkFollowStatus() {
       try {
-        const res = await fetch(`/api/users/${userId}/is-following`, {
-          credentials: "include"
-        });
-        
+        const res = await fetch(`/api/users/${userId}/is-following`, { credentials: "include" });
         if (res.ok) {
           const data = await res.json();
           setIsFollowing(data.isFollowing);
-        } else if (res.status === 401) {
-          console.log("Not authorized to check follow status");
         }
-      } catch (error) {
-        console.error("Error checking follow status:", error);
+      } catch (err) {
+        console.error(err);
       } finally {
         setCheckingStatus(false);
       }
@@ -44,42 +33,36 @@ export default function FollowButton({ userId, currentUserId }) {
   }, [userId, currentUserId]);
 
   const handleFollow = async () => {
-    if (loading || checkingStatus || !currentUserId || !userId || currentUserId.toString() === userId.toString()) return;
-    
+    if (loading) return;
     setLoading(true);
     try {
       const method = isFollowing ? "DELETE" : "POST";
       const res = await fetch(`/api/users/${userId}/follow`, {
-        method: method,
-        credentials: "include"
+        method,
+        credentials: "include",
       });
-
       if (res.ok) {
         setIsFollowing(!isFollowing);
-      } else if (res.status === 400) {
-        const data = await res.json();
-        if (data.error === "already following") {
-          setIsFollowing(true);
+
+ if (setFollowers) {
+        if (!isFollowing) {
+         
+          setFollowers(prev => [...prev, { ID: currentUserId, name: "You" }]);
+        } else {
+      
+          setFollowers(prev => prev.filter(f => f.ID !== currentUserId));
         }
       }
-    } catch (error) {
-      console.error("Error following user:", error);
+    }
+  } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  // ФИНАЛЬНАЯ ПРОВЕРКА: на всякий случай
-  if (!currentUserId || !userId || currentUserId.toString() === userId.toString()) {
-    return null;
-  }
-
   if (checkingStatus) {
-    return (
-      <button className="follow-btn loading" disabled>
-        ...
-      </button>
-    );
+    return <button className="follow-btn loading" disabled>...</button>;
   }
 
   return (
@@ -88,12 +71,13 @@ export default function FollowButton({ userId, currentUserId }) {
       disabled={loading}
       className={`follow-btn ${isFollowing ? "unfollow" : "follow"}`}
     >
-      {loading ? "..." : (isFollowing ? "Unfollow" : "Follow")}
+      {loading ? "..." : isFollowing ? "Unfollow" : "Follow"}
     </button>
   );
 }
 
-// Стили остаются без изменений
+
+
 const styles = `
   .follow-btn {
     padding: 0.4rem 1rem;

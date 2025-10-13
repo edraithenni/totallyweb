@@ -5,23 +5,21 @@ import PlaylistCard from "../components/PlaylistCard";
 import FollowButton from "../components/FollowButton";
 import FollowList from "../components/FollowList";
 
-
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [playlists, setPlaylists] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [bioEdit, setBioEdit] = useState(false);
   const [bioText, setBioText] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("/public/src/default_pfp.png");
+  const [avatarUrl, setAvatarUrl] = useState("/src/default_pfp.png");
   const [currentUserId, setCurrentUserId] = useState(null);
   const [viewingProfileId, setViewingProfileId] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [followers, setFollowers] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
   const fileInputRef = useRef(null);
-  const modalAvatarRef = useRef(null);
 
   useEffect(() => {
     async function loadProfile() {
@@ -34,7 +32,6 @@ export default function ProfilePage() {
         if (resMe.ok) {
           const me = await resMe.json();
           setCurrentUserId(me.id);
-
           if (!profileId) {
             profileId = me.id;
             window.history.replaceState(null, "", `/profile?id=${profileId}`);
@@ -46,8 +43,14 @@ export default function ProfilePage() {
             const data = await res.json();
             setUser(data);
             setBioText(data.description || "—");
-            if (data.avatar && data.avatar !== "") setAvatarUrl(data.avatar);
-            else setAvatarUrl(`/src/default_pfp.png`);
+            setAvatarUrl(data.avatar || "/src/default_pfp.png");
+
+            const resFollowers = await fetch(`/api/users/${profileId}/followers`, { credentials: "include" });
+            if (resFollowers.ok) {
+              const dataFollowers = await resFollowers.json();
+              setFollowers(dataFollowers.followers || dataFollowers.data || []);
+            }
+
             await loadPlaylists(profileId);
             await loadReviews(profileId);
           } else {
@@ -56,83 +59,43 @@ export default function ProfilePage() {
           }
         }
       } catch (err) {
-        console.error("Error loading profile:", err);
+        console.error(err);
         setPlaylists([]);
         setReviews([]);
       } finally {
         setLoading(false);
       }
     }
-async function loadPlaylists(userId) {
-  try {
-    const res = await fetch(`/api/users/${userId}/playlists`, { credentials: "include" });
-    if (!res.ok) {
-      console.warn("loadPlaylists: bad status", res.status);
-      setPlaylists([]);
-      return;
+
+    async function loadPlaylists(userId) {
+      try {
+        const res = await fetch(`/api/users/${userId}/playlists`, { credentials: "include" });
+        if (!res.ok) return setPlaylists([]);
+        const data = await res.json().catch(() => null);
+        if (!data) return setPlaylists([]);
+        if (Array.isArray(data)) setPlaylists(data);
+        else if (Array.isArray(data.playlists)) setPlaylists(data.playlists);
+        else if (Array.isArray(data.data)) setPlaylists(data.data);
+        else setPlaylists([]);
+      } catch {
+        setPlaylists([]);
+      }
     }
 
-    const data = await res.json().catch((e) => {
-      console.warn("loadPlaylists: invalid JSON", e);
-      return null;
-    });
-
-    if (!data) {
-      setPlaylists([]);
-      return;
+    async function loadReviews(userId) {
+      try {
+        const res = await fetch(`/api/users/${userId}/reviews`, { credentials: "include" });
+        if (!res.ok) return setReviews([]);
+        const data = await res.json().catch(() => null);
+        if (!data) return setReviews([]);
+        if (Array.isArray(data)) setReviews(data);
+        else if (Array.isArray(data.reviews)) setReviews(data.reviews);
+        else if (Array.isArray(data.data)) setReviews(data.data);
+        else setReviews([]);
+      } catch {
+        setReviews([]);
+      }
     }
-
-    if (Array.isArray(data)) {
-      setPlaylists(data);
-    } else if (Array.isArray(data.playlists)) {
-      setPlaylists(data.playlists);
-    } else if (Array.isArray(data.data)) {
-      setPlaylists(data.data);
-    } else {
-      console.warn("loadPlaylists: unexpected payload shape", data);
-      setPlaylists([]);
-    }
-  } catch (error) {
-    console.error("Error loading playlists:", error);
-    setPlaylists([]);
-  }
-}
-
-async function loadReviews(userId) {
-  try {
-    const res = await fetch(`/api/users/${userId}/reviews`, { credentials: "include" });
-    if (!res.ok) {
-      console.warn("loadReviews: bad status", res.status);
-      setReviews([]);
-      return;
-    }
-
-    const data = await res.json().catch((e) => {
-      console.warn("loadReviews: invalid JSON", e);
-      return null;
-    });
-
-    if (!data) {
-      setReviews([]);
-      return;
-    }
-
-    if (Array.isArray(data)) {
-      setReviews(data);
-    } else if (Array.isArray(data.reviews)) {
-      setReviews(data.reviews);
-    } else if (Array.isArray(data.data)) {
-      setReviews(data.data);
-    } else {
-      console.warn("loadReviews: unexpected payload shape", data);
-      setReviews([]);
-    }
-  } catch (error) {
-    console.error("Error loading reviews:", error);
-    setReviews([]);
-  }
-}
-
 
     loadProfile();
   }, []);
@@ -142,126 +105,81 @@ async function loadReviews(userId) {
     document.body.style.overflow = modalOpen ? "hidden" : "auto";
   }, [modalOpen]);
 
-  const isOwnProfile =
-    currentUserId && viewingProfileId && currentUserId.toString() === viewingProfileId.toString();
+  useEffect(() => {
+  const handleEsc = (e) => {
+    if (e.key === "Escape") {
+      setModalOpen(false);
+    }
+  };
+  window.addEventListener("keydown", handleEsc);
+  return () => window.removeEventListener("keydown", handleEsc);
+}, []);
+
+
+  const isOwnProfile = currentUserId && viewingProfileId && currentUserId.toString() === viewingProfileId.toString();
 
   const onAvatarClick = () => {
+    if (!isOwnProfile) return;
     setPreviewUrl(avatarUrl);
     setModalOpen(true);
   };
 
   const handleFileChange = async (e) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
-  if (!file.type.startsWith("image/")) {
-    setUploadStatus("Please select an image file.");
-    return;
-  }
-  if (file.size > 5 * 1024 * 1024) {
-    setUploadStatus("File is too big (max 5MB).");
-    return;
-  }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return setUploadStatus("Please select an image file.");
+    if (file.size > 5 * 1024 * 1024) return setUploadStatus("File is too big (max 5MB).");
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    setPreviewUrl(reader.result);
-  };
-  reader.readAsDataURL(file);
+    const reader = new FileReader();
+    reader.onload = () => setPreviewUrl(reader.result);
+    reader.readAsDataURL(file);
 
-  setUploadStatus("Uploading...");
-  const form = new FormData();
-  form.append("avatar", file);
+    setUploadStatus("Uploading...");
+    const form = new FormData();
+    form.append("avatar", file);
 
-  try {
-    const resp = await fetch("/api/users/me/avatar", {
-      method: "POST",
-      credentials: "include",
-      body: form,
-    });
-    if (!resp.ok) throw new Error("Server error " + resp.status);
-    const data = await resp.json();
-    
-    const newAvatar = (data?.avatar && data.avatar !== "")
-      ? data.avatar
-      : `/uploads/${viewingProfileId}/avatar.png?${Date.now()}`;
-
-    setAvatarUrl(newAvatar);
-    setPreviewUrl(newAvatar);
-
-
-    setUser(prev => ({ ...prev, avatar: newAvatar }));
-
-    setUploadStatus("Avatar updated.");
-  } catch (err) {
-    console.error(err);
-    setUploadStatus("Error uploading avatar.");
-  } finally {
-    if (fileInputRef.current) fileInputRef.current.value = "";
-    setTimeout(() => setUploadStatus(""), 3000);
-  }
-};
-
-const handleDeleteAvatar = async () => {
-  if (!confirm("Are you sure you want to delete avatar?")) return;
-  setUploadStatus("Deleting...");
-  try {
-    const resp = await fetch("/api/users/me/avatar", {
-      method: "DELETE",
-      credentials: "include",
-    });
-    if (!resp.ok) throw new Error("Server error " + resp.status);
-    const data = await resp.json();
-
-    const newAvatar = (data?.avatar && data.avatar !== "")
-        ? data.avatar
-        : "/src/default_pfp.png";
-
-    setAvatarUrl(newAvatar);
-    setPreviewUrl(newAvatar);
-    setUser(prev => ({ ...prev, avatar: newAvatar })); 
-
-    setModalOpen(false);
-    setUploadStatus("Avatar deleted.");
-  } catch (err) {
-    console.error(err);
-    setUploadStatus("Error deleting avatar.");
-  } finally {
-    setTimeout(() => setUploadStatus(""), 2500);
-  }
-};
-
-
-
-  useEffect(() => {
-    let ws;
-    async function initWS() {
-      try {
-        const meRes = await fetch("/api/users/me", { credentials: "include" });
-        const me = await meRes.json();
-        if (!me?.id) return;
-        ws = new WebSocket(`ws://localhost:8080/ws?user_id=${me.id}`);
-        ws.onmessage = (event) => {
-          const notifList = document.getElementById("notifList");
-          const notifCountSpan = document.getElementById("notifCount");
-          if (notifList && notifCountSpan) {
-            const li = document.createElement("li");
-            li.textContent = event.data;
-            notifList.prepend(li);
-            notifCountSpan.textContent = Number(notifCountSpan.textContent || 0) + 1;
-            notifCountSpan.style.display = "inline";
-          }
-        };
-        ws.onclose = () => setTimeout(initWS, 2000);
-      } catch (err) {
-        console.error("WebSocket error:", err);
-      }
+    try {
+      const resp = await fetch("/api/users/me/avatar", {
+        method: "POST",
+        credentials: "include",
+        body: form,
+      });
+      if (!resp.ok) throw new Error("Server error " + resp.status);
+      const data = await resp.json();
+      const newAvatar = data?.avatar || `/uploads/${viewingProfileId}/avatar.png?${Date.now()}`;
+      setAvatarUrl(newAvatar);
+      setPreviewUrl(newAvatar);
+      setUser(prev => ({ ...prev, avatar: newAvatar }));
+      setUploadStatus("Avatar updated.");
+    } catch {
+      setUploadStatus("Error uploading avatar.");
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      setTimeout(() => setUploadStatus(""), 3000);
     }
-    initWS();
-    return () => {
-      if (ws) ws.close();
-    };
-  }, []);
+  };
 
+  const handleDeleteAvatar = async () => {
+    if (!confirm("Are you sure you want to delete avatar?")) return;
+    setUploadStatus("Deleting...");
+    try {
+      const resp = await fetch("/api/users/me/avatar", { method: "DELETE", credentials: "include" });
+      if (!resp.ok) throw new Error("Server error " + resp.status);
+      const data = await resp.json();
+      const newAvatar = data?.avatar || "/src/default_pfp.png";
+      setAvatarUrl(newAvatar);
+      setPreviewUrl(newAvatar);
+      setUser(prev => ({ ...prev, avatar: newAvatar }));
+      setModalOpen(false);
+      setUploadStatus("Avatar deleted.");
+    } catch {
+      setUploadStatus("Error deleting avatar.");
+    } finally {
+      setTimeout(() => setUploadStatus(""), 2500);
+    }
+  };
+
+  
   const handleBioSave = async () => {
     try {
       const res = await fetch("/api/users/me", {
@@ -277,12 +195,10 @@ const handleDeleteAvatar = async () => {
   };
 
   if (loading) {
-    return (
-      <>
-        <Header />
-        <div className="loading">Loading...</div>
-      </>
-    );
+    return <>
+      <Header />
+      <div className="loading">Loading...</div>
+    </>;
   }
 
   return (
@@ -291,125 +207,75 @@ const handleDeleteAvatar = async () => {
       <div className="profile-card">
         <div className="profile-header"></div>
 
-        <div className="notif-container">
-          <button id="notifBtn" className="notif-btn">
-            <img src="/src/mail-pink.png" alt="Notifications" />
-            <span id="notifCount" className="notif-count">0</span>
-          </button>
-          <div id="notifMenu" className="notif-menu">
-            <p>Notifications</p>
-            <ul id="notifList"></ul>
-          </div>
-        </div>
-        <FollowList userId={viewingProfileId} />
+        <FollowList userId={viewingProfileId} followers={followers} setFollowers={setFollowers} />
 
         <div className="avatar-row">
           <img
-            id="avatarImg"
             className="avatar"
             src={avatarUrl}
             alt="avatar"
             onClick={onAvatarClick}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: isOwnProfile ? "pointer" : "default" }}
           />
           <div className="name-and-email">
             <div className="name-header">
               <h1 className="name">{user?.name || "Loading..."}</h1>
-              <FollowButton
-                key={`follow-${viewingProfileId}-${currentUserId}`}
-                userId={viewingProfileId}
-                currentUserId={currentUserId}
-              />
+              {!isOwnProfile && (
+                <FollowButton
+                  userId={viewingProfileId}
+                  currentUserId={currentUserId}
+                  followers={followers}
+                  setFollowers={setFollowers}
+                />
+              )}
             </div>
-
-            {isOwnProfile ? (
-              <div className="email">
-                <b>Email:</b> {user?.email || "—"}
-              </div>
-            ) : (
-              <div className="email muted">Private</div>
-            )}
+            {isOwnProfile ? <div className="email"><b>Email:</b> {user?.email || "—"}</div> : <div className="email muted">Private</div>}
           </div>
         </div>
 
         <div id="uploadStatus" className="upload-status">{uploadStatus}</div>
-        <input
-          ref={fileInputRef}
-          id="avatarInput"
-          type="file"
-          accept="image/*"
-          style={{ display: "none" }}
-          onChange={handleFileChange}
-        />
+        <input ref={fileInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFileChange} />
 
         <hr />
         <h3>Bio</h3>
         {!bioEdit && <div className="bio">{bioText}</div>}
         {bioEdit && (
           <div className="bio-edit">
-            <textarea
-              style={{ width: "100%", fontSize: 18 }}
-              value={bioText}
-              onChange={(e) => setBioText(e.target.value)}
-            />
+            <textarea style={{ width: "100%", fontSize: 18 }} value={bioText} onChange={(e) => setBioText(e.target.value)} />
             <div className="bio-buttons">
               <button onClick={handleBioSave} className="btn btn-save">Save</button>
               <button onClick={() => setBioEdit(false)} className="btn btn-cancel">Cancel</button>
             </div>
           </div>
         )}
-
-        {!bioEdit && isOwnProfile && (
-          <button onClick={() => setBioEdit(true)} className="btn btn-edit">Edit</button>
-        )}
+        {!bioEdit && isOwnProfile && <button onClick={() => setBioEdit(true)} className="btn btn-edit">Edit</button>}
 
         <hr />
         <h3>Playlists</h3>
         <div className="playlists-grid">
-          {(!playlists || playlists.length === 0) ? (
-            <p className="muted">No playlists yet</p>
-          ) : (
-            playlists.map((pl) => (
-              <PlaylistCard
-                key={pl.id}
-                playlist={pl}
-                onClick={() => (window.location.href = `/playlist?id=${pl.id}`)}
-              />
-            ))
-          )}
+          {playlists.length === 0 ? <p className="muted">No playlists yet</p> : playlists.map(pl => <PlaylistCard key={pl.id} playlist={pl} onClick={() => window.location.href = `/playlist?id=${pl.id}`} />)}
         </div>
 
         <hr />
         <h3>Reviews</h3>
-       
-<div>
-  {(!reviews || reviews.length === 0) ? (
-    <p className="muted">No reviews yet</p>
-  ) : (
-    reviews.map((rv) => {
-      const reviewWithAvatar = { ...rv, user_avatar: avatarUrl, user_name: user?.name };
-      return <ReviewCard key={rv.id} review={reviewWithAvatar} />;
-    })
-  )}
-</div>
+        <div>
+          {reviews.length === 0 ? <p className="muted">No reviews yet</p> : reviews.map(rv => <ReviewCard key={rv.id} review={{ ...rv, user_avatar: avatarUrl, user_name: user?.name }} />)}
+        </div>
 
-      </div>
-
-      <div id="avatarModal" className={`modal ${modalOpen ? "open" : ""}`}>
-        <div className="modal-content">
-          <div className="close-modal" onClick={() => setModalOpen(false)}>&times;</div>
-          <img id="modalAvatar" ref={modalAvatarRef} src={previewUrl} alt="Avatar preview" />
-          <div className="avatar-options">
+        <div id="avatarModal" className={`modal ${modalOpen ? "open" : ""}`}>
+          <div className="modal-content">
+            <div className="close-modal" onClick={() => setModalOpen(false)}>&times;</div>
+            <img src={previewUrl} alt="Avatar preview" />
             {isOwnProfile && (
-              <>
-                <button id="changeAvatarBtn" onClick={() => fileInputRef.current?.click()} className="btn btn-edit">Change pfp</button>
-                <button id="deleteAvatarBtn" onClick={handleDeleteAvatar} className="btn btn-cancel">Delete pfp</button>
-              </>
+              <div className="avatar-options">
+                <button onClick={() => fileInputRef.current?.click()} className="btn btn-edit">Change pfp</button>
+                <button onClick={handleDeleteAvatar} className="btn btn-cancel">Delete pfp</button>
+              </div>
             )}
           </div>
         </div>
       </div>
-
+   
       <style jsx>{`
         @font-face {
           font-family: 'Basiic';

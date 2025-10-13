@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 
-export default function FollowList({ userId }) {
+export default function FollowList({ userId, followers, setFollowers }) {
+
   const [tab, setTab] = useState("followers");
   const [list, setList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
@@ -39,6 +40,13 @@ export default function FollowList({ userId }) {
 
     load();
   }, [userId, tab]);
+
+  useEffect(() => {
+  if (followers && Array.isArray(followers)) {
+    setList(followers);
+    setFilteredList(followers);
+  }
+}, [followers]);
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
@@ -86,9 +94,9 @@ export default function FollowList({ userId }) {
             {filteredList.map((u) => (
               <li
                 key={u.id}
-                onClick={() => (window.location.href = `/profile?id=${u.id}`)}
+                onClick={() => (window.location.href = `/profile?id=${u.ID}`)}
               >
-                ▓ {u.name || `User #${u.id}`}
+                ▓ {u.name || `User #${u.ID}`}
               </li>
             ))}
           </ul>
