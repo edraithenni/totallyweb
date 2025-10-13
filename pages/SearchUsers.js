@@ -1,20 +1,36 @@
 import Head from "next/head";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "../components/header";
 import HudScene from "../components/HudScene2";
 import UserCard from "../components/UserCard";
 
 export default function SearchUsersPage() {
+  const [currentUser, setCurrentUser] = useState(null);
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false); // ✅ добавляем флаг
+  const [searched, setSearched] = useState(false);
+
+  useEffect(() => {
+    async function fetchCurrentUser() {
+      try {
+        const res = await fetch("/api/users/me", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          setCurrentUser(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch current user", err);
+      }
+    }
+    fetchCurrentUser();
+  }, []);
 
   async function searchUsers() {
     const q = query.trim();
     if (!q) return;
     setLoading(true);
-    setSearched(true); 
+    setSearched(true);
     try {
       const res = await fetch(`/api/users/search?query=${encodeURIComponent(q)}`);
       const data = await res.json();
@@ -26,7 +42,7 @@ export default function SearchUsersPage() {
     }
   }
 
-  const showHud = !searched; 
+  const showHud = !searched;
 
   return (
     <>
@@ -34,7 +50,6 @@ export default function SearchUsersPage() {
         <title>User Search — Totally Guys</title>
       </Head>
 
-      {}
       {showHud && (
         <div style={{ position: "fixed", inset: 0, zIndex: 1, opacity: 0.6 }}>
           <HudScene />
@@ -50,12 +65,10 @@ export default function SearchUsersPage() {
           zIndex: 2,
           paddingBottom: "2rem",
           background: "transparent",
-          
         }}
       >
         <Header />
 
-        {}
         <div
           style={{
             maxWidth: 600,
@@ -101,7 +114,6 @@ export default function SearchUsersPage() {
           </button>
         </div>
 
-        {}
         {searched && (
           <div
             style={{
@@ -118,7 +130,13 @@ export default function SearchUsersPage() {
             }}
           >
             {users.length > 0 ? (
-              users.map((u) => <UserCard key={u.id} user={u} />)
+              users.map((u) => (
+                <UserCard
+                  key={u.ID}
+                  user={u}
+                  currentUserId={currentUser?.id}
+                />
+              ))
             ) : (
               <div
                 style={{
