@@ -1,13 +1,38 @@
 import { useEffect, useState, useRef } from "react";
 
-export default function FollowList({ userId, followers, setFollowers }) {
-
+export default function FollowList({ userId, followers}) {
   const [tab, setTab] = useState("followers");
   const [list, setList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchActive, setSearchActive] = useState(false);
   const inputRef = useRef(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  useEffect(() => {
+    async function loadCurrentUser() {
+      const res = await fetch("/api/users/me", { credentials: "include" });
+      if (res.ok) {
+        const me = await res.json();
+        setCurrentUserId(me.id);
+      }
+    }
+    loadCurrentUser();
+  }, []);
+
+  function normalizeItems(items, meId) {
+    return (items || []).map(u => {
+      if (u.ID === meId) return { ...u, name: "You", isYou: true };
+      return { ...u, isYou: false };
+    });
+  }
+
+  useEffect(() => {
+    if (!Array.isArray(followers)) return;
+    const normalized = normalizeItems(followers, currentUserId);
+    setList(normalized);
+    setFilteredList(normalized);
+  }, [followers, currentUserId]);
 
   useEffect(() => {
     if (!userId) return;
@@ -21,14 +46,14 @@ export default function FollowList({ userId, followers, setFollowers }) {
             : `/api/users/${userId}/following`;
         const res = await fetch(endpoint, { credentials: "include" });
         const data = await res.json();
-
         const items =
           tab === "followers"
             ? data.followers || data.data || []
             : data.following || data.data || [];
         const validList = Array.isArray(items) ? items : [];
-        setList(validList);
-        setFilteredList(validList);
+        const normalized = normalizeItems(validList, currentUserId);
+        setList(normalized);
+        setFilteredList(normalized);
       } catch (err) {
         console.error("FollowList load error:", err);
         setList([]);
@@ -39,14 +64,7 @@ export default function FollowList({ userId, followers, setFollowers }) {
     }
 
     load();
-  }, [userId, tab]);
-
-  useEffect(() => {
-  if (followers && Array.isArray(followers)) {
-    setList(followers);
-    setFilteredList(followers);
-  }
-}, [followers]);
+  }, [userId, tab, currentUserId]);
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
@@ -93,8 +111,9 @@ export default function FollowList({ userId, followers, setFollowers }) {
           <ul>
             {filteredList.map((u) => (
               <li
-                key={u.id}
+                key={u.ID}
                 onClick={() => (window.location.href = `/profile?id=${u.ID}`)}
+                className={u.isYou ? "you-item" : ""}
               >
                 ▓ {u.name || `User #${u.ID}`}
               </li>
@@ -212,6 +231,13 @@ export default function FollowList({ userId, followers, setFollowers }) {
         li:hover {
           background: #082050;
           color: #61E0F4;
+        }
+
+        .you-item {
+          color: #ff66cc;
+          background: #30001f;
+          font-weight: bold;
+          
         }
 
         .dos-line {

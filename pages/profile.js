@@ -47,10 +47,18 @@ export default function ProfilePage() {
 
             const resFollowers = await fetch(`/api/users/${profileId}/followers`, { credentials: "include" });
             if (resFollowers.ok) {
-              const dataFollowers = await resFollowers.json();
-              setFollowers(dataFollowers.followers || dataFollowers.data || []);
-            }
+            const dataFollowers = await resFollowers.json();
+  let list = dataFollowers.followers || dataFollowers.data || [];
 
+  
+  if (Array.isArray(list) && me?.id) {
+    list = list.map(f => 
+      f.ID === me.id ? { ...f, name: "You", isYou: true } : f
+    );
+  }
+
+  setFollowers(list);
+}
             await loadPlaylists(profileId);
             await loadReviews(profileId);
           } else {
@@ -207,7 +215,13 @@ export default function ProfilePage() {
       <div className="profile-card">
         <div className="profile-header"></div>
 
-        <FollowList userId={viewingProfileId} followers={followers} setFollowers={setFollowers} />
+       <FollowList
+  userId={viewingProfileId}
+  followers={followers}
+  setFollowers={setFollowers}
+  currentUserId={currentUserId}
+/>
+
 
         <div className="avatar-row">
           <img

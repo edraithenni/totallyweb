@@ -1,7 +1,6 @@
-// components/FollowButton.js
 import { useState, useEffect } from "react";
 
-export default function FollowButton({ userId, currentUserId, followers, setFollowers }) {
+export default function FollowButton({ userId, currentUserId, setFollowers }) {
   if (!currentUserId) return null;
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -15,7 +14,7 @@ export default function FollowButton({ userId, currentUserId, followers, setFoll
       setCheckingStatus(false);
       return;
     }
-    
+
     async function checkFollowStatus() {
       try {
         const res = await fetch(`/api/users/${userId}/is-following`, { credentials: "include" });
@@ -45,17 +44,15 @@ export default function FollowButton({ userId, currentUserId, followers, setFoll
       if (res.ok) {
         setIsFollowing(!isFollowing);
 
- if (setFollowers) {
-        if (!isFollowing) {
-         
-          setFollowers(prev => [...prev, { ID: currentUserId, name: "You" }]);
-        } else {
-      
-          setFollowers(prev => prev.filter(f => f.ID !== currentUserId));
+        if (setFollowers) {
+          if (!isFollowing) {
+            setFollowers(prev => [...prev, { ID: currentUserId, name: "You" }]);
+          } else {
+            setFollowers(prev => prev.filter(f => f.ID !== currentUserId));
+          }
         }
       }
-    }
-  } catch (err) {
+    } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
@@ -73,54 +70,45 @@ export default function FollowButton({ userId, currentUserId, followers, setFoll
       className={`follow-btn ${isFollowing ? "unfollow" : "follow"}`}
     >
       {loading ? "..." : isFollowing ? "Unfollow" : "Follow"}
+      <style jsx>{`
+        .follow-btn {
+          padding: 0.2rem 1rem;
+          border: 1px solid;
+          cursor: pointer;
+          font-family: 'Basiic', sans-serif;
+          font-size: 0.9rem;
+          transition: all 0.3s ease;
+          border-radius: 0;
+        }
+
+        .follow-btn.follow {
+          background: #ff66cc !important;
+          color: #000 !important;
+          border-color: #30001f !important;
+        }
+
+        .follow-btn.follow:hover {
+          background: #ff66cc !important;
+          color: #61E0F4 !important;
+          border-color: #556b3bff !important;
+        }
+
+        .follow-btn.unfollow {
+          background: #cab3ffff !important;
+          color: #000 !important;
+        }
+
+        .follow-btn.unfollow:hover {
+          background: #908bd2ff !important;
+          color: #61E0F4 !important;
+          border-color: #908bd2ff !important;
+        }
+
+        .follow-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      `}</style>
     </button>
   );
-}
-
-
-
-const styles = `
-  .follow-btn {
-    padding: 0.2rem 1rem;
-    border: 1px solid;
-    cursor: pointer;
-    font-family: 'Basiic', sans-serif;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    border-radius: 0;
-  }
-
-  .follow-btn.follow {
-    background: #595f52ff;
-    color: #000;
-    border-color: #595f52ff;
-  }
-
-  .follow-btn.follow:hover {
-    background: #556b3bff;
-    color: #61E0F4;
-    border-color: #556b3bff;
-  }
-
-  .follow-btn.unfollow {
-    background: #cab3ffff;
-    color: #000;
-  }
-
-  .follow-btn.unfollow:hover {
-    background: #908bd2ff;
-    color: #61E0F4;
-    border-color: #908bd2ff;
-  }
-
-  .follow-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-`;
-
-if (typeof document !== 'undefined') {
-  const styleSheet = document.createElement('style');
-  styleSheet.textContent = styles;
-  document.head.appendChild(styleSheet);
 }
