@@ -479,7 +479,7 @@ export default function PlaylistPage() {
 .random-card {
   display: inline-block;
   margin-top: 1rem;
-  border: 2px solid #8a2be2;
+  border: 1px solid var(--border-primary);
   padding: 0.5rem;
   background: var(--bg-panel);
   cursor: pointer;
@@ -490,7 +490,7 @@ export default function PlaylistPage() {
   width: 150px;
   height: 220px;
   object-fit: cover;
-  border: 1px solid #8a2be2;
+  border: 1px solid var(--border-primary);
 }
 .random-card h3 {
   margin-top: 0.5rem;
