@@ -9,6 +9,9 @@ export default function PlaylistPage() {
   const [playlistOwnerId, setPlaylistOwnerId] = useState(null);
   const [editingMovie, setEditingMovie] = useState(null);
   const [editText, setEditText] = useState("");
+  const [randomMovie, setRandomMovie] = useState(null);
+  const [spinning, setSpinning] = useState(false);
+
 
   const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
   const playlistId = params?.get("id");
@@ -24,6 +27,8 @@ export default function PlaylistPage() {
     div.textContent = text;
     return div.innerHTML;
   }
+
+
 
   async function saveDescription(movieId) {
     try {
@@ -73,6 +78,28 @@ export default function PlaylistPage() {
 
     loadPlaylist();
   }, [playlistId]);
+  
+  async function handlePickRandom() {
+  if (!movies.length) return;
+  setSpinning(true);
+  setRandomMovie(null);
+
+  let spins = 20 + Math.floor(Math.random() * 10);
+  let index = 0;
+
+  const spinInterval = setInterval(() => {
+    index = (index + 1) % movies.length;
+    setRandomMovie(movies[index]);
+  }, 100);
+
+  setTimeout(() => {
+    clearInterval(spinInterval);
+    const winner = movies[Math.floor(Math.random() * movies.length)];
+    setRandomMovie(winner);
+    setSpinning(false);
+  }, spins * 100);
+}
+
 
   return (
     <>
@@ -83,6 +110,19 @@ export default function PlaylistPage() {
       </Head>
 
       <Header />
+
+    {randomMovie && (
+        <div className={`random-result ${spinning ? "spinning" : "final"}`}>
+            <h2>You got:</h2>
+            <div className="random-card" onClick={() => goToMovie(randomMovie.ID)}>
+            <img
+                src={randomMovie.poster || randomMovie.poster_url || "/static/movies/poster-placeholder.png"}
+                alt={randomMovie.title}
+            />
+            <h3>{randomMovie.title}</h3>
+            </div>
+        </div>
+        )}
 
       <div className="playlist-container">
         <div className="playlist-header">
@@ -96,6 +136,16 @@ export default function PlaylistPage() {
             <p id="playlist-owner">By {playlist?.owner_name || `User ${playlist?.ownerId}`}</p>
             <p id="movie-count">{movies.length} movies</p>
           </div>
+          {playlist?.name === "watch-later" && movies.length > 0 && (
+        <button
+            className="pick-random-btn"
+            disabled={spinning}
+            onClick={handlePickRandom}
+        >
+       {spinning ? "Spinning..." : "Pick Random"}
+        </button>
+        )}
+
         </div>
         <div className="movies-list" id="movies">
           {movies.length === 0 ? (
@@ -396,6 +446,69 @@ export default function PlaylistPage() {
   font-size: 0.9rem;
   margin-left: 0.3rem;
 }
+
+.pick-random-btn {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #100030;
+  border: 1px solid #8a2be2;
+  color: #ccadf2;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  font-family: var(--font-terminal);
+  box-shadow: var(--glow-medium);
+}
+.pick-random-btn:hover {
+  background: #2C000A;
+  color: #BE00ED;
+  box-shadow: 0 0 15px #233007;
+}
+
+.random-result {
+  text-align: center;
+  margin-top: 2rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.random-result h2 {
+  color: #ff00cc;
+  text-shadow: 0 0 10px #ff00cc, 0 0 20px #8a2be2;
+}
+
+.random-card {
+  display: inline-block;
+  margin-top: 1rem;
+  border: 2px solid #8a2be2;
+  padding: 0.5rem;
+  background: var(--bg-panel);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: var(--glow-medium);
+}
+.random-card img {
+  width: 150px;
+  height: 220px;
+  object-fit: cover;
+  border: 1px solid #8a2be2;
+}
+.random-card h3 {
+  margin-top: 0.5rem;
+  font-family: var(--font-terminal);
+  color: #ccadf2;
+  text-shadow: var(--glow-medium);
+}
+.random-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px #ff00cc;
+  background: #040F04
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 
 
 `}</style>
