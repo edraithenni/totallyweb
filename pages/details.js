@@ -78,7 +78,7 @@ export default function DetailsPage() {
 
       <div className="reviews-section">
         <h3>Reviews</h3>
-        {reviews.length === 0 ? <p>No reviews yet.</p> : reviews.map(r => <ReviewCard key={r.id} review={r} />)}
+        {reviews === null ? <p>No reviews yet.</p> : reviews.map(r => <ReviewCard key={r.id} review={r} />)}
 
         <div className="review-form">
           <h4>Create Review</h4>
