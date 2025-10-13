@@ -3,6 +3,8 @@ import Header from "../components/header";
 import ReviewCard from "../components/ReviewCard";
 import PlaylistCard from "../components/PlaylistCard";
 import FollowButton from "../components/FollowButton";
+import FollowList from "../components/FollowList";
+
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -299,6 +301,7 @@ const handleDeleteAvatar = async () => {
             <ul id="notifList"></ul>
           </div>
         </div>
+        <FollowList userId={viewingProfileId} />
 
         <div className="avatar-row">
           <img
