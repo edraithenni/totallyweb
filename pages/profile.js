@@ -4,6 +4,7 @@ import ReviewCard from "../components/ReviewCard";
 import PlaylistCard from "../components/PlaylistCard";
 import FollowButton from "../components/FollowButton";
 import FollowList from "../components/FollowList";
+import NotificationBell from "../components/NotificationBell";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -215,12 +216,17 @@ export default function ProfilePage() {
       <div className="profile-card">
         <div className="profile-header"></div>
 
+        {isOwnProfile && (
+            <div className="notif-container">
+            <NotificationBell userId={currentUserId} />
+            </div>
+        )}
        <FollowList
-  userId={viewingProfileId}
-  followers={followers}
-  setFollowers={setFollowers}
-  currentUserId={currentUserId}
-/>
+        userId={viewingProfileId}
+        followers={followers}
+        setFollowers={setFollowers}
+        currentUserId={currentUserId}
+        />
 
 
         <div className="avatar-row">
