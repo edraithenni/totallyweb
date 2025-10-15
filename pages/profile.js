@@ -216,11 +216,11 @@ export default function ProfilePage() {
       <div className="profile-card">
         <div className="profile-header"></div>
 
-        {isOwnProfile && (
+       {isOwnProfile && ( 
             <div className="notif-container">
             <NotificationBell userId={currentUserId} />
             </div>
-        )}
+        )} 
        <FollowList
         userId={viewingProfileId}
         followers={followers}
