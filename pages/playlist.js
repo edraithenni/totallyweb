@@ -100,6 +100,23 @@ export default function PlaylistPage() {
   }, spins * 100);
 }
 
+async function removeMovieFromPlaylist(movieId) {
+  if (!confirm("Remove this movie from the playlist?")) return;
+  try {
+    const res = await fetch(`/api/playlists/${playlistId}/movies/${movieId}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (res.ok) {
+      setMovies((prev) => prev.filter((m) => m.ID !== movieId));
+    } else {
+      alert("Failed to remove movie");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error removing movie");
+  }
+}
 
   return (
     <>
@@ -149,6 +166,7 @@ export default function PlaylistPage() {
 
         </div>
         <div className="movies-list" id="movies">
+          
           {movies.length === 0 ? (
             <p style={{ textAlign: "center", color: "#9C9CC9", padding: "40px" }}>
               No movies in this playlist yet
@@ -156,6 +174,14 @@ export default function PlaylistPage() {
           ) : (
             movies.map((movie) => (
               <div className="movie-item" key={movie.ID}>
+                {currentUserId === playlistOwnerId && (
+  <button
+    className="remove-movie-btn"
+    onClick={() => removeMovieFromPlaylist(movie.ID)}
+  >
+    Remove
+  </button>
+)}
                 <img
                   src={movie.poster || movie.poster_url || "/movies/poster-placeholder.png"}
                   alt={movie.title}
@@ -209,6 +235,8 @@ export default function PlaylistPage() {
               </div>
             ))
           )}
+          
+
         </div>
       </div>
 
@@ -504,6 +532,34 @@ export default function PlaylistPage() {
   box-shadow: 0 0 20px #ff00cc;
   background: #040F04
 }
+
+.remove-movie-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #000;
+  border: 1px solid #ff0033;
+  color: #ff0033;
+  font-family: var(--font-terminal);
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 5px #ff0033;
+  z-index: 2;
+}
+.remove-movie-btn:hover {
+  background: #ff0033;
+  color: #000;
+  box-shadow: 0 0 10px #ff0033;
+  transform: scale(1.1);
+}
+
+.movie-item {
+  position: relative; 
+}
+
+ 
 
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
