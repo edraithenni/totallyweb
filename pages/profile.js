@@ -5,6 +5,7 @@ import PlaylistCard from "../components/PlaylistCard";
 import FollowButton from "../components/FollowButton";
 import FollowList from "../components/FollowList";
 import NotificationBell from "../components/NotificationBell";
+import Link from "next/link"
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -273,13 +274,18 @@ export default function ProfilePage() {
         <hr />
         <h3>Playlists</h3>
         <div className="playlists-grid">
-          {playlists.length === 0 ? <p className="muted">No playlists yet</p> : playlists.map(pl => <PlaylistCard key={pl.id} playlist={pl} onClick={() => window.location.href = `/playlist?id=${pl.id}`} />)}
+          {playlists.length === 0 ? <p className="muted">No playlists yet</p> : playlists.map(pl => <Link href={`/playlist?id=${pl.id}`}>
+              <PlaylistCard key={pl.id} playlist={pl}/>
+           </Link>)}
         </div>
-
         <hr />
         <h3>Reviews</h3>
         <div>
-          {reviews.length === 0 ? <p className="muted">No reviews yet</p> : reviews.map(rv => <ReviewCard key={rv.id} review={{ ...rv, user_avatar: avatarUrl, user_name: user?.name }} />)}
+          {reviews.length === 0 ? <p className="muted">No reviews yet</p> : reviews.map(rv =>
+             <ReviewCard key={rv.id} review={{ ...rv, user_avatar: avatarUrl, user_name: user?.name }} 
+              currentUser={{ id: currentUserId }}
+              showMovieLink={true}
+              onReviewDeleted={() => setReviews(prev => prev.filter(r => r.id !== rv.id))}/>)}
         </div>
 
         <div id="avatarModal" className={`modal ${modalOpen ? "open" : ""}`}>

@@ -8,6 +8,7 @@ export default function DetailsPage() {
   const [reviews, setReviews] = useState([]);
   const [reviewContent, setReviewContent] = useState("");
   const [reviewRating, setReviewRating] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
 
   const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
   const movieId = params?.get("id");
@@ -22,6 +23,22 @@ export default function DetailsPage() {
 
     loadReviews();
   }, [movieId]);
+  
+  useEffect(() => {
+  async function loadCurrentUser() {
+    try {
+      const res = await fetch("/api/users/me", { credentials: "include" });
+      if (res.ok) {
+        const me = await res.json();
+        setCurrentUser(me);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  loadCurrentUser();
+}, []);
+
 
   async function loadReviews() {
     if (!movieId) return;
@@ -53,6 +70,7 @@ export default function DetailsPage() {
     } catch (err) { alert("Error submitting review"); }
   }
 
+ 
   if (!movie) return <div>Loading...</div>;
 
   return (
@@ -78,7 +96,12 @@ export default function DetailsPage() {
 
       <div className="reviews-section">
         <h3>Reviews</h3>
-        {reviews === null ? <p>No reviews yet.</p> : reviews.map(r => <ReviewCard key={r.id} review={r} />)}
+        {reviews === null ? <p>No reviews yet.</p> : reviews.map(r => 
+        <ReviewCard 
+        key={r.id} 
+        review={r}
+        currentUser={currentUser}
+        onReviewDeleted={loadReviews} />)}
 
         <div className="review-form">
           <h4>Create Review</h4>

@@ -2,13 +2,37 @@
 import { useState } from "react";
 import Link from "next/link";
 
-export default function ReviewCard({ review, showMovieLink = false, showUserLink = false }) {
+export default function ReviewCard({ review, showMovieLink = false, showUserLink = false, currentUser, onReviewDeleted}) {
   const [expanded, setExpanded] = useState(false);
-  
+  const [isDeleting, setIsDeleting] = useState(false);
   const maxLength = 200;
   const needsTruncation = review.content && review.content.length > maxLength;
   const displayContent = expanded ? review.content : 
     needsTruncation ? review.content.substring(0, maxLength) + "..." : (review.content || "No content");
+
+  const isOwner = currentUser && currentUser.id === review.user_id;
+
+  const deleteReview = async () => {
+    if (!confirm("Are you sure you want to delete this review?")) return;
+    
+      setIsDeleting(true);
+      try {
+        const res = await fetch(`/api/reviews/${review.id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+        if (res.ok) {
+           if (onReviewDeleted) {
+          onReviewDeleted(); 
+        }
+        } else {
+          alert("Failed to delete review");
+        }
+      } catch (err) { alert("Error deleting review"); 
+      }finally {
+      setIsDeleting(false);
+    }
+    }
 
   const safeRating = () => {
     try {
@@ -37,6 +61,8 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
     }
   };
 
+   
+  
   return (
     <div className="review-card">
       <div className="review-header">
@@ -51,12 +77,22 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
            </Link>
 
         </div>
-        
+        {showMovieLink && (
         <div className="movie-info">
           <Link href={`/details?id=${review.movie_id}`} className="movie-link">
             {review.movie_title || "Unknown Movie"}
             </Link>
         </div>
+        )}
+        {isOwner && (
+          <button 
+            onClick={deleteReview}
+            disabled={isDeleting}
+            className="delete-review-btn"
+          >
+            {isDeleting ? "Deleting..." : "❌"}
+          </button>
+        )}
       </div>
 
       
@@ -117,6 +153,7 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
           justify-content: space-between;
           align-items: flex-start;
           margin-bottom: 1rem;
+          position: relative; 
           flex-wrap: wrap;
           gap: 0.5rem;
         }
@@ -238,6 +275,30 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
           color: #9c9cc9;
           font-size: 0.9rem;
         }
+
+
+  .delete-review-btn {
+  top: 0;
+  right: 0;
+  background: #000;
+  border: 1px solid #ff0033;
+  color: #ff0033;
+  font-family: var(--font-terminal);
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 2;
+  box-shadow: 0 0 5px #ff0033;
+}
+
+
+.delete-review-btn:hover {
+  background: #ff3366;
+  transform: scale(1.1);
+  color: #000;
+  box-shadow: 0 0 10px #ff0033;
+}
 
         @media (max-width: 480px) {
           .review-header {
