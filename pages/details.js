@@ -7,7 +7,8 @@ export default function DetailsPage() {
   const [movie, setMovie] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [reviewContent, setReviewContent] = useState("");
-  const [reviewRating, setReviewRating] = useState("");
+  const [reviewRating, setReviewRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
   const [currentUser, setCurrentUser] = useState(null);
 
   const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
@@ -25,20 +26,19 @@ export default function DetailsPage() {
   }, [movieId]);
   
   useEffect(() => {
-  async function loadCurrentUser() {
-    try {
-      const res = await fetch("/api/users/me", { credentials: "include" });
-      if (res.ok) {
-        const me = await res.json();
-        setCurrentUser(me);
+    async function loadCurrentUser() {
+      try {
+        const res = await fetch("/api/users/me", { credentials: "include" });
+        if (res.ok) {
+          const me = await res.json();
+          setCurrentUser(me);
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
     }
-  }
-  loadCurrentUser();
-}, []);
-
+    loadCurrentUser();
+  }, []);
 
   async function loadReviews() {
     if (!movieId) return;
@@ -62,7 +62,7 @@ export default function DetailsPage() {
       });
       if (res.ok) {
         setReviewContent("");
-        setReviewRating("");
+        setReviewRating(0);
         loadReviews();
       } else {
         alert("Failed to submit review");
@@ -70,7 +70,6 @@ export default function DetailsPage() {
     } catch (err) { alert("Error submitting review"); }
   }
 
- 
   if (!movie) return <div>Loading...</div>;
 
   return (
@@ -98,15 +97,33 @@ export default function DetailsPage() {
         <h3>Reviews</h3>
         {reviews === null ? <p>No reviews yet.</p> : reviews.map(r => 
         <ReviewCard 
-        key={r.id} 
-        review={r}
-        currentUser={currentUser}
-        onReviewDeleted={loadReviews} />)}
+          key={r.id} 
+          review={r}
+          currentUser={currentUser}
+          onReviewDeleted={loadReviews} />)}
 
         <div className="review-form">
           <h4>Create Review</h4>
-          <textarea placeholder="Write your review" value={reviewContent} onChange={e => setReviewContent(e.target.value)} />
-          <input type="number" placeholder="Rating (1-10)" min="1" max="10" value={reviewRating} onChange={e => setReviewRating(e.target.value)} />
+          <textarea
+            placeholder="Write your review"
+            value={reviewContent}
+            onChange={e => setReviewContent(e.target.value)}
+          />
+          
+          <div className="star-rating">
+            {[1,2,3,4,5,6,7,8,9,10].map((star) => (
+              <span
+                key={star}
+                className={`star ${star <= (hoverRating || reviewRating) ? "filled" : ""}`}
+                onClick={() => setReviewRating(star)}
+                onMouseEnter={() => setHoverRating(star)}
+                onMouseLeave={() => setHoverRating(0)}
+              >
+                ★
+              </span>
+            ))}
+          </div>
+
           <button onClick={submitReview}>Submit</button>
         </div>
       </div>
@@ -186,6 +203,27 @@ export default function DetailsPage() {
           padding: 6px 12px;
           font-family: 'Basiic', sans-serif;
         }
+
+        .star-rating {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    user-select: none;
+  }
+
+  .star {
+    color: #444; 
+    transition: color 0.2s;
+  }
+
+  .star.filled {
+    color: #ffc659; 
+  }
+
+  
+  
       `}</style>
     </>
   );
