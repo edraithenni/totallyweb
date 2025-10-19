@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import Header from "../components/header";
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 export default function PlaylistPage() {
   const [playlist, setPlaylist] = useState(null);
@@ -118,6 +120,29 @@ async function removeMovieFromPlaylist(movieId) {
   }
 }
 
+async function deletePlaylist(){
+  if(!confirm("Delete this playlist?"))return;
+  try{
+    const res = await fetch(`api/playlists/${playlistId}`, {
+      method : "DELETE",
+      credentials : "include",
+    });
+    if(res.ok){
+      toast.success("Playlist deleted!");
+      setTimeout(() =>{
+         window.location.assign("/profile");
+      }, 2500);
+     
+      
+    }else{
+    alert("Failed to delete playlist");
+    }
+  }catch(err) {
+    console.error(err);
+    alert("Error removing playlist");
+  }
+}
+
   return (
     <>
       <Head>
@@ -153,6 +178,12 @@ async function removeMovieFromPlaylist(movieId) {
             <h1 id="playlist-name">{playlist?.name || "Loading..."}</h1>
             <p id="playlist-owner">By {playlist?.owner_name || `User ${playlist?.ownerId}`}</p>
             <p id="movie-count">{movies.length} movies</p>
+            {currentUserId === playlistOwnerId && !["watch-later", "watched", "liked"].includes(playlist?.name) &&(
+            <button className="delete-playlist-btn"
+            onClick={deletePlaylist}>
+                Delete playlist
+            </button>            
+            )}
           </div>
           {playlist?.name === "watch-later" && movies.length > 0 && (
         <button
@@ -175,13 +206,11 @@ async function removeMovieFromPlaylist(movieId) {
             movies.map((movie) => (
               <div className="movie-item" key={movie.ID}>
                 {currentUserId === playlistOwnerId && (
-  <button
-    className="remove-movie-btn"
-    onClick={() => removeMovieFromPlaylist(movie.ID)}
-  >
-    Remove
-  </button>
-)}
+              <button
+                className="remove-movie-btn"
+                onClick={() => removeMovieFromPlaylist(movie.ID)}
+              >Remove</button>
+              )}
                 <img
                   src={movie.poster || movie.poster_url || "/movies/poster-placeholder.png"}
                   alt={movie.title}
@@ -239,6 +268,17 @@ async function removeMovieFromPlaylist(movieId) {
 
         </div>
       </div>
+
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2500}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="dark"
+      />
 
       <style jsx global>{`
   @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
@@ -566,7 +606,26 @@ async function removeMovieFromPlaylist(movieId) {
   to { opacity: 1; transform: scale(1); }
 }
 
+.delete-playlist-btn {
+          margin-top: 1rem;
+          padding: 0.5rem 1rem;
+          background: var(--terminal-red);
+          color: black;
+          border: 1px solid var(--terminal-red);
+          font-family: var(--font-terminal);
+          cursor: pointer;
+          transition: all 0.3s;
+          text-transform: uppercase;
+          font-weight: bold;
+          box-shadow: var(--glow-terminalred);
+        }
 
+.delete-playlist-btn:hover {
+          background: #ff3366;
+          border-color: #ff3366;
+          box-shadow: 0 0 15px var(--terminal-red);
+          transform: scale(1.05);
+        }
 
 `}</style>
 
