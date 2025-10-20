@@ -1,16 +1,13 @@
-
 import { useState } from "react";
 import Link from "next/link";
-
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
-
 import Image from "next/image";
-
 
 export default function ReviewCard({ review, showMovieLink = false, showUserLink = false, currentUser, onReviewDeleted}) {
   const [expanded, setExpanded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const maxLength = 200;
   const needsTruncation = review.content && review.content.length > maxLength;
   const displayContent = expanded ? review.content : 
@@ -19,28 +16,29 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
   const isOwner = currentUser && currentUser.id === review.user_id;
 
   const deleteReview = async () => {
-  confirmAction("Are you sure you want to delete this review?", async () => {
-    setIsDeleting(true);
-    try {
-      const res = await fetch(`/api/reviews/${review.id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (res.ok) {
-        toast.success("Review deleted!");
-        if (onReviewDeleted) {
-          onReviewDeleted(); 
+    confirmAction("Are you sure you want to delete this review?", async () => {
+      setIsDeleting(true);
+      try {
+        const res = await fetch(`/api/reviews/${review.id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+        if (res.ok) {
+          toast.success("Review deleted!");
+          if (onReviewDeleted) {
+            onReviewDeleted(); 
+          }
+        } else {
+          toast.error("Failed to delete review");
         }
-      } else {
-        toast.error("Failed to delete review");
+      } catch (err) { 
+        toast.error("Error deleting review");
+      } finally {
+        setIsDeleting(false);
       }
-    } catch (err) { 
-      toast.error("Error deleting review");
-    } finally {
-      setIsDeleting(false);
-    }
-  });
-}
+    });
+  }
+
   const safeRating = () => {
     try {
       const rating = Number(review.rating);
@@ -52,23 +50,23 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
     }
   };
 
-
   const confirmAction = (message, onConfirm) => {
-  const toastId = toast.info(
-    <div>
-      <p>{message}</p>
-      <button onClick={() => {
-        onConfirm();
-        toast.dismiss(toastId);
-      }}>Confirm</button>
-      <button onClick={() => toast.dismiss(toastId)}>Cancel</button>
-    </div>,
-    {
-      autoClose: false,
-      closeOnClick: false,
-    }
-  );
-};
+    const toastId = toast.info(
+      <div>
+        <p>{message}</p>
+        <button onClick={() => {
+          onConfirm();
+          toast.dismiss(toastId);
+        }}>Confirm</button>
+        <button onClick={() => toast.dismiss(toastId)}>Cancel</button>
+      </div>,
+      {
+        autoClose: false,
+        closeOnClick: false,
+      }
+    );
+  };
+
   const filledStars = safeRating();
   const emptyStars = Math.max(0, 10 - filledStars); 
 
@@ -85,8 +83,6 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
     }
   };
 
-   
-  
   return (
     <div className="review-card">
       <div className="review-header">
@@ -99,36 +95,36 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
             />
             <span className="user-name">{review.user_name || "Unknown User"}</span>
            </Link>
-
         </div>
         {showMovieLink && (
-        <div className="movie-info">
-          <Link href={`/details?id=${review.movie_id}`} className="movie-link">
-            {review.movie_title || "Unknown Movie"}
+          <div className="movie-info">
+            <Link href={`/details?id=${review.movie_id}`} className="movie-link">
+              {review.movie_title || "Unknown Movie"}
             </Link>
-        </div>
+          </div>
         )}
         {isOwner && (
-            <button
-                onClick={deleteReview}
-                disabled={isDeleting}
-                className="delete-review-btn flex items-center gap-2"
-            >
-                {isDeleting ? (
-                "Deleting..."
-                ) : (
-                <Image
-                    src="/src/trash-full-pastel.png"
-                    alt="Delete"
-                    width={20}
-                    height={20}
-                />
-                )}
-            </button>
+          <button
+            onClick={deleteReview}
+            disabled={isDeleting}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            className="delete-review-btn"
+          >
+            {isDeleting ? (
+              "🗑️"
+            ) : (
+              <Image
+                src={isHovered ? "/src/trash-puff-sad.gif" : "/src/trash-full-pastel.png"}
+                alt="Delete"
+                width={25}
+                height={25}
+              />
             )}
+          </button>
+        )}
       </div>
 
-      
       <div className="review-rating">
         <div className="stars">
           {"★".repeat(filledStars)}{"☆".repeat(emptyStars)}
@@ -136,7 +132,6 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
         <span className="rating-text">{safeRating()}/10</span>
       </div>
 
-    
       <div className="review-content">
         <p>{displayContent}</p>
         {needsTruncation && (
@@ -148,7 +143,6 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
           </button>
         )}
       </div>
-
 
       <div className="review-footer">
         <span className="review-date">{formatDate(review.created_at)}</span>
@@ -168,14 +162,12 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
       </div>
   
       <style jsx>{`
-
-        
-
         .review-card {
           background: #0a1b31;
           border: 1px solid #727d79;
           padding: 1.5rem;
           transition: all 0.3s ease;
+          position: relative;
         }
 
         .review-card:hover {
@@ -189,7 +181,7 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
           justify-content: space-between;
           align-items: flex-start;
           margin-bottom: 1rem;
-          position: relative; 
+          position: relative;
           flex-wrap: wrap;
           gap: 0.5rem;
         }
@@ -204,7 +196,6 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          
           text-decoration: none;
           color: inherit;
         }
@@ -240,11 +231,6 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
 
         .movie-link:hover {
           text-decoration: underline;
-        }
-
-        .movie-title {
-          color: #ffb3ff;
-          font-weight: bold;
         }
 
         .review-rating {
@@ -294,7 +280,6 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
           justify-content: space-between;
           align-items: center;
           padding-top: 1rem;
-          
           border-top: 1px solid #6c6c9c;
         }
 
@@ -313,29 +298,28 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
           font-size: 0.9rem;
         }
 
+        .delete-review-btn {
+          background: transparent;
+          border: none;
+          padding: 4px;
+          cursor: pointer;
+          border-radius: 4px;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
 
-  .delete-review-btn {
-  top: 0;
-  right: 0;
-  background: #000;
-  border: 1px solid #ff0033;
-  color: #661929ff;
-  font-family: var(--font-terminal);
-  padding: 4px 8px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 2;
-  box-shadow: 0 0 5px #ff0033;
-}
+        .delete-review-btn:hover {
+          transform: scale(1.1);
+        }
 
+        .delete-review-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
+        }
 
-.delete-review-btn:hover {
-  background: #651025ff;
-  transform: scale(1.1);
-  color: #000;
-  box-shadow: 0 0 10px #ff0033;
-}
 
         @media (max-width: 480px) {
           .review-header {
