@@ -26,6 +26,7 @@ export default function SignInModal({ open, onClose, onSuccess }) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Login failed");
+      window.location.assign("/search");
       onSuccess && onSuccess();
       onClose && onClose();
     } catch (err) {
