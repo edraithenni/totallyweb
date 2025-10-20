@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import Header from "../components/header";
 import ReviewCard from "../components/ReviewCard";
 import AddToPlaylistButton from "../components/AddToPlaylistButton";
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 export default function DetailsPage() {
   const [movie, setMovie] = useState(null);
@@ -76,6 +78,7 @@ export default function DetailsPage() {
     <>
       <Header />
       <div className="movie-container">
+        
         <div className="movie-poster">
           <img src={movie.poster} alt={movie.title} />
           <AddToPlaylistButton movieId={movieId} movieTitle={movie.title} />
@@ -127,6 +130,17 @@ export default function DetailsPage() {
           <button onClick={submitReview}>Submit</button>
         </div>
       </div>
+
+       <ToastContainer
+        position="bottom-right"
+        autoClose={2500}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="dark"
+      />
 
       <style jsx>{`
         @font-face {

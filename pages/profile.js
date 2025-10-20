@@ -6,6 +6,8 @@ import FollowButton from "../components/FollowButton";
 import FollowList from "../components/FollowList";
 import NotificationBell from "../components/NotificationBell";
 import Link from "next/link"
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -302,6 +304,16 @@ export default function ProfilePage() {
         </div>
       </div>
    
+       <ToastContainer
+        position="bottom-right"
+        autoClose={2500}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="dark"
+      />
       <style jsx>{`
         @font-face {
           font-family: 'Basiic';

@@ -1,6 +1,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 export default function ReviewCard({ review, showMovieLink = false, showUserLink = false, currentUser, onReviewDeleted}) {
   const [expanded, setExpanded] = useState(false);
@@ -13,27 +15,28 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
   const isOwner = currentUser && currentUser.id === review.user_id;
 
   const deleteReview = async () => {
-    if (!confirm("Are you sure you want to delete this review?")) return;
-    
-      setIsDeleting(true);
-      try {
-        const res = await fetch(`/api/reviews/${review.id}`, {
-          method: "DELETE",
-          credentials: "include",
-        });
-        if (res.ok) {
-           if (onReviewDeleted) {
+  confirmAction("Are you sure you want to delete this review?", async () => {
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/reviews/${review.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (res.ok) {
+        toast.success("Review deleted!");
+        if (onReviewDeleted) {
           onReviewDeleted(); 
         }
-        } else {
-          alert("Failed to delete review");
-        }
-      } catch (err) { alert("Error deleting review"); 
-      }finally {
+      } else {
+        toast.error("Failed to delete review");
+      }
+    } catch (err) { 
+      toast.error("Error deleting review");
+    } finally {
       setIsDeleting(false);
     }
-    }
-
+  });
+}
   const safeRating = () => {
     try {
       const rating = Number(review.rating);
@@ -45,6 +48,23 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
     }
   };
 
+
+  const confirmAction = (message, onConfirm) => {
+  const toastId = toast.info(
+    <div>
+      <p>{message}</p>
+      <button onClick={() => {
+        onConfirm();
+        toast.dismiss(toastId);
+      }}>Confirm</button>
+      <button onClick={() => toast.dismiss(toastId)}>Cancel</button>
+    </div>,
+    {
+      autoClose: false,
+      closeOnClick: false,
+    }
+  );
+};
   const filledStars = safeRating();
   const emptyStars = Math.max(0, 10 - filledStars); 
 
@@ -133,7 +153,7 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
           )}
         </div>
       </div>
-
+  
       <style jsx>{`
         .review-card {
           background: #0a1b31;
