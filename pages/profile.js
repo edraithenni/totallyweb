@@ -261,18 +261,62 @@ export default function ProfilePage() {
 
         <hr />
         <h3>Bio</h3>
-        {!bioEdit && <div className="bio">{bioText}</div>}
-        {bioEdit && (
-          <div className="bio-edit">
-            <textarea style={{ width: "100%", fontSize: 18 }} value={bioText} onChange={(e) => setBioText(e.target.value)} />
-            <div className="bio-buttons">
-              <button onClick={handleBioSave} className="btn btn-save">Save</button>
-              <button onClick={() => setBioEdit(false)} className="btn btn-cancel">Cancel</button>
-            </div>
-          </div>
-        )}
-        {!bioEdit && isOwnProfile && <button onClick={() => setBioEdit(true)} className="btn btn-edit">Edit</button>}
+<div
+  ref={el => {
+    if (bioEdit && el) {
+      // ставим курсор в конец при начале редактирования
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }}
+  className={`bio ${bioEdit ? "editing" : ""}`}
+  contentEditable={bioEdit}
+  suppressContentEditableWarning={true}
+  onInput={(e) => {
+    const text = e.currentTarget.textContent || "";
+    if (text.length <= 200) {
+      setBioText(text);
+    } else {
+      // ограничение по символам
+      e.currentTarget.textContent = text.slice(0, 200);
+      setBioText(text.slice(0, 200));
+      // снова курсор в конец
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.selectNodeContents(e.currentTarget);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }}
+>
+  {bioText}
+</div>
 
+{isOwnProfile && (
+  <>
+    <button
+      onClick={() => {
+        if (bioEdit) handleBioSave();
+        setBioEdit(!bioEdit);
+      }}
+      className="btn btn-edit"
+    >
+      {bioEdit ? "Save" : "Edit"}
+    </button>
+
+    {bioEdit && (
+      <div className="char-count">{bioText.length}/200</div>
+    )}
+  </>
+)}
+
+
+       
         <hr />
         <h3>Playlists</h3>
         <div className="playlists-grid">
@@ -319,15 +363,25 @@ export default function ProfilePage() {
           font-family: 'Basiic';
           src: url('/src/basiic.ttf') format('truetype');
         }
+        
+        hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, #727d79, #727d79);
+            width: calc(100% + 3rem); 
+            margin: 2rem -1.5rem;
+            border-radius: 2px;
+        }
 
         .profile-card {
           position: relative;
           max-width: 700px;
           margin: 2rem auto;
-          background-color: #0a1b31;
+         /* background-color: #0a1b31; */
+         background-color: #262123ff;
           padding: 1.5rem;
           padding-top: 130px;
-          border: 2px solid #3f3d40;
+          border: 1px solid #727d79;
           color: #9c9cc9;
           font-family: 'Basiic', sans-serif;
         }
@@ -384,7 +438,7 @@ export default function ProfilePage() {
           height: 96px;
           border-radius: 50%;
           object-fit: cover;
-          border: 2px solid #fff;
+          border: 0px solid #fff;
           background: #000;
         }
 
@@ -407,12 +461,32 @@ export default function ProfilePage() {
         }
 
         .bio {
-          background: #000;
-          padding: 10px;
-          border: 1px solid #3a3a90;
-          white-space: pre-wrap;
-          color: #fff;
-        }
+  background: #000;
+  padding: 10px;
+  border: 1px solid transparent;
+  color: #d2ece3;
+  white-space: pre-wrap;
+  min-height: 50px;
+  transition: border 0.2s;
+}
+
+.bio.editing {
+  border: 1px solid #d2ece3;
+  outline: none;
+  cursor: text;
+}
+
+.bio.editing:focus {
+  border: 1px solid #d2ece3;
+}
+
+.char-count {
+  font-size: 0.8rem;
+  color: #727d79;
+  text-align: right;
+  margin-top: 4px;
+}
+
 
         .playlists-grid {
           display: grid;
@@ -431,8 +505,14 @@ export default function ProfilePage() {
 
         .btn-edit {
           background: #000;
-          color: #fff;
-          border: 1px solid #41d3d2;
+          color: #727d79;
+          border: 1px solid #727d79;
+        }
+
+        .btn-edit:hover {
+          background: #292626ff;
+          color: #d2ece3;
+          border: 1px solid #727d79;
         }
 
         .btn-save {
@@ -459,23 +539,29 @@ export default function ProfilePage() {
         .modal.open { display: flex; }
         .modal-content {
           position: relative;
-          background: #0a1b31;
+          background: #262123ff;
           padding: 1rem;
-          border-radius: 10px;
+          border-radius: 0px;
           text-align: center;
         }
         .modal-content img {
           max-width: 90vw;
           max-height: 80vh;
-          border-radius: 10px;
+          border-radius: 0px;
         }
         .close-modal {
-          position: absolute;
-          top: 10px;
-          right: 20px;
-          color: white;
-          cursor: pointer;
-          font-size: 2rem;
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            color: #d2ece3;
+            cursor: pointer;
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: none;
+            border: none;
+            line-height: 1;
+            transition: color 0.2s, transform 0.2s;
+            z-index: 10; 
         }
         .avatar-options {
           margin-top: 10px;
