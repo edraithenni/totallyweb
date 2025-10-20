@@ -155,7 +155,7 @@ export default function FollowList({ userId, followers}) {
         .dos-followlist {
           position: fixed;
           top: 160px;
-          right: 28px;
+          right: 2%;
           width: 230px;
           height: 420px;
           background: #000084;

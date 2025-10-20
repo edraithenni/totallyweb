@@ -89,13 +89,7 @@ export default function SearchPage() {
           {movies.map((m) => (
             <div
               key={m.id}
-              style={{
-                background: "#8dd9ff",
-                color: "#cd77ff",
-                cursor: "pointer",
-                borderRadius: 0,
-                outline: "2px solid #ce3ed0",
-              }}
+              className="movie-card"
               onClick={() => (window.location.href = `/details?id=${m.id}`)}
             >
               <img
@@ -111,6 +105,25 @@ export default function SearchPage() {
           ))}
         </div>
       </div>
+  <style jsx>{`
+    
+    .movie-card{
+      background: #333333ff;
+      color: #cd77ff;
+      cursor: pointer;
+      borderRadius: 0;
+      outline: 2px solid #ce3ed0;
+      transition: all ease 0.3s;
+    }
+    .movie-card:hover{
+      transform: scale(1.05);
+     }   
+    `
+  }
+    </style>
     </>
+    
   );
+
+
 }
