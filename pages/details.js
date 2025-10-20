@@ -13,6 +13,16 @@ export default function DetailsPage() {
 
   const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
   const movieId = params?.get("id");
+  const validReviews = Array.isArray(reviews) ? reviews : [];
+const averageRating =
+  validReviews.length > 0
+    ? (
+        validReviews.reduce((sum, r) => sum + (r.rating || 0), 0) /
+        validReviews.length
+      ).toFixed(1)
+    : null;
+
+
 
   useEffect(() => {
     if (!movieId) return;
@@ -86,7 +96,12 @@ export default function DetailsPage() {
           <p><b>Description:</b> {movie.plot || "No description yet"}</p>
           <p><b>Genre:</b> {movie.genre || "—"}</p>
           <p><b>Director:</b> {movie.director || "—"}</p>
-          <p><b>Rating:</b> {movie.rating || "—"}</p>
+          <p><b> IMDB Rating:</b> {movie.rating || "—"}</p>
+          {averageRating && (
+            <p className="website-rating">
+            <b>Website Rating:</b> ★ {averageRating}/10 ({reviews.length} reviews)
+            </p>
+            )}
         </div>
         <div className="movie-gif">
           <img src="https://images.melonland.net/?url=https%3A%2F%2Fi.imgur.com%2FhWxzM0d.gif&w=1200&fit=inside&we&q=85&il&n=-1&default=1" alt="Movie gif"/>
@@ -216,10 +231,12 @@ export default function DetailsPage() {
   .star {
     color: #444; 
     transition: color 0.2s;
+    border: 1px sold #fb5255;
   }
 
   .star.filled {
-    color: #ffc659; 
+    color: #d03e78; 
+    border: 1px sold #fb5255;
   }
 
   

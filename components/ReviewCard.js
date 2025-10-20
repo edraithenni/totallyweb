@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function ReviewCard({ review, showMovieLink = false, showUserLink = false, currentUser, onReviewDeleted}) {
   const [expanded, setExpanded] = useState(false);
@@ -85,14 +86,23 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
         </div>
         )}
         {isOwner && (
-          <button 
-            onClick={deleteReview}
-            disabled={isDeleting}
-            className="delete-review-btn"
-          >
-            {isDeleting ? "Deleting..." : "❌"}
-          </button>
-        )}
+            <button
+                onClick={deleteReview}
+                disabled={isDeleting}
+                className="delete-review-btn flex items-center gap-2"
+            >
+                {isDeleting ? (
+                "Deleting..."
+                ) : (
+                <Image
+                    src="/src/trash-full-pastel.png"
+                    alt="Delete"
+                    width={20}
+                    height={20}
+                />
+                )}
+            </button>
+            )}
       </div>
 
       
@@ -135,15 +145,18 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
       </div>
 
       <style jsx>{`
+
+        
+
         .review-card {
           background: #0a1b31;
-          border: 1px solid #3f3d40;
+          border: 1px solid #727d79;
           padding: 1.5rem;
           transition: all 0.3s ease;
         }
 
         .review-card:hover {
-          border-color: #41d3d2;
+          border-color: #d2ece3;
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(65, 211, 210, 0.1);
         }
@@ -181,11 +194,11 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          border: 1px solid #3a3a90;
+          border: 0px solid #3a3a90;
         }
 
         .user-name {
-          color: #fff;
+          color: #d2ece3;
           font-weight: bold;
           top: -10px; 
           margin-left: 0.4rem; 
@@ -219,7 +232,7 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
         }
 
         .stars {
-          color: #ffb3ff;
+          color: #829a91ff;
           font-size: 1.1rem;
           letter-spacing: -0.5px;
         }
@@ -234,7 +247,7 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
         }
 
         .review-content p {
-          color: #fff;
+          color: #d2ece3;
           line-height: 1.5;
           margin: 0;
         }
@@ -258,7 +271,8 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
           justify-content: space-between;
           align-items: center;
           padding-top: 1rem;
-          border-top: 1px solid #3f3d40;
+          
+          border-top: 1px solid #6c6c9c;
         }
 
         .review-date {
@@ -282,7 +296,7 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
   right: 0;
   background: #000;
   border: 1px solid #ff0033;
-  color: #ff0033;
+  color: #661929ff;
   font-family: var(--font-terminal);
   padding: 4px 8px;
   font-size: 0.8rem;
@@ -294,7 +308,7 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
 
 
 .delete-review-btn:hover {
-  background: #ff3366;
+  background: #651025ff;
   transform: scale(1.1);
   color: #000;
   box-shadow: 0 0 10px #ff0033;
