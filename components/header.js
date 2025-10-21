@@ -38,6 +38,12 @@ export default function Header() {
           {}
           <button
             className="secondary"
+            onClick={() => (window.location.href = "/genres")}
+        >
+            Genres
+        </button>
+          <button
+            className="secondary"
             onClick={() => (window.location.href = "/SearchUsers")}
           >
             Find users
