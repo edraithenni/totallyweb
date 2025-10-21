@@ -5,7 +5,7 @@ import Header from "../components/header";
 const GENRES = [
   "Action", "Adventure", "Animation", "Biography",
   "Crime", "Family", "Fantasy", "Film-Noir",
-  "History", "Horror", "Mystery", "Romance", "Sci-Fi",
+  "History", "Horror", "Mystery", "Romance", "Scifi",
   "Sports", "Thriller", "War"
 ];
 
