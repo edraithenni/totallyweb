@@ -3,8 +3,10 @@ import Link from "next/link";
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 export default function ReviewCard({ review, showMovieLink = false, showUserLink = false, currentUser, onReviewDeleted}) {
+  const router = useRouter(); 
   const [expanded, setExpanded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -15,7 +17,8 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
 
   const isOwner = currentUser && currentUser.id === review.user_id;
 
-  const deleteReview = async () => {
+  const deleteReview = async (e) => {
+    e.stopPropagation();
     confirmAction("Are you sure you want to delete this review?", async () => {
       setIsDeleting(true);
       try {
@@ -84,10 +87,11 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
   };
 
   return (
-    <div className="review-card">
+    <div className="review-card" onClick={() => router.push(`/review?id=${review.id}`)} >
+      
       <div className="review-header">
         <div className="user-info">
-          <Link href={`/profile?id=${review.user_id}`} className="user-link">
+          <Link href={`/profile?id=${review.user_id}`} className="user-link" onClick={e => e.stopPropagation()}>
             <img 
                 src={review.user_avatar || "/src/default_pfp.png"} 
                 alt={review.user_name || "User"} 
@@ -98,7 +102,7 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
         </div>
         {showMovieLink && (
           <div className="movie-info">
-            <Link href={`/details?id=${review.movie_id}`} className="movie-link">
+            <Link href={`/details?id=${review.movie_id}`} className="movie-link" onClick={e => e.stopPropagation()}>
               {review.movie_title || "Unknown Movie"}
             </Link>
           </div>

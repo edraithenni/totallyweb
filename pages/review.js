@@ -1,4 +1,3 @@
-// pages/review.js
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import ReviewCard from "@/components/ReviewCard";
@@ -7,22 +6,20 @@ export default function ReviewPage() {
   const router = useRouter();
   const { id } = router.query;
 
-  const [review, setReview] = useState(null); // ревью будет null до загрузки
+  const [review, setReview] = useState(null);
   const [comments, setComments] = useState([]);
   const [loadingComments, setLoadingComments] = useState(true);
 
   useEffect(() => {
     if (!id) return;
 
-    async function fetchReview() {
+    async function fetchData() {
       try {
-        // Загружаем сам ревью
         const resReview = await fetch(`/api/reviews/${id}`, { credentials: "include" });
         if (!resReview.ok) throw new Error("Failed to load review");
         const reviewData = await resReview.json();
         setReview(reviewData);
 
-        // Загружаем комментарии
         const resComments = await fetch(`/api/reviews/${id}/comments`, { credentials: "include" });
         if (!resComments.ok) throw new Error("Failed to load comments");
         const commentsData = await resComments.json();
@@ -44,7 +41,7 @@ export default function ReviewPage() {
       }
     }
 
-    fetchReview();
+    fetchData();
   }, [id]);
 
   if (!review) {
@@ -53,10 +50,8 @@ export default function ReviewPage() {
 
   return (
     <div className="review-page">
-      {/* Ревью всегда отображается */}
       <ReviewCard review={review} showMovieLink />
 
-      {/* Комментарии */}
       <div className="comments-section">
         <h3>Comments</h3>
         {loadingComments ? (
@@ -76,6 +71,7 @@ export default function ReviewPage() {
           background: #0a1b31;
           border-radius: 10px;
           color: #d2ece3;
+          font-family: inherit;
         }
         .comments-section {
           margin-top: 2rem;
@@ -85,18 +81,19 @@ export default function ReviewPage() {
         h3 {
           color: #41d3d2;
           margin-bottom: 1rem;
+          font-family: inherit;
         }
         .loading {
           text-align: center;
           color: #9c9cc9;
           margin-top: 2rem;
+          font-family: inherit;
         }
       `}</style>
     </div>
   );
 }
 
-// Рекурсивное дерево комментариев
 function CommentTree({ comments, depth = 0 }) {
   return (
     <ul className="comment-list" style={{ marginLeft: depth * 20 }}>
@@ -116,26 +113,31 @@ function CommentTree({ comments, depth = 0 }) {
         .comment-list {
           list-style: none;
           padding-left: 0;
+          font-family: inherit;
         }
         .comment-item {
           margin-bottom: 1rem;
           padding: 0.5rem;
           border-left: 2px solid #41d3d2;
+          color: inherit;
         }
         .comment-header {
           display: flex;
           justify-content: space-between;
-          font-size: 0.9rem;
+          font-size: 0.95rem;
           color: #9c9cc9;
           margin-bottom: 0.2rem;
         }
         .comment-content {
           color: #d2ece3;
-          line-height: 1.4;
+          line-height: 1.5;
           margin: 0;
+          font-family: inherit;
+          font-size: 0.95rem;
         }
         .comment-date {
           font-style: italic;
+          font-size: 0.85rem;
         }
       `}</style>
     </ul>
