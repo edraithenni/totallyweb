@@ -3,22 +3,31 @@ import React from "react";
 export default function PlaylistCard({ playlist, onClick }) {
   let iconUrl = "";
   let defaultCover = "/src/default-playlist.jpg";
+  let isDefault = false;
 
   if (playlist.name === "watch-later") {
     iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-yellow.gif";
     defaultCover = "/src/watch-later-playlist.jpg";
+    isDefault = true;
   } else if (playlist.name === "watched") {
     iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-green.gif";
     defaultCover = "/src/watched-playlist.jpg";
+    isDefault = true;
   } else if (playlist.name === "liked") {
     iconUrl = "https://pixelsea.neocities.org/icons/puff-folder-red.gif";
     defaultCover = "/src/liked-playlist.jpg";
+    isDefault = true;
   }
-  
+
+  // если cover пустой, undefined, null или не строка, используем defaultCover
+  let coverUrl = defaultCover;
+  if (!isDefault) {
+    coverUrl = typeof playlist.cover === "string" && playlist.cover ? playlist.cover : defaultCover;
+  }
 
   return (
     <div className="playlist-card" onClick={onClick}>
-      <img src={playlist.cover || defaultCover} alt={playlist.name} />
+      <img src={coverUrl} alt={playlist.name} />
       <div className="title">
         {playlist.name}
         {iconUrl && <img src={iconUrl} style={{ width: 20, height: 20, marginLeft: 4, verticalAlign: "middle" }} />}
