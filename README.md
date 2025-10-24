@@ -17,8 +17,7 @@ API of server can be found in the BE repository https://github.com/edraithenni/t
 This report requires the frontend (Next.js) and backend (Gin) to run on different machines. We use Cloudflare Tunnel to expose the backend to the internet so that the frontend can access it without running the backend locally.
 
 ## 1. Backend Setup (Go REST API)
-1. Install Go and dependencies.
-2. Run the backend on port 8080:
+1. Run the backend on port 8080:
 bash:
 
 ```go run .```
@@ -48,10 +47,10 @@ Note: Tunnel logs may show errors like:
 
 Cloudflare automatically retries connections.
 
-4. Frontend Setup (Next.js)
+3. Frontend Setup (Next.js)
 In next.config.js, update the rewrites to point to the Cloudflare Tunnel URL:
 
-        destination: 'https://random-subdomain.cloudflareTunnel.com/api/:path*',
+```destination: 'https://random-subdomain.cloudflareTunnel.com/api/:path*',```
 
 Run the frontend on another machine:
    
