@@ -82,15 +82,15 @@ export default function FollowButton({ userId, currentUserId, setFollowers }) {
         }
 
         .follow-btn.follow {
-          background: #ff66cc !important;
+          background: #aebbbaff !important;
           color: #000 !important;
-          border-color: #30001f !important;
+          border-color: #aebbbaff !important;
         }
 
         .follow-btn.follow:hover {
-          background: #ff66cc !important;
+          background: #687273ff !important;
           color: #61E0F4 !important;
-          border-color: #556b3bff !important;
+          border-color: #687273ff !important;
         }
 
         .follow-btn.unfollow {

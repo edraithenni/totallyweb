@@ -9,6 +9,26 @@ const GENRES = [
   "Sports", "Thriller", "War"
 ];
 
+const GENRE_ICONS = {
+  Action: "/src/cd-drive-pastel.png",
+  Adventure: "/src/cd-drive-pastel.png",
+  Animation: "/src/cd-drive-pastel.png",
+  Biography: "/src/cd-drive-pastel.png",
+  Crime: "/src/cd-drive-pastel.png",
+  Family: "/src/cd-drive-pastel.png",
+  Fantasy: "/src/cd-drive-pastel.png",
+  "Film-Noir": "/src/cd-drive-pastel.png",
+  History: "/src/cd-drive-pastel.png",
+  Horror: "/src/cd-drive-pastel.png",
+  Mystery: "/src/cd-drive-pastel.png",
+  Romance: "/src/cd-drive-pastel.png",
+  Scifi: "/src/cd-drive-pastel.png",
+  Sports: "/src/cd-drive-pastel.png",
+  Thriller: "/src/cd-drive-pastel.png",
+  War: "/src/cd-drive-pastel.png",
+};
+
+
 export default function GenresPage() {
   const [selectedGenre, setSelectedGenre] = useState(null);
   const [movies, setMovies] = useState([]);
@@ -46,18 +66,20 @@ export default function GenresPage() {
         {!selectedGenre ? (
           <div className="genres-list">
             {GENRES.map(g => (
-              <button
-                key={g}
-                className={`genre-btn ${selectedGenre === g ? "active" : ""}`}
-                onClick={() => {
-                  setSelectedGenre(g);
-                  loadMovies(g, 1);
-                }}
-              >
-                {g}
-              </button>
+             <div key={g} className="genre-item">
+                <img src={GENRE_ICONS[g]} alt={`${g} icon`} className="genre-side-icon" />
+                <button
+                    className={`genre-btn ${selectedGenre === g ? "active" : ""}`}
+                    onClick={() => {
+                    setSelectedGenre(g);
+                    loadMovies(g, 1);
+                    }}
+                >
+                    {g}
+                </button>
+                </div>
             ))}
-          </div>
+            </div>
         ) : (
           <div className="movies-container">
             
@@ -158,11 +180,27 @@ export default function GenresPage() {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         transition: 0.3s;
         }
+       
 
         .page-container.fantasy .movie-card:hover {
          transform: scale(1.08);
         box-shadow: 0 0 20px rgba(220, 180, 255, 0.6);
         background: rgba(200, 180, 255, 0.25);
+        }
+
+          .page-container.horror .movie-card {
+        background: rgba(0, 0, 0, 0.15);
+        border: 1px solid #880862ff;
+        color: #b72f41ff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        transition: 0.3s;
+        font-family: 'Jacquard_24', system-ui;
+        }
+
+        .page-container.horror .movie-card:hover {
+         transform: scale(1.08);
+        box-shadow: 0 0 20px rgba(49, 4, 27, 0.6);
+        background: rgba(50, 11, 33, 0.25);
         }
 
         .page-container.romance {
@@ -173,25 +211,26 @@ export default function GenresPage() {
         .genres-list {
           display: flex;
           flex-direction: column;
-          gap: 0.8rem;
+          gap: 0.4rem;
           align-items: center;
         }
 
         .genre-btn {
           font-family: 'Basiic', sans-serif;
-          padding: 0.8rem 1.2rem;
+          padding: 0.4rem 0.8rem;
+          
           background: #000;
-          border: 2px solid #41d3d2;
-          color: #8dd9ff;
+          border: 1px solid #727d79;
+          color: #727d79;
           cursor: pointer;
           font-size: 1.2rem;
-          min-width: 180px;
+          min-width: 250px;
           transition: 0.3s;
         }
 
         .genre-btn:hover {
           background: #1a1a1a;
-          color: #fff;
+          color: #d2ece3;
         }
 
         .genre-btn.active {
@@ -253,8 +292,8 @@ export default function GenresPage() {
         .nav-btn,
         .back-btn {
           background: none;
-          border: 2px solid #41d3d2;
-          color: #8dd9ff;
+          border: 2px solid #727d79;
+          color: #727d79;
           font-family: 'Basiic', sans-serif;
           padding: 0.5rem 1rem;
           cursor: pointer;
@@ -264,7 +303,7 @@ export default function GenresPage() {
         .nav-btn:hover,
         .back-btn:hover {
           background: #060606ff;
-          color: #8dd9ff;
+          color: #d2ece3;
         }
 
         .back-btn {
@@ -299,11 +338,25 @@ export default function GenresPage() {
             font-size: 1.8rem;
             }
 
-            .genre-icon {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
+            .genre-item {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;          
             }
+
+            .genre-side-icon {
+                width: 30px;
+                height: 30px;
+                object-fit: contain;
+                filter: brightness(0.85);
+                transition: 0.3s;
+                margin-top: 2px;      
+                margin-right: 4px;   
+                position: relative;
+                top: 2px;            
+            }
+
+           
 
       `}</style>
     </>
