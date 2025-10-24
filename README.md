@@ -20,21 +20,21 @@ This report requires the frontend (Next.js) and backend (Gin) to run on differen
 1. Install Go and dependencies.
 2. Run the backend on port 8080:
 bash:
-`go run .`
+```go run .```
 Test locally:
-`curl http://localhost:8080/health`
+```curl http://localhost:8080/health```
 
 2. Cloudflare Tunnel Setup
     Install Cloudflare Tunnel (cloudflared)
    
     Authenticate with your Cloudflare account:
-`cloudflared login`
+```cloudflared login```
     Run the tunnel to expose your backend:
-`cloudflared tunnel --url http://localhost:8080`
+```cloudflared tunnel --url http://localhost:8080```
     Note the generated public URL, e.g.:
-`https://random-subdomain.cloudflareTunnel.com`
+```https://random-subdomain.cloudflareTunnel.com```
 Note: Tunnel logs may show errors like:
-`ERR failed to serve tunnel connection error="control stream encountered a failure while serving"`
+```ERR failed to serve tunnel connection error="control stream encountered a failure while serving"```
 Cloudflare automatically retries connections.
 
 4. Frontend Setup (Next.js)
@@ -43,5 +43,5 @@ Cloudflare automatically retries connections.
         destination: 'https://random-subdomain.cloudflareTunnel.com/api/:path*',
 
     Run the frontend on another machine:
-`npm run dev`
+```npm run dev```
     The frontend now communicates with the backend through the tunnel.
