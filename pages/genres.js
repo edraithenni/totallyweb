@@ -65,7 +65,7 @@ export default function GenresPage() {
                 {selectedGenre === "Fantasy" ? (
                     <>
                      <img
-                        src="src\tumblr_inline_ouovp1ujPdR1uqb749_500.png"
+                        src="src/tumblr_inline_ouovp1ujPdR1uqb749_500.png"
                         alt="Fantasy Icon"
                         className="genre-icon"
                     />
@@ -106,15 +106,23 @@ export default function GenresPage() {
       </div>
 
       <style jsx>{`
+        
         @font-face {
           font-family: 'Basiic';
           src: url('/src/basiic.ttf') format('truetype');
         }
 
         @import url('https://fonts.cdnfonts.com/css/so-bad');
+        @import url('https://fonts.cdnfonts.com/css/gothicpixels');
+        @font-face {
+            font-family: 'Jacquard_24';
+            src: url('/src/Jacquard_24/Jacquard24-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
 
         .page-container {
-          font-family: 'Basiic', sans-serif;
+           font-family: 'Basiic', sans-serif;
           background: #000;
           color: #8dd9ff;
           min-height: 100vh;
@@ -130,6 +138,7 @@ export default function GenresPage() {
 
         .page-container.horror {
           background: #100000;
+           font-family: 'Jacquard_24', system-ui;
           color: #ff1a1a;
         }
           .page-container.fantasy {
