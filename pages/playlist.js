@@ -303,7 +303,12 @@ async function deletePlaylist(){
           
           {movies.length === 0 ? (
             <p style={{ textAlign: "center", color: "#9C9CC9", padding: "40px" }}>
-              No movies in this playlist yet
+              <img
+              src="/src/_gif__static_tvs_by_notes28_dbozzsl-fullview.png" 
+              alt="Empty playlist"
+              style={{ width: "200px", marginBottom: "0.5rem" }}
+            />
+              <p>No movies in this playlist yet</p>
             </p>
           ) : (
             movies.map((movie) => (
