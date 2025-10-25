@@ -142,7 +142,6 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
     }
   };
 
-  // Безопасный рендеринг плейлистов
   const renderPlaylists = () => {
     if (!Array.isArray(playlists)) {
       console.warn('Playlists is not an array:', playlists);
@@ -253,7 +252,7 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
 
         .add-to-playlist-btn {
           position: relative;
-          background: linear-gradient(135deg, #fb5255 0%, #d03e78 100%);
+          background: linear-gradient(135deg, #0a112cff 0%, #171852ff 100%);
           color: white;
           border: none;
           padding: 12px 24px;
@@ -275,7 +274,7 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
         .add-to-playlist-btn:hover:not(:disabled) {
           transform: translateY(-2px);
           box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-          background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+          background: linear-gradient(135deg, #240a3dff 0%, #250a46ff 100%);
         }
 
         .add-to-playlist-btn:active:not(:disabled) {
