@@ -32,7 +32,9 @@ export default function ProfilePage() {
         const params = new URLSearchParams(window.location.search);
         let profileId = params.get("id");
 
-        const resMe = await fetch("/api/users/me", { credentials: "include" });
+        const resMe = await fetch("/api/users/me", { credentials: "include" }
+          
+        );
         if (resMe.ok) {
           const me = await resMe.json();
           setCurrentUserId(me.id);
