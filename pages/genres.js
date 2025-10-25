@@ -61,7 +61,9 @@ export default function GenresPage() {
         <title>Browse by Genre</title>
       </Head>
       <Header />
-
+      {selectedGenre === "Horror" && (
+        <div className="horror-divider"></div>
+      )}
       <div className={`page-container ${selectedGenre ? selectedGenre.toLowerCase() : ""}`}>
         {!selectedGenre ? (
           <div className="genres-list">
@@ -93,13 +95,23 @@ export default function GenresPage() {
                     />
                      <h2>Fantasy Movies</h2>
                     </>
+                ) : selectedGenre === "Horror" ? (
+                  
+                    <>
+                      <img
+                        src="src/madness_returns_4.png"
+                        alt="Horror Icon"
+                        className="genre-icon"
+                      />
+                      <h2>Horror Movies</h2>
+                    </>
                 ) : (
                     <h2>{selectedGenre} Movies</h2>
                 )}
                 </div>
 
             <div className="movies-nav">
-              <button onClick={handlePrev} disabled={page === 1 || loading} className="nav-btn">◀</button>
+              <button onClick={handlePrev} disabled={page === 1 || loading} className="nav-btn">&lt;-</button>
 
               <div className="movies-list">
                 {movies.map(m => (
@@ -117,12 +129,21 @@ export default function GenresPage() {
                 ))}
               </div>
 
-              <button onClick={handleNext} disabled={loading} className="nav-btn">▶</button>
+              <button onClick={handleNext} disabled={loading} className="nav-btn">-&gt;</button>
             </div>
 
             <button onClick={() => setSelectedGenre(null)} className="back-btn">
               Back to Genres
             </button>
+            {selectedGenre === "Horror" && (
+          <div className="horror-footer">
+          <img
+            src="src/web.archive.org---web---20061027181729---http_------www.geocities.com---toto125@sbcglobal.net---blinkie---SpookyEyes2.gif"
+            alt="Horror footer"
+            className="horror-footer-img"
+            />
+          </div>
+          )}
           </div>
         )}
       </div>
@@ -159,7 +180,7 @@ export default function GenresPage() {
         }
 
         .page-container.horror {
-          background: #100000;
+          background: #0f0000ff;
            font-family: 'Jacquard_24', system-ui;
           color: #ff1a1a;
         }
@@ -190,8 +211,8 @@ export default function GenresPage() {
 
           .page-container.horror .movie-card {
         background: rgba(0, 0, 0, 0.15);
-        border: 1px solid #880862ff;
-        color: #b72f41ff;
+        border: 1px solid #84026eff;
+        color: #ff1a1a;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         transition: 0.3s;
         font-family: 'Jacquard_24', system-ui;
@@ -199,8 +220,8 @@ export default function GenresPage() {
 
         .page-container.horror .movie-card:hover {
          transform: scale(1.08);
-        box-shadow: 0 0 20px rgba(49, 4, 27, 0.6);
-        background: rgba(50, 11, 33, 0.25);
+        box-shadow: 0 0 20px rgba(49, 59, 0, 0.6);
+        background: rgba(0, 0, 48, 0.6);
         }
 
         .page-container.romance {
@@ -292,10 +313,10 @@ export default function GenresPage() {
         .nav-btn,
         .back-btn {
           background: none;
-          border: 2px solid #727d79;
+          border: 1px solid #727d79;
           color: #727d79;
           font-family: 'Basiic', sans-serif;
-          padding: 0.5rem 1rem;
+          padding: 0.3rem 1rem;
           cursor: pointer;
           transition: 0.3s;
         }
@@ -312,7 +333,7 @@ export default function GenresPage() {
 
         .page-container.horror .nav-btn {
           border-color: #ff1a1a;
-          color: #ff6666;
+          color: #ff1a1a;
         }
 
         .page-container.romance .nav-btn {
@@ -355,8 +376,31 @@ export default function GenresPage() {
                 position: relative;
                 top: 2px;            
             }
+          .page-container.horror .genre-icon {
+            width: 30px;   
+          height: auto;
+          margin-top: 2px;
+          filter: brightness(0.85);
+          }
+          .page-container.fantasy .genre-icon {
+            width: 55px;   
+          height: auto;
+          margin-top: 2px;
+          filter: brightness(0.85);
+          }
 
-           
+          
+           .horror-divider {
+          width: 100%;
+          height: 50px; 
+          background-image: url('/src/tumblr_a914d5e8b099742bc53740f3028fbc7f_de6272da_250.png'); 
+          background-repeat: repeat-x; 
+          background-size: auto 100%;
+          
+          margin-top: 20px;
+          margin-bottom: 0rem;
+          }
+
 
       `}</style>
     </>
