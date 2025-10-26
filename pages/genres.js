@@ -138,7 +138,7 @@ export default function GenresPage() {
             {selectedGenre === "Horror" && (
           <div className="horror-footer">
           <img
-            src="src/web.archive.org---web---20061027181729---http_------www.geocities.com---toto125@sbcglobal.net---blinkie---SpookyEyes2.gif"
+            src="src/artworks-MzlUSBDCvBRy5M4r-n2WHvA-t500x500.jpg"
             alt="Horror footer"
             className="horror-footer-img"
             />
@@ -388,7 +388,11 @@ export default function GenresPage() {
           margin-top: 2px;
           filter: brightness(0.85);
           }
-
+          .horror-footer-img {
+          margin-top: 50px;
+          width: 150px;
+          height: 150px;
+          }
           
            .horror-divider {
           width: 100%;
