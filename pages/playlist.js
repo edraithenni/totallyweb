@@ -302,13 +302,16 @@ async function deletePlaylist(){
         <div className="movies-list" id="movies">
           
           {movies.length === 0 ? (
-            <p style={{ textAlign: "center", color: "#9C9CC9", padding: "40px" }}>
+            <p style={{ textAlign: "center", color: "#9C9CC9", padding: "40px",display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center", }}>
               <img
-              src="/src/_gif__static_tvs_by_notes28_dbozzsl-fullview.png" 
+              src="/src/lain_eyes_by_kicked_in_teeth-db91rfu.gif" 
               alt="Empty playlist"
-              style={{ width: "200px", marginBottom: "0.5rem" }}
+              style={{ width: "150px", marginBottom: "0.5rem" }}
             />
-              <p>No movies in this playlist yet</p>
+              No movies in this playlist yet
             </p>
           ) : (
             movies.map((movie) => (

@@ -2,105 +2,9 @@ import Head from "next/head";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import LetterGlitch from "@/components/LetterGlitch";
 
-// === 3D СЦЕНА ЗВЁЗДНОГО ФОНА ===
-function StarField({ mouse }) {
-  const ref = useRef();
 
-  const positions = useMemo(() => {
-    const cnt = 5000;
-    const arr = new Float32Array(cnt * 3);
-    for (let i = 0; i < cnt; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 800;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 800;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 800;
-    }
-    return arr;
-  }, []);
-
-  const starTexture = useMemo(() => {
-    const tex = new THREE.TextureLoader().load(
-      "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/sprites/circle.png"
-    );
-    return tex;
-  }, []);
-
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-    if (ref.current) {
-      ref.current.rotation.x = t * 0.5 + mouse[1] * 0.6;
-      ref.current.rotation.y = t * 0.7 + mouse[0] * 0.6;
-    }
-  });
-
-  return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          array={positions}
-          count={positions.length / 3}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        map={starTexture}
-        color="#ffffff"
-        size={2.5}
-        transparent
-        opacity={0.6}
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-        sizeAttenuation
-      />
-    </points>
-  );
-}
-
-function StarBackground() {
-  const [mouse, setMouse] = useState([0, 0]);
-
-  useEffect(() => {
-    const handleMove = (e) => {
-      setMouse([
-        (e.clientX / window.innerWidth) * 2 - 1,
-        -(e.clientY / window.innerHeight) * 2 + 1,
-      ]);
-    };
-    window.addEventListener("mousemove", handleMove);
-    return () => window.removeEventListener("mousemove", handleMove);
-  }, []);
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 0,
-        background: "black",
-      }}
-    >
-      <Canvas
-        camera={{ position: [0, 0, 1], fov: 75 }}
-        style={{ width: "100%", height: "100%" }}
-      >
-        <StarField mouse={mouse} />
-      </Canvas>
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAG0lEQVR4Xu3BAQ0AAADCIPunNsN+YAAAAAAAAAD4HAGMgAAGpIHOIAAAAASUVORK5CYII=')",
-          opacity: 0.07,
-          pointerEvents: "none",
-        }}
-      />
-    </div>
-  );
-}
-
-// === СТРАНИЦА АВТОРИЗАЦИИ ===
 export default function AuthPage() {
   const [active, setActive] = useState("register");
   const [regName, setRegName] = useState("");
@@ -115,6 +19,10 @@ export default function AuthPage() {
   const [logEmail, setLogEmail] = useState("");
   const [logPass, setLogPass] = useState("");
   const [logMsg, setLogMsg] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const glitchChars = "▓▒░█▄■□▪▫";
+  const [cursorVisible, setCursorVisible] = useState(true);
+
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -145,9 +53,9 @@ export default function AuthPage() {
   
       setVerEmail(regEmail);
       showForm("verify");
-      setVerMsg("✅ Registered successfully! Enter your verification code below.");
+      setVerMsg("^_^ Registered successfully! Enter your verification code below.");
     } catch (err) {
-      setRegMsg("❌ Registration error: " + (err.message || "Unknown error"));
+      setRegMsg("X Registration error: " + (err.message || "Unknown error"));
     }
   }
 
@@ -189,7 +97,7 @@ export default function AuthPage() {
       } catch {}
 
   
-      setLogMsg("✅ Login successful! Redirecting...");
+      setLogMsg(" ^_^Login successful! Redirecting...");
       const base = window.location.pathname.startsWith("/app") ? "/app" : "";
 
      
@@ -198,7 +106,7 @@ export default function AuthPage() {
       }, 1000);
     } catch (err) {
    
-      setLogMsg("❌ Login error: " + (err.message || "Unknown error"));
+      setLogMsg("[Х] Login error: " + (err.message || "Unknown error"));
     }
   }
 
@@ -216,8 +124,23 @@ export default function AuthPage() {
         />
       </Head>
 
-      {/* 🌌 Фон со звёздами */}
-      <StarBackground />
+      
+<div
+  style={{
+    position: "fixed",
+    inset: 0,
+    zIndex: 0, 
+    pointerEvents: "none", 
+    overflow: "hidden",
+  }}
+>
+  <LetterGlitch
+    glitchSpeed={50}
+    centerVignette={true}
+    outerVignette={false}
+    smooth={true}
+  />
+</div>
 
       <div
         className="card-wrap"
@@ -232,147 +155,326 @@ export default function AuthPage() {
         }}
       >
         <div className="card">
-          <div style={{ display: active === "register" ? "block" : "none" }}>
-            <h2>Register</h2>
-            <div className={`msg ${regMsg.includes("error") ? "error" : "success"} ${regMsg ? "" : "hidden"}`}>
-  {regMsg}
+  <div className="card-header">
+    {active === "register" && "REGISTER"}
+    {active === "login" && "LOGIN"}
+    {active === "verify" && "VERIFICATION"}
+  </div>
+
+  <div className="card-body">
+   {/* REGISTER */}
+<div style={{ display: active === "register" ? "block" : "none" }}>
+  <div className={`msg ${regMsg.includes("error") ? "error" : "success"} ${regMsg ? "" : "hidden"}`}>
+    {regMsg}
+  </div>
+
+  {/** Name field **/}
+  <div className="input-group">
+    <label htmlFor="regName">Name</label>
+    <div className="terminal-input">
+      <span className="prompt">&gt;</span>
+      <input
+        id="regName"
+        type="text"
+        value={regName}
+        onChange={(e) => setRegName(e.target.value)}
+      />
+      {regName === "" && <span className="cursor">_</span>}
+    </div>
+  </div>
+
+  {/** Email field **/}
+  <div className="input-group">
+    <label htmlFor="regEmail">Email</label>
+    <div className="terminal-input">
+      <span className="prompt">&gt;</span>
+      <input
+        id="regEmail"
+        type="email"
+        value={regEmail}
+        onChange={(e) => setRegEmail(e.target.value)}
+      />
+      {regEmail === "" && <span className="cursor">_</span>}
+    </div>
+  </div>
+
+  {/** Password field **/}
+  <div className="input-group">
+    <label htmlFor="regPass">Password</label>
+    <div className="terminal-input">
+      <span className="prompt">&gt;</span>
+      <input
+        id="regPass"
+        type="password"
+        value={regPass}
+        onChange={(e) => setRegPass(e.target.value)}
+      />
+      {regPass === "" && <span className="cursor">_</span>}
+    </div>
+  </div>
+
+  <button onClick={register}>[Sign up]</button>
+  <div className="switch" onClick={() => showForm("login")}>Already have an account? Log in</div>
 </div>
 
-            <input
-              value={regName}
-              onChange={(e) => setRegName(e.target.value)}
-              id="regName"
-              type="text"
-              placeholder="Name"
-            />
-            <input
-              value={regEmail}
-              onChange={(e) => setRegEmail(e.target.value)}
-              id="regEmail"
-              type="email"
-              placeholder="Email"
-            />
-            <input
-              value={regPass}
-              onChange={(e) => setRegPass(e.target.value)}
-              id="regPass"
-              type="password"
-              placeholder="Password"
-            />
-            <button onClick={register}>Sign up</button>
-            <div className="switch" onClick={() => showForm("login")}>
-              Already have an account? Log in
-            </div>
-          </div>
 
-          <div style={{ display: active === "verify" ? "block" : "none" }}>
-            <h2>Confirmation</h2>
-            <div className={`msg ${verMsg ? "" : "hidden"}`}>{verMsg}</div>
-            <input
-              value={verEmail}
-              onChange={(e) => setVerEmail(e.target.value)}
-              id="verEmail"
-              type="email"
-              placeholder="Email"
-            />
-            <input
-              value={verCode}
-              onChange={(e) => setVerCode(e.target.value)}
-              id="verCode"
-              type="text"
-              placeholder="Verification code(sent to email)"
-            />
-            <button onClick={verify}>Confirm</button>
-            <div className="switch" onClick={() => showForm("login")}>
-              Go to Log in
-            </div>
-          </div>
+    {/* LOGIN */}
+<div style={{ display: active === "login" ? "block" : "none" }}>
+  <div className={`msg ${logMsg.includes("error") ? "error" : "success"} ${logMsg ? "" : "hidden"}`}>
+    {logMsg}
+  </div>
 
-          <div style={{ display: active === "login" ? "block" : "none" }}>
-            <h2>Log in</h2>
-            <div className={`msg ${logMsg.includes("error") ? "error" : "success"} ${logMsg ? "" : "hidden"}`}> {logMsg}</div>
+  <div className="input-group">
+    <label htmlFor="logEmail">Email</label>
+    <div className="terminal-input">
+      <span className="prompt">&gt;</span>
+      <input
+        id="logEmail"
+        type="email"
+        value={logEmail}
+        onChange={(e) => setLogEmail(e.target.value)}
+      />
+      {logEmail === "" && <span className="cursor">_</span>}
+    </div>
+  </div>
 
-            <input
-              value={logEmail}
-              onChange={(e) => setLogEmail(e.target.value)}
-              id="logEmail"
-              type="email"
-              placeholder="Email"
-            />
-            <input
-              value={logPass}
-              onChange={(e) => setLogPass(e.target.value)}
-              id="logPass"
-              type="password"
-              placeholder="Password"
-            />
-            <button onClick={login}>Log in</button>
-            <div className="switch" onClick={() => showForm("register")}>
-              Don't have an account? Register
-            </div>
-          </div>
-        </div>
+  <div className="input-group">
+    <label htmlFor="logPass">Password</label>
+    <div className="terminal-input">
+      <span className="prompt">&gt;</span>
+      <input
+        id="logPass"
+        type="password"
+        value={logPass}
+        onChange={(e) => setLogPass(e.target.value)}
+      />
+      {logPass === "" && <span className="cursor">_</span>}
+    </div>
+  </div>
+
+  <button onClick={login}>[Log in]</button>
+  <div className="switch" onClick={() => showForm("register")}>Don't have an account? Register</div>
+</div>
+
+{/* VERIFY */}
+<div style={{ display: active === "verify" ? "block" : "none" }}>
+  <div className={`msg ${verMsg ? "" : "hidden"}`}>{verMsg}</div>
+
+  <div className="input-group">
+    <label htmlFor="verEmail">Email</label>
+    <div className="terminal-input">
+      <span className="prompt">&gt;</span>
+      <input
+        id="verEmail"
+        type="email"
+        value={verEmail}
+        onChange={(e) => setVerEmail(e.target.value)}
+      />
+      {verEmail === "" && <span className="cursor">_</span>}
+    </div>
+  </div>
+
+  <div className="input-group">
+    <label htmlFor="verCode">Verification Code</label>
+    <div className="terminal-input">
+      <span className="prompt">&gt;</span>
+      <input
+        id="verCode"
+        type="text"
+        value={verCode}
+        onChange={(e) => setVerCode(e.target.value)}
+      />
+      {verCode === "" && <span className="cursor">_</span>}
+    </div>
+  </div>
+
+  <button onClick={verify}>[Confirm]</button>
+  <div className="switch" onClick={() => showForm("login")}>Go to Log in</div>
+</div>
+
+  </div>
+</div>
+
       </div>
 
       <style jsx>{`
-        .card {
-          background: #0a1b31;
-          border: 1px solid rgb(66, 65, 72);
-          padding: 2rem;
-          width: 350px;
-          color: #40f;
-          font-family: 'DotGothic16', monospace;
+      @font-face {
+          font-family: 'Basiic';
+          src: url('/src/basiic.ttf') format('truetype');
         }
+
+        .card {
+  padding: 0;
+  width: 510px;
+  height: 350px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 0, 0, 1); 
+  color: rgba(255, 0, 0, 1);
+  font-family: 'Basiic', sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
         h2 {
           margin-top: 0;
         }
         input {
           width: 100%;
-          padding: 0.6rem 1rem;
-          margin-bottom: 0.8rem;
-          background: rgb(59, 59, 116);
-          border: 1px solid rgb(104, 102, 117);
+          padding: 0.4rem 0.5rem;
+          margin-bottom: 0.4rem;
+          background: rgba(0, 0, 0, 1);
+          border: 1px solid rgba(255, 0, 0, 1);
           font-size: 1rem;
-          font-family: 'DotGothic16', monospace;
-          color: #dbeafe;
+          font-family: 'Basiic', sans-serif;
+          color: #c8edf3ff;
         }
         button {
           width: 100%;
           padding: 0.6rem 1rem;
           border: none;
-          background: rgb(44, 44, 122);
-          font-family: 'DotGothic16', monospace;
-          color: #40f;
+          background: rgba(0, 0, 0, 0);
+          font-family: 'Basiic', sans-serif;
+          color: rgba(255, 0, 0, 1);
+          border: 0px solid rgba(255, 0, 0, 1);
           cursor: pointer;
         }
         .switch {
           margin-top: 1rem;
           text-align: center;
-          color: #aaaaaa;
+          color: #ff0000ff;
           cursor: pointer;
         }
         .hidden {
           display: none;
         }
         .msg {
-          background: #e6ffed;
-          border: 1px solid #b2f5c8;
+          background: #000000ff;
+          border: 0px solid #b2f5c8;
           padding: 0.5rem;
           margin-bottom: 0.8rem;
-          color: #22543d;
+          color: #ffffffff;
           font-size: 0.9rem;
         }
           .msg.error {
-  background: #ffe6e6;
-  border: 1px solid #ffb2b2;
+  background: #000000ff;
+  border: 1px solid #ff0000ff;
   color: #8b0000;
 }
 
 .msg.success {
-  background: #e6ffed;
-  border: 1px solid #b2f5c8;
+  background: #000000ff;
+  border: 1px solid #00c60dff;
   color: #22543d;
 }
+.card {
+  padding: 0;
+  width: 510px;
+  height: 350px;
+  background: rgba(0, 0, 0, 0.40);
+  border: 1px solid rgba(255, 0, 0, 1); 
+  color: rgba(255, 0, 0, 1);
+  font-family: 'Basiic', sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.card-header {
+  height: 34px; 
+  line-height: 34px; 
+  background: rgba(0, 0, 0, 1);
+  color: rgba(255, 0, 0, 1); 
+  padding: 0 12px; 
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  user-select: none;
+  border-bottom: 1px solid rgba(255, 0, 0, 1);
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+}
+
+.card-body {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 8px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.35));
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.8rem;
+  }
+
+.input-group label {
+    font-size: 0.6rem;
+    color: rgba(255, 0, 0, 0.9);
+    margin-bottom: 0.2rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    user-select: none;
+  }
+
+.input-group input {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  background: rgba(0, 0, 0, 1);
+ 
+  font-size: 1rem;
+  font-family: 'Basiic', sans-serif;
+  color: #c8edf3ff;
+}
+
+.input-group input::placeholder {
+  color: rgba(255, 0, 0, 0.8);
+}
+
+ .terminal-input {
+    display: flex;
+    align-items: center;
+    font-family: 'Basiic', monospace;
+    font-size: 1rem;
+    position: relative;
+  }
+
+  .terminal-input .prompt {
+    color: rgba(255, 0, 0, 0.8);
+    margin-right: 0.3rem;
+  }
+
+.terminal-input input {
+  background: transparent;
+  border: none;
+  color: #c8edf3ff;
+  outline: none;
+  font-family: 'Basiic', monospace;
+  font-size: 1rem;
+  padding-left: 1ch; /* небольшой отступ, чтобы курсор не накладывался на > */
+}
+
+.terminal-input .cursor {
+  position: absolute;
+  left: 1ch; 
+  top: 50%;  
+  transform: translateY(-50%);
+  color: #ff0000ff;
+  animation: blink 1s steps(2, start) infinite;
+}
+
+
+ @keyframes blink {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+  }
+
+
 
       `}</style>
     </>
