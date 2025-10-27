@@ -93,7 +93,7 @@ export default function SignInModal({ open, onClose, onSuccess }) {
         <div className="modal-content">
           <div className="modal-frame">
             <span className="modal-close" onClick={onClose}>
-              ✖
+              X
             </span>
 
             <div className="modal-body">

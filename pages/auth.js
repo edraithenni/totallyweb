@@ -42,6 +42,11 @@ export default function AuthPage() {
     return () => clearInterval(cursorInterval);
   }, []);
 
+  // Функция для перехода на страницу поиска
+  const handleGoToSearch = () => {
+    const base = window.location.pathname.startsWith("/app") ? "/app" : "";
+    window.location.href = `${base}/search`;
+  };
 
   const triggerButtonGlitch = (buttonType) => {
     setGlitchingButtons(prev => ({
@@ -144,7 +149,7 @@ export default function AuthPage() {
           window.location.href = `${base}/search`;
         }, 1000);
       } catch (err) {
-        setLogMsg("[Х] Login error: " + (err.message || "Unknown error"));
+        setLogMsg("X Login error: " + (err.message || "Unknown error"));
       }
     }, 300);
   }
@@ -200,13 +205,22 @@ export default function AuthPage() {
       >
         <div className="card">
           <div className="card-header">
-            {active === "register" && "REGISTER"}
-            {active === "login" && "LOGIN"}
-            {active === "verify" && "VERIFICATION"}
+            <span className="card-title">
+              {active === "register" && "REGISTER"}
+              {active === "login" && "LOGIN"}
+              {active === "verify" && "VERIFICATION"}
+            </span>
+            <button 
+              className="close-button"
+              onClick={handleGoToSearch}
+              title="Go to Search"
+            >
+              X
+            </button>
           </div>
 
           <div className="card-body">
-            {/* REGISTER */}
+            {/* Остальной код остается без изменений */}
             <div style={{ display: active === "register" ? "block" : "none" }}>
               <div className={`msg ${regMsg.includes("error") ? "error" : "success"} ${regMsg ? "" : "hidden"}`}>
                 {regMsg}
@@ -393,6 +407,33 @@ export default function AuthPage() {
           box-shadow: inset 0 -1px 0 rgba(0,0,0,0.2);
           display: flex;
           align-items: center;
+          justify-content: space-between;
+        }
+
+        .card-title {
+          flex: 1;
+        }
+
+        .close-button {
+          background: none;
+          border: none;
+          color: rgba(255, 0, 0, 1);
+          font-size: 16px;
+          cursor: pointer;
+          width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+          font-family: 'Basiic', sans-serif;
+          transition: all 0.2s ease;
+        }
+
+        .close-button:hover {
+          
+          color:  rgba(255, 58, 58, 0.93)
+          text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
         }
 
         .card-body {
@@ -421,10 +462,12 @@ export default function AuthPage() {
         }
 
         .input-group input {
+
           width: 100%;
           padding: 0.4rem 0.5rem;
           background: rgba(0, 0, 0, 1);
           font-size: 1rem;
+          
           font-family: 'Basiic', sans-serif;
           color: #c8edf3ff;
         }
@@ -446,13 +489,23 @@ export default function AuthPage() {
           margin-right: 0.3rem;
         }
 
+        .terminal-input input:focus {
+  background: rgba(255, 0, 0, 0.1);
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+}
+
+.input-group input:focus {
+  background: rgba(255, 0, 0, 0.1);
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+}
+
         .terminal-input input {
           background: transparent;
           border: none;
-          color: #c8edf3ff;
+          color: #ff4444;
           outline: none;
           font-family: 'Basiic', monospace;
-          font-size: 1rem;
+          font-size: 0.85rem;
           padding-left: 1ch;
         }
 
@@ -520,7 +573,7 @@ export default function AuthPage() {
           border: 0px solid #b2f5c8;
           padding: 0.5rem;
           margin-bottom: 0.8rem;
-          color: #ffffffff;
+          color: rgba(255, 0, 0, 1);
           font-size: 0.9rem;
         }
 
@@ -532,8 +585,8 @@ export default function AuthPage() {
 
         .msg.success {
           background: #000000ff;
-          border: 1px solid #00c60dff;
-          color: #22543d;
+          border: 0px solid #00c60dff;
+          color: #21d410ff;
         }
       `}</style>
     </>
