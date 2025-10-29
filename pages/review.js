@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import ReviewCard from "@/components/ReviewCard";
+import Header from "../components/header";
 import { ToastContainer } from 'react-toastify';
 
 export default function ReviewPage() {
@@ -56,8 +57,10 @@ export default function ReviewPage() {
     return <p style={{ textAlign: "center", marginTop: "2rem" }}>Loading review...</p>;
   }
 
-  return (
+  return (<>
+     <Header />
     <div className="review-page">
+    
       <ToastContainer
         position="bottom-right"
         autoClose={3000}
@@ -78,6 +81,7 @@ export default function ReviewPage() {
         showComments={true}
       />
 
+
       <style jsx>{`
         .review-page {
           max-width: 800px;
@@ -90,5 +94,6 @@ export default function ReviewPage() {
         }
       `}</style>
     </div>
+     </>
   );
 }
