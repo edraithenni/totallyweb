@@ -1,8 +1,9 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import ReviewCard from "@/components/ReviewCard";
+import CommentsSection from "@/components/CommentsSection";
 import Header from "../components/header";
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from "react-toastify";
 
 export default function ReviewPage() {
   const router = useRouter();
@@ -40,60 +41,67 @@ export default function ReviewPage() {
   useEffect(() => {
     async function fetchCurrentUser() {
       try {
-        const res = await fetch('/api/users/me', { credentials: 'include' });
+        const res = await fetch("/api/users/me", { credentials: "include" });
         if (res.ok) {
           const user = await res.json();
           setCurrentUser(user);
         }
       } catch (err) {
-        console.error('Failed to fetch current user', err);
+        console.error("Failed to fetch current user", err);
       }
     }
 
     fetchCurrentUser();
   }, []);
 
+
+  const handleReviewUpdated = (updatedReview) => {
+    setReview(updatedReview);
+  };
+
   if (!review) {
     return <p style={{ textAlign: "center", marginTop: "2rem" }}>Loading review...</p>;
   }
 
-  return (<>
-     <Header />
-    <div className="review-page">
-    
-      <ToastContainer
-        position="bottom-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
-      
-      <ReviewCard 
-        review={review} 
-        showMovieLink 
-        currentUser={currentUser}
-        showComments={true}
-      />
+  return (
+    <>
+      <Header />
+      <div className="review-page">
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+        />
 
+        <ReviewCard
+          review={review}
+          showMovieLink
+          currentUser={currentUser}
+          editable={true}            
+          onReviewUpdated={handleReviewUpdated} 
+        />
 
-      <style jsx>{`
-        .review-page {
-          max-width: 800px;
-          margin: 2rem auto;
-          padding: 1rem;
-          background: #0a1b31;
-          border-radius: 10px;
-          color: #d2ece3;
-          font-family: inherit;
-        }
-      `}</style>
-    </div>
-     </>
+        <CommentsSection reviewId={review.id} currentUser={currentUser} />
+
+        <style jsx>{`
+          .review-page {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: #0a1b31;
+            border-radius: 10px;
+            color: #d2ece3;
+            font-family: inherit;
+          }
+        `}</style>
+      </div>
+    </>
   );
 }
