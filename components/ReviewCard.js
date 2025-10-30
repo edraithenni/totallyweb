@@ -4,6 +4,20 @@ import Image from "next/image";
 import { toast } from "react-toastify";
 import { useState } from "react";
 
+function formatDateTime(dateString) {
+  if (!dateString) return "Unknown date";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "Invalid date";
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
 export default function ReviewCard({
   review,
   showMovieLink = false,
@@ -128,22 +142,23 @@ export default function ReviewCard({
       onClick={() => !isEditing && router.push(`/review?id=${review.id}`)}
     >
       <div className="review-header">
-        <div className="user-info">
-          <Link
-            href={`/profile?id=${review.user_id}`}
-            className="user-link"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              src={review.user_avatar || "/src/default_pfp.png"}
-              alt={review.user_name || "User"}
-              width={32}
-              height={32}
-              className="user-avatar"
-            />
-            <span className="user-name">{review.user_name || "Unknown User"}</span>
-          </Link>
-        </div>
+   <div className="user-info">
+  <Link href={`/profile?id=${review.user_id}`} className="user-link" onClick={e => e.stopPropagation()}>
+    <div className="avatar-name-wrapper">
+      <div className="avatar-wrapper">
+      <Image
+        src={review.user_avatar || "/src/default_pfp.png"}
+        alt={review.user_name || "User"}
+        width={32}
+        height={32}
+        className="user-avatar"
+      />
+      </div>
+      <span className="user-name">{review.user_name || "Unknown User"}</span>
+    </div>
+  </Link>
+</div>
+
 
         {showMovieLink && (
           <div className="movie-info">
@@ -257,7 +272,7 @@ export default function ReviewCard({
 
       <div className="review-footer">
         <span className="review-date">
-          {review.CreatedAt || review.created_at}
+          { formatDateTime(review.created_at)}
         </span>
         <div className="review-stats">
           {review.likes_count > 0 && (
@@ -288,18 +303,27 @@ export default function ReviewCard({
           align-items: center;
           margin-bottom: 8px;
         }
-        .user-info {
+       .avatar-name-wrapper {
           display: flex;
-          align-items: center;
-          gap: 8px;
+          align-items: center; 
+          gap: 0.5rem;
         }
-        .user-avatar {
+
+       .avatar-wrapper {
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
-          border: 2px solid #ff74a5;
+          overflow: hidden; 
+          flex-shrink: 0;
         }
+
         .user-name {
-          color: #ffc659;
+          font-weight: bold;
+          color: #d2ece3;
+          line-height: 1; 
+          
         }
+
         .movie-link {
           color: #8dd9ff;
           text-decoration: underline;

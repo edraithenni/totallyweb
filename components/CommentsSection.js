@@ -102,7 +102,7 @@ function CommentItem({ comment, currentUser, onDeleteComment, onReply, depth = 0
             className={`toggle-replies-btn ${showReplies ? "expanded" : ""}`}
             onClick={() => setShowReplies(!showReplies)}
           >
-            {showReplies ? "▼" : "▶"} {comment.replies.length} replies
+            {showReplies ? "▼hide replies" : "▶show replies"} 
           </button>
         )}
       </div>
