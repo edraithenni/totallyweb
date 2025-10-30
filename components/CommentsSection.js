@@ -268,6 +268,7 @@ export default function CommentsSection({ reviewId, currentUser }) {
           margin-top: 2rem;
           padding-top: 1rem;
           border-top: 1px solid #334;
+          font-family: "Basiic", sans-serif;
         }
         h3 {
           margin-bottom: 1rem;
