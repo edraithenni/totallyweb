@@ -95,8 +95,8 @@ export default function ReviewPage() {
             max-width: 800px;
             margin: 2rem auto;
             padding: 1rem;
-            background: #0a1b31;
-            border-radius: 10px;
+            background: #141319ff;
+            border-radius: 0px;
             color: #d2ece3;
             font-family: inherit;
           }

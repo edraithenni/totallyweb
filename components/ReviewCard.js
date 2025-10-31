@@ -285,17 +285,17 @@ export default function ReviewCard({
       <style jsx>{`
         .review-card {
           background: #0b1020;
-          border: 2px solid #d03e78;
+          border: 1px solid #d2ece3;
           padding: 16px;
           margin-bottom: 20px;
-          border-radius: 8px;
+          border-radius: 0px;
           color: #d2ece3;
           font-family: "Basiic", sans-serif;
           transition: 0.2s;
           cursor: pointer;
         }
         .review-card:hover {
-          border-color: #ff74a5;
+          border-color: #828b95ff;
         }
         .review-header {
           display: flex;

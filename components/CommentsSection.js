@@ -159,7 +159,7 @@ function CommentItem({ comment, currentUser, onDeleteComment, onReply, depth = 0
         .toggle-replies-btn {
           background: none;
           border: none;
-          color: #41d3d2;
+          color: #999;
           cursor: pointer;
           font-size: 0.85rem;
         }
@@ -267,13 +267,14 @@ export default function CommentsSection({ reviewId, currentUser }) {
         .comments-section {
           margin-top: 2rem;
           padding-top: 1rem;
-          border-top: 1px solid #334;
+          border-top: 1px solid rgba(60, 51, 68, 1);
           font-family: "Basiic", sans-serif;
         }
         h3 {
           margin-bottom: 1rem;
-          color: #ffb3ff;
+          color: #8dd9ff;
           font-size: 1.3rem;
+          
         }
         .comment-form {
           margin-top: 1rem;
@@ -283,33 +284,33 @@ export default function CommentsSection({ reviewId, currentUser }) {
         }
         textarea {
           width: 100%;
-          background: #091a2c;
+          background: #282439ff;
           color: #d2ece3;
           border: 1px solid #446;
-          border-radius: 6px;
+          border-radius: 0px;
           padding: 0.5rem;
           min-height: 80px;
           resize: vertical;
         }
         textarea:focus {
           outline: none;
-          border-color: #41d3d2;
+          border-color: #16131aff;
         }
         .comment-form-actions {
           display: flex;
           gap: 0.5rem;
         }
         button {
-          background: #41d3d2;
+          background: #556;
           border: none;
           color: #0a1b31;
-          border-radius: 6px;
+          border-radius: 0px;
           padding: 0.4rem 0.8rem;
           cursor: pointer;
           transition: background 0.3s;
         }
         button:hover {
-          background: #2abcb9;
+          background: #8dd9ff;
         }
         .cancel-reply-btn {
           background: #334;
