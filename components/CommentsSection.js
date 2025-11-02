@@ -19,7 +19,7 @@ function formatDateTime(dateString) {
 function CommentTree({ comments, currentUser, onDeleteComment, onReply, depth = 0 }) {
   return (
     <ul className="comment-tree">
-      {comments.map(comment => (
+      {comments.map((comment) => (
         <CommentItem
           key={comment.ID}
           comment={comment}
@@ -39,6 +39,58 @@ function CommentItem({ comment, currentUser, onDeleteComment, onReply, depth = 0
   const isOwner = currentUser && currentUser.id === comment.user_id;
   const hasReplies = comment.replies && comment.replies.length > 0;
 
+
+  const [isVoting, setIsVoting] = useState(false);
+
+const [score, setScore] = useState(comment.Value ?? 0);
+const [userVote, setUserVote] = useState(comment.user_vote ?? 0);
+
+useEffect(() => {
+  setScore(comment.Value ?? 0);
+  setUserVote(comment.user_vote ?? 0);
+}, [comment.Value, comment.user_vote]);
+
+const handleVote = async (type) => {
+  if (!comment || comment.DeletedAt !== null) return;
+  if (isVoting) return;
+  setIsVoting(true);
+
+  let action = null;
+  if (type === "up") action = userVote === 1 ? "remove" : "up";
+  else if (type === "down") action = userVote === -1 ? "remove" : "down";
+
+  if (action === "remove" && userVote === 0) {
+    setIsVoting(false);
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/comments/${comment.ID}/vote`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      toast.error(err.error || "Ошибка голосования");
+      return;
+    }
+
+    const data = await res.json();
+    if (typeof data.value === "number") setScore(data.value);
+    if (typeof data.user_vote === "number") setUserVote(data.user_vote);
+
+  } catch {
+    toast.error("Ошибка соединения");
+  } finally {
+    setIsVoting(false);
+  }
+};
+
+
+
   const handleDelete = async () => {
     const confirmDelete = () => {
       toast.dismiss();
@@ -47,7 +99,7 @@ function CommentItem({ comment, currentUser, onDeleteComment, onReply, depth = 0
         method: "DELETE",
         credentials: "include",
       })
-        .then(res => {
+        .then((res) => {
           if (res.ok) {
             onDeleteComment();
             toast.success("Comment deleted");
@@ -63,8 +115,12 @@ function CommentItem({ comment, currentUser, onDeleteComment, onReply, depth = 0
       <div className="confirm-toast">
         <p>Delete this comment?</p>
         <div className="confirm-actions">
-          <button onClick={confirmDelete} className="confirm-yes">Yes</button>
-          <button onClick={() => toast.dismiss()} className="confirm-no">Cancel</button>
+          <button onClick={confirmDelete} className="confirm-yes">
+            Yes
+          </button>
+          <button onClick={() => toast.dismiss()} className="confirm-no">
+            Cancel
+          </button>
         </div>
       </div>,
       { autoClose: false, closeOnClick: false, position: "bottom-right" }
@@ -91,8 +147,38 @@ function CommentItem({ comment, currentUser, onDeleteComment, onReply, depth = 0
       <p className="comment-content">{comment.content}</p>
 
       <div className="comment-actions">
-         
-       {comment.DeletedAt === null && (<button className="reply-btn" onClick={() => onReply(comment)}>Reply</button>)}
+        {comment.DeletedAt === null && (
+          <>
+            <div className="vote-group">
+              <button
+                className={`vote-btn up ${userVote === 1 ? "active" : ""}`}
+                onClick={() => handleVote("up")}
+                disabled={isVoting}
+                aria-pressed={userVote === 1}
+                title="Upvote"
+              >
+                ▲
+              </button>
+              <span className="comment-score" aria-live="polite">
+                {score}
+              </span>
+              <button
+                className={`vote-btn down ${userVote === -1 ? "active" : ""}`}
+                onClick={() => handleVote("down")}
+                disabled={isVoting}
+                aria-pressed={userVote === -1}
+                title="Downvote"
+              >
+                ▼
+              </button>
+            </div>
+
+            <button className="reply-btn" onClick={() => onReply(comment)}>
+              Reply
+            </button>
+          </>
+        )}
+
         {isOwner && comment.DeletedAt === null && (
           <button className="delete-btn" onClick={handleDelete} disabled={isDeleting}>
             {isDeleting ? "Deleting..." : "Delete"}
@@ -103,7 +189,7 @@ function CommentItem({ comment, currentUser, onDeleteComment, onReply, depth = 0
             className={`toggle-replies-btn ${showReplies ? "expanded" : ""}`}
             onClick={() => setShowReplies(!showReplies)}
           >
-            {showReplies ? "▼hide replies" : "▶show replies"} 
+            {showReplies ? "▼hide replies" : "▶show replies"}
           </button>
         )}
       </div>
@@ -154,6 +240,46 @@ function CommentItem({ comment, currentUser, onDeleteComment, onReply, depth = 0
           display: flex;
           gap: 0.5rem;
           margin-top: 0.4rem;
+          align-items: center;
+        }
+        .vote-group {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+        }
+        .vote-btn {
+          background: none;
+          border: 1px solid transparent;
+          padding: 0.15rem 0.4rem;
+          cursor: pointer;
+          font-size: 0.9rem;
+          line-height: 1;
+          border-radius: 4px;
+          color: #999;
+          user-select: none;
+        }
+        .vote-btn:hover {
+          text-decoration: underline;
+        }
+        .vote-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        .vote-btn.up.active {
+          color: #0a8;
+          font-weight: 700;
+          text-shadow: 0 0 6px rgba(10, 136, 136, 0.18);
+        }
+        .vote-btn.down.active {
+          color: #f55;
+          font-weight: 700;
+          text-shadow: 0 0 6px rgba(255, 85, 85, 0.12);
+        }
+        .comment-score {
+          min-width: 2.2rem;
+          text-align: center;
+          color: #d2ece3;
+          font-weight: 600;
         }
         .reply-btn,
         .delete-btn,
@@ -171,6 +297,10 @@ function CommentItem({ comment, currentUser, onDeleteComment, onReply, depth = 0
         }
         .toggle-replies-btn.expanded {
           color: #ffb3ff;
+        }
+        .confirm-yes,
+        .confirm-no {
+          margin-right: 0.5rem;
         }
       `}</style>
     </li>
@@ -231,8 +361,6 @@ export default function CommentsSection({ reviewId, currentUser }) {
     }
   };
 
- 
-
   return (
     <div className="comments-section">
       <h3>Comments</h3>
@@ -277,7 +405,6 @@ export default function CommentsSection({ reviewId, currentUser }) {
           margin-bottom: 1rem;
           color: #8dd9ff;
           font-size: 1.3rem;
-          
         }
         .comment-form {
           margin-top: 1rem;
