@@ -91,8 +91,9 @@ function CommentItem({ comment, currentUser, onDeleteComment, onReply, depth = 0
       <p className="comment-content">{comment.content}</p>
 
       <div className="comment-actions">
-        <button className="reply-btn" onClick={() => onReply(comment)}>Reply</button>
-        {isOwner && (
+         
+       {comment.DeletedAt === null && (<button className="reply-btn" onClick={() => onReply(comment)}>Reply</button>)}
+        {isOwner && comment.DeletedAt === null && (
           <button className="delete-btn" onClick={handleDelete} disabled={isDeleting}>
             {isDeleting ? "Deleting..." : "Delete"}
           </button>
@@ -229,6 +230,8 @@ export default function CommentsSection({ reviewId, currentUser }) {
       setIsPosting(false);
     }
   };
+
+ 
 
   return (
     <div className="comments-section">
