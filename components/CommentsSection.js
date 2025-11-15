@@ -42,11 +42,11 @@ function CommentItem({ comment, currentUser, onDeleteComment, onReply, depth = 0
 
   const [isVoting, setIsVoting] = useState(false);
 
-const [score, setScore] = useState(comment.Value ?? 0);
+const [score, setScore] = useState(comment.value ?? 0);
 const [userVote, setUserVote] = useState(comment.user_vote ?? 0);
 
 useEffect(() => {
-  setScore(comment.Value ?? 0);
+  setScore(comment.value ?? 0);
   setUserVote(comment.user_vote ?? 0);
 }, [comment.Value, comment.user_vote]);
 
@@ -67,7 +67,7 @@ const handleVote = async (type) => {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action }),
+      body: JSON.stringify({ action}),
     });
 
     const data = await res.json();
