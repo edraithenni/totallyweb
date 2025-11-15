@@ -50,18 +50,16 @@ useEffect(() => {
   setUserVote(comment.user_vote ?? 0);
 }, [comment.Value, comment.user_vote]);
 
+
 const handleVote = async (type) => {
   if (!comment || comment.DeletedAt !== null) return;
   if (isVoting) return;
+
   setIsVoting(true);
 
-  let action = null;
-  if (type === "up") action = userVote === 1 ? "remove" : "up";
-  else if (type === "down") action = userVote === -1 ? "remove" : "down";
-
-  if (action === "remove" && userVote === 0) {
-    setIsVoting(false);
-    return;
+  let action = type;
+  if ((type === "up" && userVote === 1) || (type === "down" && userVote === -1)) {
+    action = "remove";
   }
 
   try {
@@ -72,24 +70,22 @@ const handleVote = async (type) => {
       body: JSON.stringify({ action }),
     });
 
+    const data = await res.json();
+
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      toast.error(err.error || "Ошибка голосования");
+      if (data.error && data.error !== "no vote to remove") toast.error(data.error);
       return;
     }
 
-    const data = await res.json();
     if (typeof data.value === "number") setScore(data.value);
     if (typeof data.user_vote === "number") setUserVote(data.user_vote);
 
-  } catch {
+  } catch (err) {
     toast.error("Ошибка соединения");
   } finally {
     setIsVoting(false);
   }
 };
-
-
 
   const handleDelete = async () => {
     const confirmDelete = () => {
