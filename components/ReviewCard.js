@@ -37,6 +37,10 @@ export default function ReviewCard({
   const [editRating, setEditRating] = useState(review.rating || 0);
   const [hoverRating, setHoverRating] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  const [spoilerRevealed, setSpoilerRevealed] = useState(false);
+  const [editContainsSpoiler, setEditContainsSpoiler] = useState(
+    !!(review.contains_spoiler || review.containsSpoiler || review.spoiler)
+  );
 
   const maxLength = 200;
   const needsTruncation = review.content && review.content.length > maxLength;
@@ -96,7 +100,7 @@ export default function ReviewCard({
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ content: editContent, rating: editRating }),
+        body: JSON.stringify({ content: editContent, rating: editRating, contains_spoiler: !!editContainsSpoiler }),
       });
 
       if (res.ok) {
@@ -111,6 +115,7 @@ export default function ReviewCard({
           user_avatar: review.user_avatar,
           movie_id: review.movie_id,
           movie_title: review.movie_title,
+          contains_spoiler: updated.contains_spoiler ?? !!editContainsSpoiler,
         };
 
         toast.success("Review updated!");
@@ -136,6 +141,7 @@ export default function ReviewCard({
 
   const filledStars = safeRating();
   const emptyStars = Math.max(0, 10 - filledStars);
+  const hasSpoiler = !!(review.contains_spoiler || review.containsSpoiler || review.spoiler);
 
   const handleReviewCardClick = () => {
     if (isEditing) return;
@@ -253,6 +259,14 @@ export default function ReviewCard({
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
             />
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
+              <input
+                type="checkbox"
+                checked={editContainsSpoiler}
+                onChange={(e) => setEditContainsSpoiler(e.target.checked)}
+              />
+              <span>Contains Spoiler</span>
+            </label>
             <div className="edit-buttons">
               <button onClick={saveEdit} disabled={isSaving}>
                 Save
@@ -264,17 +278,31 @@ export default function ReviewCard({
           </>
         ) : (
           <>
-            <p>{displayContent}</p>
-            {needsTruncation && (
-              <button
+            {hasSpoiler && !spoilerRevealed ? (
+              <div
+                className="spoiler-overlay"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setExpanded(!expanded);
+                  setSpoilerRevealed(true);
                 }}
-                className="expand-btn"
               >
-                {expanded ? "Show less" : "Read more"}
-              </button>
+                <h1 className="logo glitch" data-text="SPOILERS">SPOILERS</h1>
+              </div>
+            ) : (
+              <>
+                <p>{displayContent}</p>
+                {needsTruncation && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExpanded(!expanded);
+                    }}
+                    className="expand-btn"
+                  >
+                    {expanded ? "Show less" : "Read more"}
+                  </button>
+                )}
+              </>
             )}
           </>
         )}
@@ -406,6 +434,69 @@ export default function ReviewCard({
           border: none;
           cursor: pointer;
           font-family: inherit;
+        }
+        .spoiler-overlay {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 140px;
+          background: linear-gradient(90deg, rgba(0,0,0,0.8), rgba(10,10,10,0.95));
+          border: 2px dashed #cc00ff;
+          cursor: pointer;
+          text-align: center;
+        }
+
+        :root {
+          --terminal-purple: #cc00ff;
+          --font-header: 'VT323', 'Share Tech Mono', monospace;
+          --animation-slow: 4s;
+        }
+
+        .logo.glitch {
+          font-family: var(--font-header);
+          font-size: 2rem;
+          color: var(--terminal-purple);
+          margin: 0;
+          letter-spacing: 0.6rem;
+          text-transform: uppercase;
+          text-shadow:
+            0 0 10px rgba(204, 0, 255, 0.7),
+            0 0 20px rgba(204, 0, 255, 0.5);
+          animation: logo-pulse var(--animation-slow) infinite alternate;
+          position: relative;
+        }
+
+        .logo.glitch::before,
+        .logo.glitch::after {
+          content: attr(data-text);
+          position: absolute;
+          left: 0;
+          top: 0;
+          opacity: 0.8;
+        }
+
+        .logo.glitch::before {
+          color: #ff0033;
+          transform: translate(-2px, -1px);
+        }
+
+        .logo.glitch::after {
+          color: #00ccff;
+          transform: translate(2px, 1px);
+        }
+
+        @keyframes logo-pulse {
+          0% {
+            text-shadow:
+              0 0 10px rgba(255, 0, 0, 0.7),
+              0 0 20px rgba(255, 0, 0, 0.4);
+          }
+          100% {
+            text-shadow:
+              0 0 15px rgba(255, 0, 0, 0.9),
+              0 0 30px rgba(255, 0, 0, 0.7),
+              0 0 50px rgba(255, 0, 0, 0.5);
+          }
         }
       `}</style>
     </div>

@@ -12,6 +12,7 @@ export default function DetailsPage() {
   const [reviewContent, setReviewContent] = useState("");
   const [reviewRating, setReviewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+  const [containsSpoiler, setContainsSpoiler] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [signInModalOpen, setSignInModalOpen] = useState(false);
 
@@ -78,11 +79,12 @@ const averageRating =
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ content: reviewContent, rating: parseInt(reviewRating) })
+        body: JSON.stringify({ content: reviewContent, rating: parseInt(reviewRating), contains_spoiler: !!containsSpoiler })
       });
       if (res.ok) {
         setReviewContent("");
         setReviewRating(0);
+        setContainsSpoiler(false);
         loadReviews();
       } else {
         alert("Failed to submit review");
@@ -155,7 +157,17 @@ const averageRating =
             ))}
           </div>
 
-          <button onClick={submitReview}>Submit</button>
+          <div className="review-form-footer">
+            <button onClick={submitReview}>Submit</button>
+            <label className="spoiler-checkbox">
+              <input
+                type="checkbox"
+                checked={containsSpoiler}
+                onChange={(e) => setContainsSpoiler(e.target.checked)}
+              />
+              <span>Contains Spoiler</span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -266,6 +278,31 @@ const averageRating =
     cursor: pointer;
     font-size: 24px;
     user-select: none;
+  }
+
+  .review-form .spoiler-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: bold;
+    color: #d03e78;
+  }
+
+  .review-form .spoiler-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    border: 2px solid #d03e78;
+    accent-color: #d03e78;
+  }
+
+  .review-form-footer {
+    display: flex;
+    align-items: center;
+    gap: 15px;
   }
 
   .star {
