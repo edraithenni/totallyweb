@@ -25,6 +25,7 @@ export default function ReviewCard({
   onReviewDeleted,
   editable = false,
   onReviewUpdated,
+  onReviewClick,
 }) {
   const router = useRouter();
   const [expanded, setExpanded] = useState(false);
@@ -136,10 +137,19 @@ export default function ReviewCard({
   const filledStars = safeRating();
   const emptyStars = Math.max(0, 10 - filledStars);
 
+  const handleReviewCardClick = () => {
+    if (isEditing) return;
+    if (!currentUser) {
+      onReviewClick && onReviewClick();
+      return;
+    }
+    router.push(`/review?id=${review.id}`);
+  };
+
   return (
     <div
       className="review-card"
-      onClick={() => !isEditing && router.push(`/review?id=${review.id}`)}
+      onClick={handleReviewCardClick}
     >
       <div className="review-header">
    <div className="user-info">

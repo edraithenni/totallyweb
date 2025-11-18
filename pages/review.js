@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import ReviewCard from "@/components/ReviewCard";
 import CommentsSection from "@/components/CommentsSection";
 import Header from "../components/header";
+import SignInModal from "../components/SignInModal";
 import { ToastContainer } from "react-toastify";
 
 export default function ReviewPage() {
@@ -11,6 +12,7 @@ export default function ReviewPage() {
 
   const [review, setReview] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [signInModalOpen, setSignInModalOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -45,9 +47,13 @@ export default function ReviewPage() {
         if (res.ok) {
           const user = await res.json();
           setCurrentUser(user);
+        } else {
+          // User not authorized - show sign in modal
+          setSignInModalOpen(true);
         }
       } catch (err) {
         console.error("Failed to fetch current user", err);
+        setSignInModalOpen(true);
       }
     }
 
@@ -102,6 +108,22 @@ export default function ReviewPage() {
           }
         `}</style>
       </div>
+
+      <SignInModal 
+        open={signInModalOpen} 
+        onClose={() => {
+          setSignInModalOpen(false);
+          router.push("/search");
+        }}
+        onSuccess={() => {
+          setSignInModalOpen(false);
+          // Reload current user after successful login
+          fetch("/api/users/me", { credentials: "include" })
+            .then(res => res.ok && res.json())
+            .then(user => user && setCurrentUser(user))
+            .catch(console.error);
+        }}
+      />
     </>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Header from "../components/header";
 import ReviewCard from "../components/ReviewCard";
 import AddToPlaylistButton from "../components/AddToPlaylistButton";
+import SignInModal from "../components/SignInModal";
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 
@@ -12,6 +13,7 @@ export default function DetailsPage() {
   const [reviewRating, setReviewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [currentUser, setCurrentUser] = useState(null);
+  const [signInModalOpen, setSignInModalOpen] = useState(false);
 
   const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
   const movieId = params?.get("id");
@@ -61,6 +63,12 @@ const averageRating =
   }
 
   async function submitReview() {
+    // Check if user is logged in
+    if (!currentUser) {
+      setSignInModalOpen(true);
+      return;
+    }
+
     if (!reviewRating || reviewRating < 1 || reviewRating > 10) {
       alert("Rating must be between 1 and 10");
       return;
@@ -118,7 +126,12 @@ const averageRating =
           key={r.id} 
           review={r}
           currentUser={currentUser}
-          onReviewDeleted={loadReviews} />)}
+          onReviewDeleted={loadReviews}
+          onReviewClick={() => {
+            if (!currentUser) {
+              setSignInModalOpen(true);
+            }
+          }} />)}
 
         <div className="review-form">
           <h4>Create Review</h4>
@@ -155,6 +168,19 @@ const averageRating =
         pauseOnHover
         draggable
         theme="dark"
+      />
+
+      <SignInModal 
+        open={signInModalOpen} 
+        onClose={() => setSignInModalOpen(false)}
+        onSuccess={() => {
+          setSignInModalOpen(false);
+          // Reload current user after successful login
+          fetch("/api/users/me", { credentials: "include" })
+            .then(res => res.ok && res.json())
+            .then(user => user && setCurrentUser(user))
+            .catch(console.error);
+        }}
       />
 
       <style jsx>{`
