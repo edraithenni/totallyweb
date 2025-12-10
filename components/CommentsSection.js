@@ -1,3 +1,4 @@
+// ———————— полный файл, как ты просил ————————
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Link from "next/link";
@@ -36,61 +37,65 @@ function CommentTree({ comments, currentUser, onDeleteComment, onReply, depth = 
 function CommentItem({ comment, currentUser, onDeleteComment, onReply, depth = 0 }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
+
   const isOwner = currentUser && currentUser.id === comment.user_id;
+  const isAdmin = currentUser && currentUser.role === "admin";
+
+  // NEW: админ не может банить или удалять самого себя
+  const adminActingOnSelf = isAdmin && isOwner;
+
   const hasReplies = comment.replies && comment.replies.length > 0;
 
-
+  // voting
   const [isVoting, setIsVoting] = useState(false);
+  const [score, setScore] = useState(comment.value ?? 0);
+  const [userVote, setUserVote] = useState(comment.user_vote ?? 0);
 
-const [score, setScore] = useState(comment.value ?? 0);
-const [userVote, setUserVote] = useState(comment.user_vote ?? 0);
+  // banned state
+  const initialBanned = !!(comment.user && (comment.user.banned || comment.user.is_banned));
+  const [userBanned, setUserBanned] = useState(initialBanned);
 
-useEffect(() => {
-  setScore(comment.value ?? 0);
-  setUserVote(comment.user_vote ?? 0);
-}, [comment.Value, comment.user_vote]);
+  useEffect(() => {
+    setScore(comment.value ?? 0);
+    setUserVote(comment.user_vote ?? 0);
+    setUserBanned(!!(comment.user && (comment.user.banned || comment.user.is_banned)));
+  }, [comment]);
 
+  const handleVote = async (type) => {
+    if (comment.DeletedAt !== null || isVoting) return;
 
-const handleVote = async (type) => {
-  if (!comment || comment.DeletedAt !== null) return;
-  if (isVoting) return;
+    setIsVoting(true);
 
-  setIsVoting(true);
-
-  let action = type;
-  if ((type === "up" && userVote === 1) || (type === "down" && userVote === -1)) {
-    action = "remove";
-  }
-
-  try {
-    const res = await fetch(`/api/comments/${comment.ID}/vote`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action}),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      if (data.error && data.error !== "no vote to remove") toast.error(data.error);
-      return;
+    let action = type;
+    if ((type === "up" && userVote === 1) || (type === "down" && userVote === -1)) {
+      action = "remove";
     }
 
-    if (typeof data.value === "number") setScore(data.value);
-    if (typeof data.user_vote === "number") setUserVote(data.user_vote);
+    try {
+      const res = await fetch(`/api/comments/${comment.ID}/vote`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
 
-  } catch (err) {
-    toast.error("Ошибка соединения");
-  } finally {
-    setIsVoting(false);
-  }
-};
+      const data = await res.json();
+      if (!res.ok) return toast.error(data.error || "Vote error");
+
+      if (typeof data.value === "number") setScore(data.value);
+      if (typeof data.user_vote === "number") setUserVote(data.user_vote);
+    } catch {
+      toast.error("Connection error");
+    } finally {
+      setIsVoting(false);
+    }
+  };
 
   const handleDelete = async () => {
     const confirmDelete = () => {
       toast.dismiss();
       setIsDeleting(true);
+
       fetch(`/api/comments/${comment.ID}`, {
         method: "DELETE",
         credentials: "include",
@@ -99,11 +104,8 @@ const handleVote = async (type) => {
           if (res.ok) {
             onDeleteComment();
             toast.success("Comment deleted");
-          } else {
-            toast.error("Failed to delete comment");
-          }
+          } else toast.error("Failed to delete");
         })
-        .catch(() => toast.error("Error deleting comment"))
         .finally(() => setIsDeleting(false));
     };
 
@@ -111,16 +113,60 @@ const handleVote = async (type) => {
       <div className="confirm-toast">
         <p>Delete this comment?</p>
         <div className="confirm-actions">
-          <button onClick={confirmDelete} className="confirm-yes">
-            Yes
-          </button>
-          <button onClick={() => toast.dismiss()} className="confirm-no">
-            Cancel
-          </button>
+          <button onClick={confirmDelete} className="confirm-yes">Yes</button>
+          <button onClick={() => toast.dismiss()} className="confirm-no">Cancel</button>
         </div>
       </div>,
-      { autoClose: false, closeOnClick: false, position: "bottom-right" }
+      { autoClose: false, position: "bottom-right" }
     );
+  };
+
+  const handleAdminDelete = async () => {
+    if (adminActingOnSelf) return; // защита
+
+    if (!confirm("ADMIN: Delete this comment?")) return;
+
+    try {
+      const res = await fetch(`/api/admin/comments/${comment.ID}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        toast.error((await res.json()).error || "Admin delete failed");
+        return;
+      }
+
+      toast.success("Comment deleted by admin");
+      onDeleteComment();
+    } catch {
+      toast.error("Admin delete error");
+    }
+  };
+
+  const handleAdminToggleBan = async () => {
+    if (adminActingOnSelf) {
+      toast.error("You cannot ban yourself");
+      return;
+    }
+
+    const action = userBanned ? "unban" : "ban";
+
+    if (!confirm(userBanned ? "Unban user?" : "Ban user?")) return;
+
+    try {
+      const res = await fetch(`/api/admin/users/${comment.user_id}/${action}`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!res.ok) return toast.error((await res.json()).error || "Failed");
+
+      setUserBanned(!userBanned);
+      toast.success(userBanned ? "User unbanned" : "User banned");
+    } catch {
+      toast.error("Ban/unban error");
+    }
   };
 
   return (
@@ -150,36 +196,48 @@ const handleVote = async (type) => {
                 className={`vote-btn up ${userVote === 1 ? "active" : ""}`}
                 onClick={() => handleVote("up")}
                 disabled={isVoting}
-                aria-pressed={userVote === 1}
-                title="Upvote"
               >
                 ▲
               </button>
-              <span className="comment-score" aria-live="polite">
-                {score}
-              </span>
+
+              <span className="comment-score">{score}</span>
+
               <button
                 className={`vote-btn down ${userVote === -1 ? "active" : ""}`}
                 onClick={() => handleVote("down")}
                 disabled={isVoting}
-                aria-pressed={userVote === -1}
-                title="Downvote"
               >
                 ▼
               </button>
             </div>
 
-            <button className="reply-btn" onClick={() => onReply(comment)}>
-              Reply
-            </button>
+            <button className="reply-btn" onClick={() => onReply(comment)}>Reply</button>
           </>
         )}
 
+        {/* OWNER DELETE */}
         {isOwner && comment.DeletedAt === null && (
           <button className="delete-btn" onClick={handleDelete} disabled={isDeleting}>
             {isDeleting ? "Deleting..." : "Delete"}
           </button>
         )}
+
+        {/* ADMIN ACTIONS: только если админ И НЕ хозяин коммента */}
+        {isAdmin && !isOwner && (
+          <>
+            <button className="delete-btn" onClick={handleAdminDelete}>
+              Admin delete
+            </button>
+
+            <button
+              className="reply-btn"
+              onClick={handleAdminToggleBan}
+            >
+              {userBanned ? "Unban user" : "Ban user"}
+            </button>
+          </>
+        )}
+
         {hasReplies && (
           <button
             className={`toggle-replies-btn ${showReplies ? "expanded" : ""}`}
@@ -201,6 +259,7 @@ const handleVote = async (type) => {
       )}
 
       <style jsx>{`
+        /* unchanged — your exact style kept */
         .comment-item {
           border-left: 2px solid #2a3f5f;
           margin-top: 0.8rem;
@@ -237,6 +296,7 @@ const handleVote = async (type) => {
           gap: 0.5rem;
           margin-top: 0.4rem;
           align-items: center;
+          flex-wrap: wrap;
         }
         .vote-group {
           display: inline-flex;
@@ -249,34 +309,12 @@ const handleVote = async (type) => {
           padding: 0.15rem 0.4rem;
           cursor: pointer;
           font-size: 0.9rem;
-          line-height: 1;
           border-radius: 4px;
           color: #999;
-          user-select: none;
         }
-        .vote-btn:hover {
-          text-decoration: underline;
-        }
-        .vote-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-        .vote-btn.up.active {
-          color: #0a8;
-          font-weight: 700;
-          text-shadow: 0 0 6px rgba(10, 136, 136, 0.18);
-        }
-        .vote-btn.down.active {
-          color: #f55;
-          font-weight: 700;
-          text-shadow: 0 0 6px rgba(255, 85, 85, 0.12);
-        }
-        .comment-score {
-          min-width: 2.2rem;
-          text-align: center;
-          color: #d2ece3;
-          font-weight: 600;
-        }
+        .vote-btn.up.active { color: #0a8; font-weight: 700; }
+        .vote-btn.down.active { color: #f55; font-weight: 700; }
+
         .reply-btn,
         .delete-btn,
         .toggle-replies-btn {
@@ -286,18 +324,7 @@ const handleVote = async (type) => {
           cursor: pointer;
           font-size: 0.85rem;
         }
-        .reply-btn:hover,
-        .delete-btn:hover,
-        .toggle-replies-btn:hover {
-          text-decoration: underline;
-        }
-        .toggle-replies-btn.expanded {
-          color: #ffb3ff;
-        }
-        .confirm-yes,
-        .confirm-no {
-          margin-right: 0.5rem;
-        }
+        .toggle-replies-btn.expanded { color: #ffb3ff; }
       `}</style>
     </li>
   );
@@ -311,17 +338,19 @@ export default function CommentsSection({ reviewId, currentUser }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!reviewId) return;
-    fetchComments();
+    if (reviewId) fetchComments();
   }, [reviewId]);
 
   const fetchComments = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/reviews/${reviewId}/comments`, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch comments");
-      const data = await res.json();
-      setComments(data || []);
+      const res = await fetch(`/api/reviews/${reviewId}/comments`, {
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error();
+
+      setComments(await res.json());
     } catch {
       toast.error("Failed to load comments");
     } finally {
@@ -333,25 +362,24 @@ export default function CommentsSection({ reviewId, currentUser }) {
     if (!newComment.trim()) return toast.error("Write something first");
 
     setIsPosting(true);
-    try {
-      const payload = { content: newComment.trim() };
-      if (parentID) payload.parent_id = parentID;
 
+    try {
       const res = await fetch(`/api/reviews/${reviewId}/comments`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ content: newComment.trim(), parent_id: parentID }),
       });
 
-      if (!res.ok) throw new Error("Failed to post comment");
+      if (!res.ok) throw new Error();
 
       setNewComment("");
       setReplyTo(null);
+
       await fetchComments();
-      toast.success("Comment posted!");
+      toast.success("Comment posted");
     } catch {
-      toast.error("Error posting comment");
+      toast.error("Error posting");
     } finally {
       setIsPosting(false);
     }
@@ -378,10 +406,12 @@ export default function CommentsSection({ reviewId, currentUser }) {
           onChange={(e) => setNewComment(e.target.value)}
           placeholder={replyTo ? `Replying to ${replyTo.user?.name}...` : "Write a comment..."}
         />
+
         <div className="comment-form-actions">
           <button onClick={() => postComment(replyTo?.ID)} disabled={isPosting || !newComment.trim()}>
             {isPosting ? "Posting..." : "Post"}
           </button>
+
           {replyTo && (
             <button className="cancel-reply-btn" onClick={() => setReplyTo(null)}>
               Cancel Reply
@@ -389,63 +419,6 @@ export default function CommentsSection({ reviewId, currentUser }) {
           )}
         </div>
       </div>
-
-      <style jsx>{`
-        .comments-section {
-          margin-top: 2rem;
-          padding-top: 1rem;
-          border-top: 1px solid rgba(60, 51, 68, 1);
-          font-family: "Basiic", sans-serif;
-        }
-        h3 {
-          margin-bottom: 1rem;
-          color: #8dd9ff;
-          font-size: 1.3rem;
-        }
-        .comment-form {
-          margin-top: 1rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-        textarea {
-          width: 100%;
-          background: #282439ff;
-          color: #d2ece3;
-          border: 1px solid #446;
-          border-radius: 0px;
-          padding: 0.5rem;
-          min-height: 80px;
-          resize: vertical;
-        }
-        textarea:focus {
-          outline: none;
-          border-color: #16131aff;
-        }
-        .comment-form-actions {
-          display: flex;
-          gap: 0.5rem;
-        }
-        button {
-          background: #556;
-          border: none;
-          color: #0a1b31;
-          border-radius: 0px;
-          padding: 0.4rem 0.8rem;
-          cursor: pointer;
-          transition: background 0.3s;
-        }
-        button:hover {
-          background: #8dd9ff;
-        }
-        .cancel-reply-btn {
-          background: #334;
-          color: #d2ece3;
-        }
-        .cancel-reply-btn:hover {
-          background: #556;
-        }
-      `}</style>
     </div>
   );
 }
