@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Header from "../components/header";
 import ReviewCard from "../components/ReviewCard";
 import PlaylistCard from "../components/PlaylistCard";
+import AdminBanButton from "../components/AdminBanButton";
 import FollowButton from "../components/FollowButton";
 import FollowList from "../components/FollowList";
 import NotificationBell from "../components/NotificationBell";
@@ -20,6 +21,7 @@ export default function ProfilePage() {
   const [viewingProfileId, setViewingProfileId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [followers, setFollowers] = useState([]);
+  const [userRole, setUserRole] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
@@ -40,8 +42,10 @@ export default function ProfilePage() {
         if (resMe.ok) {
           const me = await resMe.json();
           setCurrentUserId(me.id);
+           setUserRole(me.role || '');
           if (!profileId) {
             profileId = me.id;
+
             window.history.replaceState(null, "", `/profile?id=${profileId}`);
           }
           setViewingProfileId(profileId);
@@ -293,12 +297,16 @@ export default function ProfilePage() {
                 </button>
               )}
               {!isOwnProfile && (
+                <>
                 <FollowButton
                   userId={viewingProfileId}
                   currentUserId={currentUserId}
                   followers={followers}
                   setFollowers={setFollowers}
                 />
+                 {userRole === 'admin' && (
+        <AdminBanButton targetUserId={viewingProfileId} />
+      )}  </>
               )}
             </div>
             {isOwnProfile ? <div className="email"><b>Email:</b> {user?.email || "—"}</div> : <div className="email muted">Private</div>}
