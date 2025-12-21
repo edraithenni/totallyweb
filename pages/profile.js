@@ -368,7 +368,7 @@ export default function ProfilePage() {
               <PlaylistCard key={pl.id} playlist={pl}/>
            </Link>)}
         </div>
-        <hr />
+      <hr />
         <h3>Reviews</h3>
         <div>
           {reviews.length === 0 ? <p className="muted">No reviews yet</p> : reviews.map(rv =>
@@ -378,6 +378,9 @@ export default function ProfilePage() {
               onReviewDeleted={() => setReviews(prev => prev.filter(r => r.id !== rv.id))}/>)}
         </div>
 
+        {/* --- MODALS --- */}
+
+        {/* 1. Avatar Modal */}
         <div id="avatarModal" className={`modal ${modalOpen ? "open" : ""}`}>
           <div className="modal-content">
             <div className="close-modal" onClick={() => setModalOpen(false)}>&times;</div>
@@ -391,12 +394,11 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* 2. Settings Modal */}
         <div id="settingsModal" className={`modal ${settingsOpen ? "open" : ""}`}>
           <div className="modal-content settings-content">
             <div className="close-modal" onClick={() => setSettingsOpen(false)}>&times;</div>
-            
             <h2>Settings</h2>
-            
             <div className="settings-section">             
               <div className="settings-actions">
                 <button
@@ -413,7 +415,8 @@ export default function ProfilePage() {
           </div>
         </div>
 
-      
+        {/* 3. Delete Account Modal */}
+        <div id="deleteModal" className={`modal ${deleteModalOpen ? "open" : ""}`}>
           <div className="modal-content delete-content">
             <div className="close-modal" onClick={() => {
               setDeleteModalOpen(false);
@@ -439,13 +442,13 @@ export default function ProfilePage() {
                 />
               </div>
               
-              <div className="delete-actions">
+              <div className="delete-actions" style={{display: "flex", gap: "1rem", justifyContent: "center"}}>
                 <button
                   onClick={handleDeleteAccount}
                   disabled={deleteConfirm !== "DELETE" || deleting}
                   className={`btn ${deleteConfirm === "DELETE" ? "btn-delete" : "btn-delete-disabled"}`}
                 >
-                  {deleting ? "Deleting..." : "Delete Account Permanently"}
+                  {deleting ? "Deleting..." : "Delete Account"}
                 </button>
                 
                 <button
@@ -461,67 +464,16 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-       <div id="deleteModal" className={`modal ${deleteModalOpen ? "open" : ""}`}>
-  <div className="modal-content delete-content">
-    <div className="close-modal" onClick={() => {
-      setDeleteModalOpen(false);
-      setDeleteConfirm("");
-    }}>&times;</div>
-    
-    <h2>Delete Account</h2>
-    
-    <div className="danger-zone">
-      <p className="warning-text">
-        ⚠️ Deleting your account is permanent. All your playlists, reviews, comments, and data will be removed.
-      </p>
-      
-      <div className="delete-confirm">
-        <p>Type <strong>DELETE</strong> to confirm:</p>
-        <input
-          type="text"
-          value={deleteConfirm}
-          onChange={(e) => setDeleteConfirm(e.target.value)}
-          placeholder="Type DELETE here"
-          className="delete-input"
-          disabled={deleting}
-        />
-      </div>
-      
-      <div className="delete-actions" style={{display: "flex", gap: "1rem", justifyContent: "center"}}>
-        <button
-          onClick={handleDeleteAccount}
-          disabled={deleteConfirm !== "DELETE" || deleting}
-          className={`btn ${deleteConfirm === "DELETE" ? "btn-delete" : "btn-delete-disabled"}`}
-        >
-          {deleting ? "Deleting..." : "Delete Account"}
-        </button>
-        
-        <button
-          onClick={() => {
-            setDeleteModalOpen(false);
-            setDeleteConfirm("");
-          }}
-          className="btn btn-cancel"
-          disabled={deleting}
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-      </div>
+        </div>
+      </div> {/* Конец .profile-card */}
 
       <ToastContainer
         position="bottom-right"
         autoClose={2500}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnHover
-        draggable
         theme="dark"
       />
+
+      
       <style jsx>{`
         @font-face {
           font-family: 'Basiic';
