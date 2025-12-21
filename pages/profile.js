@@ -23,6 +23,10 @@ export default function ProfilePage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -32,9 +36,7 @@ export default function ProfilePage() {
         const params = new URLSearchParams(window.location.search);
         let profileId = params.get("id");
 
-        const resMe = await fetch("/api/users/me", { credentials: "include" }
-          
-        );
+        const resMe = await fetch("/api/users/me", { credentials: "include" });
         if (resMe.ok) {
           const me = await resMe.json();
           setCurrentUserId(me.id);
@@ -53,18 +55,17 @@ export default function ProfilePage() {
 
             const resFollowers = await fetch(`/api/users/${profileId}/followers`, { credentials: "include" });
             if (resFollowers.ok) {
-            const dataFollowers = await resFollowers.json();
-  let list = dataFollowers.followers || dataFollowers.data || [];
+              const dataFollowers = await resFollowers.json();
+              let list = dataFollowers.followers || dataFollowers.data || [];
 
-  
-  if (Array.isArray(list) && me?.id) {
-    list = list.map(f => 
-      f.ID === me.id ? { ...f, name: "You", isYou: true } : f
-    );
-  }
+              if (Array.isArray(list) && me?.id) {
+                list = list.map(f => 
+                  f.ID === me.id ? { ...f, name: "You", isYou: true } : f
+                );
+              }
 
-  setFollowers(list);
-}
+              setFollowers(list);
+            }
             await loadPlaylists(profileId);
             await loadReviews(profileId);
           } else {
@@ -116,19 +117,20 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (typeof document === "undefined") return;
-    document.body.style.overflow = modalOpen ? "hidden" : "auto";
-  }, [modalOpen]);
+    document.body.style.overflow = modalOpen || settingsOpen || deleteModalOpen ? "hidden" : "auto";
+  }, [modalOpen, settingsOpen, deleteModalOpen]);
 
   useEffect(() => {
-  const handleEsc = (e) => {
-    if (e.key === "Escape") {
-      setModalOpen(false);
-    }
-  };
-  window.addEventListener("keydown", handleEsc);
-  return () => window.removeEventListener("keydown", handleEsc);
-}, []);
-
+    const handleEsc = (e) => {
+      if (e.key === "Escape") {
+        setModalOpen(false);
+        setSettingsOpen(false);
+        setDeleteModalOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
 
   const isOwnProfile = currentUserId && viewingProfileId && currentUserId.toString() === viewingProfileId.toString();
 
@@ -193,7 +195,40 @@ export default function ProfilePage() {
     }
   };
 
-  
+  const handleDeleteAccount = async () => {
+    if (deleteConfirm !== "DELETE") {
+      toast.error("Please type DELETE to confirm");
+      return;
+    }
+
+    if (!confirm("Are you absolutely sure? This will permanently delete your account, playlists, reviews, and all data. This action cannot be undone!")) {
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const resp = await fetch("/api/users/me", {
+        method: "DELETE",
+        credentials: "include"
+      });
+
+      if (resp.ok) {
+        toast.success("Account deleted successfully");
+        setTimeout(() => {
+          window.location.href = "/search";
+        }, 1500);
+      } else {
+        const error = await resp.text();
+        toast.error(`Failed to delete account: ${error}`);
+        setDeleting(false);
+      }
+    } catch (err) {
+      toast.error("Error deleting account");
+      console.error(err);
+      setDeleting(false);
+    }
+  };
+
   const handleBioSave = async () => {
     try {
       const res = await fetch("/api/users/me", {
@@ -221,18 +256,18 @@ export default function ProfilePage() {
       <div className="profile-card">
         <div className="profile-header"></div>
 
-       {isOwnProfile && ( 
-            <div className="notif-container">
+        {isOwnProfile && ( 
+          <div className="notif-container">
             <NotificationBell userId={currentUserId} />
-            </div>
-        )} 
-       <FollowList
-        userId={viewingProfileId}
-        followers={followers}
-        setFollowers={setFollowers}
-        currentUserId={currentUserId}
-        />
+          </div>
+        )}
 
+        <FollowList
+          userId={viewingProfileId}
+          followers={followers}
+          setFollowers={setFollowers}
+          currentUserId={currentUserId}
+        />
 
         <div className="avatar-row">
           <img
@@ -245,6 +280,15 @@ export default function ProfilePage() {
           <div className="name-and-email">
             <div className="name-header">
               <h1 className="name">{user?.name || "Loading..."}</h1>
+              {isOwnProfile && (
+                <button 
+                  className="btn btn-settings"
+                  onClick={() => setSettingsOpen(true)}
+                  title="Settings"
+                >
+                  ⚙
+                </button>
+              )}
               {!isOwnProfile && (
                 <FollowButton
                   userId={viewingProfileId}
@@ -263,62 +307,57 @@ export default function ProfilePage() {
 
         <hr />
         <h3>Bio</h3>
-<div
-  ref={el => {
-    if (bioEdit && el) {
-      // ставим курсор в конец при начале редактирования
-      const range = document.createRange();
-      const sel = window.getSelection();
-      range.selectNodeContents(el);
-      range.collapse(false);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-  }}
-  className={`bio ${bioEdit ? "editing" : ""}`}
-  contentEditable={bioEdit}
-  suppressContentEditableWarning={true}
-  onInput={(e) => {
-    const text = e.currentTarget.textContent || "";
-    if (text.length <= 200) {
-      setBioText(text);
-    } else {
-      // ограничение по символам
-      e.currentTarget.textContent = text.slice(0, 200);
-      setBioText(text.slice(0, 200));
-      // снова курсор в конец
-      const range = document.createRange();
-      const sel = window.getSelection();
-      range.selectNodeContents(e.currentTarget);
-      range.collapse(false);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-  }}
->
-  {bioText}
-</div>
+        <div
+          ref={el => {
+            if (bioEdit && el) {
+              const range = document.createRange();
+              const sel = window.getSelection();
+              range.selectNodeContents(el);
+              range.collapse(false);
+              sel.removeAllRanges();
+              sel.addRange(range);
+            }
+          }}
+          className={`bio ${bioEdit ? "editing" : ""}`}
+          contentEditable={bioEdit}
+          suppressContentEditableWarning={true}
+          onInput={(e) => {
+            const text = e.currentTarget.textContent || "";
+            if (text.length <= 200) {
+              setBioText(text);
+            } else {
+              e.currentTarget.textContent = text.slice(0, 200);
+              setBioText(text.slice(0, 200));
+              const range = document.createRange();
+              const sel = window.getSelection();
+              range.selectNodeContents(e.currentTarget);
+              range.collapse(false);
+              sel.removeAllRanges();
+              sel.addRange(range);
+            }
+          }}
+        >
+          {bioText}
+        </div>
 
-{isOwnProfile && (
-  <>
-    <button
-      onClick={() => {
-        if (bioEdit) handleBioSave();
-        setBioEdit(!bioEdit);
-      }}
-      className="btn btn-edit"
-    >
-      {bioEdit ? "Save" : "Edit"}
-    </button>
+        {isOwnProfile && (
+          <>
+            <button
+              onClick={() => {
+                if (bioEdit) handleBioSave();
+                setBioEdit(!bioEdit);
+              }}
+              className="btn btn-edit"
+            >
+              {bioEdit ? "Save" : "Edit"}
+            </button>
 
-    {bioEdit && (
-      <div className="char-count">{bioText.length}/200</div>
-    )}
-  </>
-)}
+            {bioEdit && (
+              <div className="char-count">{bioText.length}/200</div>
+            )}
+          </>
+        )}
 
-
-       
         <hr />
         <h3>Playlists</h3>
         <div className="playlists-grid">
@@ -348,9 +387,129 @@ export default function ProfilePage() {
             )}
           </div>
         </div>
+
+        <div id="settingsModal" className={`modal ${settingsOpen ? "open" : ""}`}>
+          <div className="modal-content settings-content">
+            <div className="close-modal" onClick={() => setSettingsOpen(false)}>&times;</div>
+            
+            <h2>Settings</h2>
+            
+            <div className="settings-section">             
+              <div className="settings-actions">
+                <button
+                  onClick={() => {
+                    setSettingsOpen(false);
+                    setDeleteModalOpen(true);
+                  }}
+                  className="btn btn-delete-settings"
+                >
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      
+          <div className="modal-content delete-content">
+            <div className="close-modal" onClick={() => {
+              setDeleteModalOpen(false);
+              setDeleteConfirm("");
+            }}>&times;</div>
+            
+            <h2>Delete Account</h2>
+            
+            <div className="danger-zone">
+              <p className="warning-text">
+                ⚠️ Deleting your account is permanent. All your playlists, reviews, comments, and data will be removed.
+              </p>
+              
+              <div className="delete-confirm">
+                <p>Type <strong>DELETE</strong> to confirm:</p>
+                <input
+                  type="text"
+                  value={deleteConfirm}
+                  onChange={(e) => setDeleteConfirm(e.target.value)}
+                  placeholder="Type DELETE here"
+                  className="delete-input"
+                  disabled={deleting}
+                />
+              </div>
+              
+              <div className="delete-actions">
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleteConfirm !== "DELETE" || deleting}
+                  className={`btn ${deleteConfirm === "DELETE" ? "btn-delete" : "btn-delete-disabled"}`}
+                >
+                  {deleting ? "Deleting..." : "Delete Account Permanently"}
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setDeleteModalOpen(false);
+                    setDeleteConfirm("");
+                  }}
+                  className="btn btn-cancel"
+                  disabled={deleting}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+       <div id="deleteModal" className={`modal ${deleteModalOpen ? "open" : ""}`}>
+  <div className="modal-content delete-content">
+    <div className="close-modal" onClick={() => {
+      setDeleteModalOpen(false);
+      setDeleteConfirm("");
+    }}>&times;</div>
+    
+    <h2>Delete Account</h2>
+    
+    <div className="danger-zone">
+      <p className="warning-text">
+        ⚠️ Deleting your account is permanent. All your playlists, reviews, comments, and data will be removed.
+      </p>
+      
+      <div className="delete-confirm">
+        <p>Type <strong>DELETE</strong> to confirm:</p>
+        <input
+          type="text"
+          value={deleteConfirm}
+          onChange={(e) => setDeleteConfirm(e.target.value)}
+          placeholder="Type DELETE here"
+          className="delete-input"
+          disabled={deleting}
+        />
       </div>
-   
-       <ToastContainer
+      
+      <div className="delete-actions" style={{display: "flex", gap: "1rem", justifyContent: "center"}}>
+        <button
+          onClick={handleDeleteAccount}
+          disabled={deleteConfirm !== "DELETE" || deleting}
+          className={`btn ${deleteConfirm === "DELETE" ? "btn-delete" : "btn-delete-disabled"}`}
+        >
+          {deleting ? "Deleting..." : "Delete Account"}
+        </button>
+        
+        <button
+          onClick={() => {
+            setDeleteModalOpen(false);
+            setDeleteConfirm("");
+          }}
+          className="btn btn-cancel"
+          disabled={deleting}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+      </div>
+
+      <ToastContainer
         position="bottom-right"
         autoClose={2500}
         hideProgressBar={false}
@@ -379,8 +538,7 @@ export default function ProfilePage() {
           position: relative;
           max-width: 700px;
           margin: 2rem auto;
-         /* background-color: #0a1b31; */
-         background-color: #262123ff;
+          background-color: #262123ff;
           padding: 1.5rem;
           padding-top: 130px;
           border: 1px solid #727d79;
@@ -457,38 +615,56 @@ export default function ProfilePage() {
           font-size: 1.8rem;
         }
 
+        .btn-settings {
+          background: #000;
+          color: #727d79;
+          border: 1px solid #727d79;
+          font-size: 1.2rem;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+        }
+
+        .btn-settings:hover {
+          background: #292626ff;
+          color: #d2ece3;
+          border: 1px solid #727d79;
+        }
+
         .email {
           color: #9c9cc9;
           margin-top: 4px;
         }
 
         .bio {
-  background: #000;
-  padding: 10px;
-  border: 1px solid transparent;
-  color: #d2ece3;
-  white-space: pre-wrap;
-  min-height: 50px;
-  transition: border 0.2s;
-}
+          background: #000;
+          padding: 10px;
+          border: 1px solid transparent;
+          color: #d2ece3;
+          white-space: pre-wrap;
+          min-height: 50px;
+          transition: border 0.2s;
+        }
 
-.bio.editing {
-  border: 1px solid #d2ece3;
-  outline: none;
-  cursor: text;
-}
+        .bio.editing {
+          border: 1px solid #d2ece3;
+          outline: none;
+          cursor: text;
+        }
 
-.bio.editing:focus {
-  border: 1px solid #d2ece3;
-}
+        .bio.editing:focus {
+          border: 1px solid #d2ece3;
+        }
 
-.char-count {
-  font-size: 0.8rem;
-  color: #727d79;
-  text-align: right;
-  margin-top: 4px;
-}
-
+        .char-count {
+          font-size: 0.8rem;
+          color: #727d79;
+          text-align: right;
+          margin-top: 4px;
+        }
 
         .playlists-grid {
           display: grid;
@@ -517,64 +693,206 @@ export default function ProfilePage() {
           border: 1px solid #727d79;
         }
 
-        .btn-save {
-          background: #41d3d2;
-          color: #000;
-          border: 1px solid #41d3d2;
-        }
-
         .btn-cancel {
           background: #ffb3ff;
           color: #000;
           border: 1px solid #ffb3ff;
         }
 
+        .btn-cancel:hover {
+          background: #ff99ff;
+          color: #000;
+          border: 1px solid #ff99ff;
+        }
+
+        .btn-delete {
+          background: #ff4444;
+          color: #fff;
+          border: 1px solid #ff4444;
+        }
+
+        .btn-delete:hover {
+          background: #ff2222;
+          color: #fff;
+          border: 1px solid #ff2222;
+        }
+
+        .btn-delete-disabled {
+          background: #444;
+          color: #888;
+          border: 1px solid #444;
+          cursor: not-allowed;
+        }
+
+        .btn-delete-disabled:hover {
+          background: #444;
+          color: #888;
+          border: 1px solid #444;
+        }
+
+        .btn-delete-settings {
+          background: #000;
+          color: #ff4444;
+          border: 1px solid #ff4444;
+          width: 100%;
+          margin-top: 1rem;
+        }
+
+        .btn-delete-settings:hover {
+          background: #ff4444;
+          color: #000;
+          border: 1px solid #ff4444;
+        }
+
         .modal {
           display: none;
           position: fixed;
           inset: 0;
-          background: rgba(0,0,0,0.8);
+          background: rgba(0,0,0,0.9);
           justify-content: center;
           align-items: center;
           z-index: 999;
         }
         .modal.open { display: flex; }
+        
         .modal-content {
           position: relative;
           background: #262123ff;
           padding: 1rem;
           border-radius: 0px;
           text-align: center;
+          max-width: 600px;
+          width: 90%;
+          border: 1px solid #727d79;
         }
+        
         .modal-content img {
           max-width: 90vw;
           max-height: 80vh;
           border-radius: 0px;
         }
+        
         .close-modal {
-            position: absolute;
-            top: 1px;
-            right: 1px;
-            color: #d2ece3;
-            cursor: pointer;
-            font-size: 1.8rem;
-            font-weight: bold;
-            background: none;
-            border: none;
-            line-height: 1;
-            transition: color 0.2s, transform 0.2s;
-            z-index: 10; 
+          position: absolute;
+          top: 10px;
+          right: 15px;
+          color: #d2ece3;
+          cursor: pointer;
+          font-size: 1.8rem;
+          font-weight: bold;
+          background: none;
+          border: none;
+          line-height: 1;
+          transition: color 0.2s, transform 0.2s;
+          z-index: 10;
         }
+        
+        .close-modal:hover {
+          color: #fff;
+          transform: scale(1.1);
+        }
+        
         .avatar-options {
           margin-top: 10px;
           display: flex;
           gap: 10px;
           justify-content: center;
         }
+        
         .upload-status {
           color: #41d3d2;
           font-size: 14px;
           margin-top: 8px;
+        }
+
+        .settings-content {
+          max-width: 500px;
+          text-align: left;
+        }
+
+        .settings-content h2 {
+          color: #fff;
+          margin-top: 0;
+          margin-bottom: 1.5rem;
+          text-align: center;
+          border-bottom: 1px solid #727d79;
+          padding-bottom: 0.5rem;
+        }
+
+        .settings-content h3 {
+          color: #ff4444;
+          margin-top: 1.5rem;
+          margin-bottom: 1rem;
+        }
+
+        .settings-section {
+          margin-bottom: 2rem;
+        }
+
+        .warning-text {
+          color: #d2ece3;
+          margin-bottom: 1rem;
+          line-height: 1.5;
+        }
+
+        .settings-actions {
+          margin-top: 1.5rem;
+        }
+
+        .delete-content {
+          max-width: 500px;
+        }
+
+        .delete-content h2 {
+          color: #ff4444;
+          margin-top: 0;
+          margin-bottom: 1.5rem;
+          text-align: center;
+          border-bottom: 1px solid #727d79;
+          padding-bottom: 0.5rem;
+        }
+
+       
+
+        .delete-confirm {
+          margin: 1.5rem 0;
+        }
+
+        .delete-confirm p {
+          color: #d2ece3;
+          margin-bottom: 0.5rem;
+        }
+
+        .delete-input {
+          background: #000;
+          border: 1px solid #727d79;
+          color: #d2ece3;
+          padding: 0.5rem;
+          width: 100%;
+          font-family: 'Basiic', sans-serif;
+          font-size: 1rem;
+        }
+
+        .delete-input:focus {
+          outline: none;
+          border: 1px solid #41d3d2;
+        }
+
+        .delete-input:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .delete-actions {
+          display: flex;
+          gap: 1rem;
+          margin-top: 1.5rem;
+          flex-wrap: wrap;
+        }
+
+        .muted {
+          color: #727d79;
+          font-style: italic;
         }
       `}</style>
     </>
