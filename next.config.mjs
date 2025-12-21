@@ -4,11 +4,15 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-       destination: 'http://backend:8080/api/:path*',
+        destination: 'http://backend:8080/api/:path*',
       },
       {
-        source: '/static/src/:path*',   
-        destination: '/src/:path*',    
+        source: '/uploads/:path*',
+        destination: 'http://backend:8080/uploads/:path*',
+      },
+      {
+        source: '/static/src/:path*',
+        destination: '/src/:path*',
       },
     ];
   },

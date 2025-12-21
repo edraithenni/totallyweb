@@ -63,7 +63,6 @@ export default function ProfilePage() {
                   f.ID === me.id ? { ...f, name: "You", isYou: true } : f
                 );
               }
-
               setFollowers(list);
             }
             await loadPlaylists(profileId);
@@ -162,10 +161,13 @@ export default function ProfilePage() {
       });
       if (!resp.ok) throw new Error("Server error " + resp.status);
       const data = await resp.json();
-      const newAvatar = data?.avatar || `/uploads/${viewingProfileId}/avatar.png?${Date.now()}`;
-      setAvatarUrl(newAvatar);
-      setPreviewUrl(newAvatar);
-      setUser(prev => ({ ...prev, avatar: newAvatar }));
+      
+      const newAvatarPath = data?.avatar || `/uploads/avatars/user_${viewingProfileId}.png`;
+      const finalAvatarUrl = `${newAvatarPath}?t=${Date.now()}`;
+      
+      setAvatarUrl(finalAvatarUrl);
+      setPreviewUrl(finalAvatarUrl);
+      setUser(prev => ({ ...prev, avatar: finalAvatarUrl }));
       setUploadStatus("Avatar updated.");
     } catch {
       setUploadStatus("Error uploading avatar.");
@@ -285,6 +287,7 @@ export default function ProfilePage() {
                   className="btn btn-settings"
                   onClick={() => setSettingsOpen(true)}
                   title="Settings"
+                
                 >
                   ⚙
                 </button>
@@ -591,6 +594,7 @@ export default function ProfilePage() {
           margin-bottom: 1rem;
           position: relative;
           z-index: 1;
+          overflow: hidden;
         }
 
         .avatar {
@@ -600,6 +604,8 @@ export default function ProfilePage() {
           object-fit: cover;
           border: 0px solid #fff;
           background: #000;
+           max-width: 100%;
+
         }
 
         .name-header {
@@ -626,6 +632,10 @@ export default function ProfilePage() {
           align-items: center;
           justify-content: center;
           padding: 0;
+           position: absolute;
+          top: 10px;
+          right: 0px;
+          z-index: 5;
         }
 
         .btn-settings:hover {
@@ -764,13 +774,28 @@ export default function ProfilePage() {
           max-width: 600px;
           width: 90%;
           border: 1px solid #727d79;
+           max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box; 
+  overflow-x: hidden; 
+  word-wrap: break-word; 
+  margin: 0 auto; 
         }
         
         .modal-content img {
-          max-width: 90vw;
-          max-height: 80vh;
-          border-radius: 0px;
-        }
+  max-width: calc(100% - 2rem); 
+  max-height: 60vh;
+  width: auto;
+  height: auto;
+  border-radius: 0px;
+  display: block;
+  margin: 0 auto; 
+
+  position: relative;
+  left: 0;
+  right: 0;
+  object-position: center;
+}
         
         .close-modal {
           position: absolute;
@@ -797,6 +822,7 @@ export default function ProfilePage() {
           display: flex;
           gap: 10px;
           justify-content: center;
+          
         }
         
         .upload-status {
