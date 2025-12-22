@@ -1,0 +1,62 @@
+{
+  "pageTitle": "About Us",
+  "pageSubtitle": "Discover the story behind our music community",
+  
+  "sections": {
+    "mission": {
+      "title": "Mission Statement",
+      "content": "Our mission is to create a vibrant community where music lovers can discover, share, and connect through their passion for music. We believe that every playlist tells a story and every review builds connection."
+    },
+    "proof": {
+      "title": "Social Proof",
+      "content": "Trusted by over 50,000 music enthusiasts worldwide. Featured in Music Tech Review and recommended by industry professionals. Our community has created more than 100,000 playlists and shared countless musical discoveries."
+    },
+    "story": {
+      "title": "Your Story",
+      "content": "Founded in 2020, our platform began as a university project between three friends who shared a love for music discovery. What started as a simple playlist sharing tool has evolved into a comprehensive music community platform."
+    },
+    "media": {
+      "title": "Images and Videos",
+      "content": "While we focus on the music experience, we're constantly working on enhancing our platform with visual elements that complement the auditory journey. Our minimalist approach ensures the music always takes center stage."
+    },
+    "problem": {
+      "title": "Problem and Solution",
+      "content": "Problem: Music platforms often isolate listeners in algorithmic bubbles. Solution: We foster genuine human connections through shared playlists and authentic reviews, creating a community-driven discovery experience."
+    },
+    "action": {
+      "title": "Call to Action",
+      "content": "Join our growing community today! Create your profile, share your first playlist, and start connecting with fellow music lovers. Your next favorite song is waiting to be discovered."
+    }
+  },
+  
+  "teamSection": {
+    "title": "Our Team",
+    "members": {
+      "artiom": {
+        "name": "Artiom Fokin",
+        "role": "Frontend Developer"
+      },
+      "yana": {
+        "name": "Yana Prapirnaya",
+        "role": "Lead Developer, full-stack"
+      },
+      "emiliya": {
+        "name": "Emiliya Kozlovskaya",
+        "role": "Backend Developer"
+      },
+      "sofiya": {
+        "name": "Sofiya Novikova",
+        "role": "Frontend Developer"
+      }
+    }
+  },
+  
+  "buttons": {
+    "readMore": "Read More",
+    "close": "Close"
+  },
+  
+  "modal": {
+    "mediaPlaceholder": "Media Placeholder"
+  }
+}

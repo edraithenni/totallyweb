@@ -1,0 +1,73 @@
+{
+  "page": {
+    "title": "Profile",
+    "loading": "Loading...",
+    "private": "Private",
+    "noPlaylists": "No playlists yet",
+    "noReviews": "No reviews yet",
+    "noBio": "—"
+  },
+  
+  "sections": {
+    "bio": "Bio",
+    "playlists": "Playlists",
+    "reviews": "Reviews",
+    "followers": "Followers",
+    "following": "Following",
+    "settings": "Settings"
+  },
+  
+  "labels": {
+    "email": "Email",
+    "avatar": "Avatar",
+    "avatarPreview": "Avatar preview",
+    "you": "You"
+  },
+  
+  "buttons": {
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "changePfp": "Change pfp",
+    "deletePfp": "Delete pfp",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "following": "Following",
+    "settings": "Settings",
+    "deleteAccount": "Delete Account",
+    "deleting": "Deleting..."
+  },
+  
+  "avatar": {
+    "uploading": "Uploading...",
+    "updated": "Avatar updated.",
+    "deleting": "Deleting...",
+    "deleted": "Avatar deleted.",
+    "errorUpload": "Error uploading avatar.",
+    "errorDelete": "Error deleting avatar.",
+    "selectImage": "Please select an image file.",
+    "fileTooBig": "File is too big (max 5MB).",
+    "confirmDelete": "Are you sure you want to delete avatar?"
+  },
+  
+  "messages": {
+    "typeDelete": "Please type DELETE to confirm",
+    "typeDeleteConfirm": "Type DELETE to confirm",
+    "confirmDelete": "Are you absolutely sure? This will permanently delete your account, playlists, reviews, and all data. This action cannot be undone!",
+    "accountDeleted": "Account deleted successfully",
+    "deleteFailed": "Failed to delete account",
+    "deleteError": "Error deleting account",
+    "deleteWarning": "Deleting your account is permanent. All your playlists, reviews, comments, and data will be removed."
+  },
+  
+  "placeholders": {
+    "typeDelete": "Type DELETE here"
+  },
+  
+  "follow": {
+    "followers": "Followers",
+    "following": "Following",
+    "noFollowers": "No followers yet",
+    "noFollowing": "Not following anyone yet"
+  }
+}

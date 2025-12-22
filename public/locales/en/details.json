@@ -1,0 +1,35 @@
+{
+  "page": {
+    "loading": "Loading...",
+    "noDescription": "No description yet"
+  },
+  
+  "movieInfo": {
+    "title": "Title",
+    "year": "Year",
+    "description": "Description",
+    "genre": "Genre",
+    "director": "Director",
+    "rating": "Rating",
+    "na": "—"
+  },
+  
+  "reviews": {
+    "sectionTitle": "Reviews",
+    "noReviews": "No reviews yet.",
+    "createReview": "Create Review",
+    "writeReview": "Write your review",
+    "ratingPlaceholder": "Rating (1-10)",
+    "submit": "Submit",
+    "ratingError": "Rating must be between 1 and 10",
+    "submitSuccess": "Review submitted successfully!",
+    "submitError": "Failed to submit review",
+    "networkError": "Error submitting review"
+  },
+  
+  "playlist": {
+    "addToPlaylist": "Add to Playlist",
+    "addSuccess": "Added to playlist!",
+    "addError": "Failed to add to playlist"
+  }
+}

@@ -2,15 +2,32 @@ import { useEffect, useState } from "react";
 import Header from "../components/header";
 import ReviewCard from "../components/ReviewCard";
 import AddToPlaylistButton from "../components/AddToPlaylistButton";
+import SignInModal from "../components/SignInModal";
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 export default function DetailsPage() {
   const [movie, setMovie] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [reviewContent, setReviewContent] = useState("");
-  const [reviewRating, setReviewRating] = useState("");
+  const [reviewRating, setReviewRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [containsSpoiler, setContainsSpoiler] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [signInModalOpen, setSignInModalOpen] = useState(false);
 
   const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
   const movieId = params?.get("id");
+  const validReviews = Array.isArray(reviews) ? reviews : [];
+const averageRating =
+  validReviews.length > 0
+    ? (
+        validReviews.reduce((sum, r) => sum + (r.rating || 0), 0) /
+        validReviews.length
+      ).toFixed(1)
+    : null;
+
+
 
   useEffect(() => {
     if (!movieId) return;
@@ -22,6 +39,21 @@ export default function DetailsPage() {
 
     loadReviews();
   }, [movieId]);
+  
+  useEffect(() => {
+    async function loadCurrentUser() {
+      try {
+        const res = await fetch("/api/users/me", { credentials: "include" });
+        if (res.ok) {
+          const me = await res.json();
+          setCurrentUser(me);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    loadCurrentUser();
+  }, []);
 
   async function loadReviews() {
     if (!movieId) return;
@@ -32,6 +64,12 @@ export default function DetailsPage() {
   }
 
   async function submitReview() {
+    // Check if user is logged in
+    if (!currentUser) {
+      setSignInModalOpen(true);
+      return;
+    }
+
     if (!reviewRating || reviewRating < 1 || reviewRating > 10) {
       alert("Rating must be between 1 and 10");
       return;
@@ -41,11 +79,12 @@ export default function DetailsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ content: reviewContent, rating: parseInt(reviewRating) })
+        body: JSON.stringify({ content: reviewContent, rating: parseInt(reviewRating), contains_spoiler: !!containsSpoiler })
       });
       if (res.ok) {
         setReviewContent("");
-        setReviewRating("");
+        setReviewRating(0);
+        setContainsSpoiler(false);
         loadReviews();
       } else {
         alert("Failed to submit review");
@@ -59,6 +98,7 @@ export default function DetailsPage() {
     <>
       <Header />
       <div className="movie-container">
+        
         <div className="movie-poster">
           <img src={movie.poster} alt={movie.title} />
           <AddToPlaylistButton movieId={movieId} movieTitle={movie.title} />
@@ -69,7 +109,12 @@ export default function DetailsPage() {
           <p><b>Description:</b> {movie.plot || "No description yet"}</p>
           <p><b>Genre:</b> {movie.genre || "—"}</p>
           <p><b>Director:</b> {movie.director || "—"}</p>
-          <p><b>Rating:</b> {movie.rating || "—"}</p>
+          <p><b> IMDB Rating:</b> {movie.rating || "—"}</p>
+          {averageRating && (
+            <p className="website-rating">
+            <b>Website Rating:</b> ★ {averageRating}/10 ({reviews.length} reviews)
+            </p>
+            )}
         </div>
         <div className="movie-gif">
           <img src="https://images.melonland.net/?url=https%3A%2F%2Fi.imgur.com%2FhWxzM0d.gif&w=1200&fit=inside&we&q=85&il&n=-1&default=1" alt="Movie gif"/>
@@ -78,15 +123,77 @@ export default function DetailsPage() {
 
       <div className="reviews-section">
         <h3>Reviews</h3>
-        {reviews === null ? <p>No reviews yet.</p> : reviews.map(r => <ReviewCard key={r.id} review={r} />)}
+        {reviews === null ? <p>No reviews yet.</p> : reviews.map(r => 
+        <ReviewCard 
+          key={r.id} 
+          review={r}
+          currentUser={currentUser}
+          onReviewDeleted={loadReviews}
+          onReviewClick={() => {
+            if (!currentUser) {
+              setSignInModalOpen(true);
+            }
+          }} />)}
 
         <div className="review-form">
           <h4>Create Review</h4>
-          <textarea placeholder="Write your review" value={reviewContent} onChange={e => setReviewContent(e.target.value)} />
-          <input type="number" placeholder="Rating (1-10)" min="1" max="10" value={reviewRating} onChange={e => setReviewRating(e.target.value)} />
-          <button onClick={submitReview}>Submit</button>
+          <textarea
+            placeholder="Write your review"
+            value={reviewContent}
+            onChange={e => setReviewContent(e.target.value)}
+          />
+          
+          <div className="star-rating">
+            {[1,2,3,4,5,6,7,8,9,10].map((star) => (
+              <span
+                key={star}
+                className={`star ${star <= (hoverRating || reviewRating) ? "filled" : ""}`}
+                onClick={() => setReviewRating(star)}
+                onMouseEnter={() => setHoverRating(star)}
+                onMouseLeave={() => setHoverRating(0)}
+              >
+                ★
+              </span>
+            ))}
+          </div>
+
+          <div className="review-form-footer">
+            <button onClick={submitReview}>Submit</button>
+            <label className="spoiler-checkbox">
+              <input
+                type="checkbox"
+                checked={containsSpoiler}
+                onChange={(e) => setContainsSpoiler(e.target.checked)}
+              />
+              <span>Contains Spoiler</span>
+            </label>
+          </div>
         </div>
       </div>
+
+       <ToastContainer
+        position="bottom-right"
+        autoClose={2500}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="dark"
+      />
+
+      <SignInModal 
+        open={signInModalOpen} 
+        onClose={() => setSignInModalOpen(false)}
+        onSuccess={() => {
+          setSignInModalOpen(false);
+          // Reload current user after successful login
+          fetch("/api/users/me", { credentials: "include" })
+            .then(res => res.ok && res.json())
+            .then(user => user && setCurrentUser(user))
+            .catch(console.error);
+        }}
+      />
 
       <style jsx>{`
         @font-face {
@@ -163,6 +270,54 @@ export default function DetailsPage() {
           padding: 6px 12px;
           font-family: 'Basiic', sans-serif;
         }
+
+        .star-rating {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    user-select: none;
+  }
+
+  .review-form .spoiler-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: bold;
+    color: #d03e78;
+  }
+
+  .review-form .spoiler-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    border: 2px solid #d03e78;
+    accent-color: #d03e78;
+  }
+
+  .review-form-footer {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .star {
+    color: #444; 
+    transition: color 0.2s;
+    border: 1px sold #fb5255;
+  }
+
+  .star.filled {
+    color: #d03e78; 
+    border: 1px sold #fb5255;
+  }
+
+  
+  
       `}</style>
     </>
   );

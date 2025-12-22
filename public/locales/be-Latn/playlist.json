@@ -1,0 +1,44 @@
+{
+  "page": {
+    "title": "Plejlist",
+    "loading": "Zahruzka...",
+    "noMovies": "U hetym plejliście pakul niama filmaŭ",
+    "unknownYear": "Nieviadomy hod"
+  },
+  
+  "playlistInfo": {
+    "by": "Ad",
+    "moviesCount": "filmy",
+    "coverAlt": "Vokładka plejlista"
+  },
+  
+  "buttons": {
+    "pickRandom": "Vybrać vypadkovy",
+    "spinning": "Krucicca...",
+    "save": "Zachavać",
+    "cancel": "Skasavać",
+    "editDescription": "Apisańnie pakul nie dadadziena. Nacisnicie, kab redahavać."
+  },
+  
+  "randomPicker": {
+    "title": "Vy atrymali:",
+    "youGot": "Vy atrymali:"
+  },
+  
+  "movieInfo": {
+    "rating": "/10",
+    "genres": "Žanry"
+  },
+  
+  "messages": {
+    "saveSuccess": "Apisańnie paspiachova zachavana",
+    "saveError": "Nie ŭdalosia zachavać apisańnie",
+    "saveNetworkError": "Pamylka padčas zachavańnia apisańnia",
+    "missingMovieId": "ID filma adsutničaje",
+    "randomPickError": "Niemahčyma vybrać vypadkovy film z pustaho plejlista"
+  },
+  
+  "rating": {
+    "stars": "★"
+  }
+}

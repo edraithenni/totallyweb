@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:8080/api/:path*',
+       destination: 'http://backend:8080/api/:path*',
       },
       {
         source: '/static/src/:path*',   
@@ -24,8 +24,18 @@ const nextConfig = {
     ];
   },
 
+
+  reactStrictMode: true,
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'be-Latn'],
+  },
+  
   assetPrefix: '',
   basePath: '',
 };
+
+
+
 
 export default nextConfig;

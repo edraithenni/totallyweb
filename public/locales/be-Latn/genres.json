@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Pa žanrach"
+  },
+  
+  "genres": {
+    "action": "Ekšn",
+    "adventure": "Pryhody",
+    "animation": "Mul'tfil'my",
+    "biography": "Bijahrafija",
+    "crime": "Kryminal",
+    "family": "Sjamiejnyja",
+    "fantasy": "Fjentėzi",
+    "filmNoir": "Fil'm-nuar",
+    "history": "Histaryčnyja",
+    "horror": "Žachi",
+    "mystery": "Detektyŭ",
+    "romance": "Ramantyka",
+    "scifi": "Navukovaja fantastyka",
+    "sports": "Sport",
+    "thriller": "Trylery",
+    "war": "Vajennyja"
+  },
+  
+  "titles": {
+    "action": "Ekšn fil'my",
+    "adventure": "Fil'my pra pryhody",
+    "animation": "Mul'tfil'my",
+    "biography": "Bijahrafičnyja fil'my",
+    "crime": "Kryminal'nyja fil'my",
+    "family": "Sjamiejnyja fil'my",
+    "fantasy": "Fjentėzi fil'my",
+    "filmNoir": "Fil'my nuar",
+    "history": "Histaryčnyja fil'my",
+    "horror": "Fil'my žachaŭ",
+    "mystery": "Detektyŭnyja fil'my",
+    "romance": "Ramantyčnyja fil'my",
+    "scifi": "Navukova-fantastyčnyja fil'my",
+    "sports": "Spartyŭnyja fil'my",
+    "thriller": "Trylery",
+    "war": "Vajennyja fil'my"
+  },
+  
+  "buttons": {
+    "backToGenres": "Nazad da žanraŭ",
+    "prev": "Nazad",
+    "next": "Dalej"
+  },
+  
+  "messages": {
+    "noMovies": "Fil'maŭ u hetim žanry nie znojdziena",
+    "loading": "Zahruzka fil'maŭ...",
+    "page": "Starona",
+    "selectGenre": "Abiarycie žanr dla prahljadu fil'maŭ"
+  },
+  
+  "images": {
+    "horrorFooter": "Maliunak dlja žanru žachaŭ",
+    "fantasyIcon": "Ikonka žanru fjentėzi",
+    "horrorIcon": "Ikonka žanru žachaŭ"
+  }
+}

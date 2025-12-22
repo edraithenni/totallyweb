@@ -6,7 +6,7 @@ function StarField({ mouse }) {
   const ref = useRef();
 
   const positions = useMemo(() => {
-    const cnt = 4000;
+    const cnt = 1500; 
     const arr = new Float32Array(cnt * 3);
     for (let i = 0; i < cnt; i++) {
       arr[i * 3] = (Math.random() - 0.5) * 600;
@@ -45,7 +45,7 @@ function StarField({ mouse }) {
       <pointsMaterial
         map={starTexture}
         color="#ffffff"
-        size={2.5}
+        size={2}
         transparent
         opacity={0.65}
         blending={THREE.AdditiveBlending}
@@ -58,24 +58,52 @@ function StarField({ mouse }) {
 
 export default function StarWindow() {
   const [mouse, setMouse] = useState([0, 0]);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
     const handleMove = (e) => {
       setMouse([
         (e.clientX / window.innerWidth) * 2 - 1,
         -(e.clientY / window.innerHeight) * 2 + 1,
       ]);
     };
+    
     window.addEventListener("mousemove", handleMove);
-    return () => window.removeEventListener("mousemove", handleMove);
+    
+    const handleTouch = (e) => {
+      if (e.touches[0]) {
+        setMouse([
+          (e.touches[0].clientX / window.innerWidth) * 2 - 1,
+          -(e.touches[0].clientY / window.innerHeight) * 2 + 1,
+        ]);
+      }
+    };
+    
+    window.addEventListener("touchmove", handleTouch);
+    
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("touchmove", handleTouch);
+      window.removeEventListener("resize", checkMobile);
+    };
   }, []);
 
   return (
     <>
       <div
         style={{
-          width: "32vw",
-          height: "32vh",
+          
+          width: isMobile ? "80vw" : "32vw",
+          height: isMobile ? "30vw" : "32vh", 
+          maxWidth: isMobile ? "300px" : "400px", 
+          maxHeight: isMobile ? "300px" : "400px",
           position: "fixed",
           top: "50%",
           left: "50%",
@@ -90,6 +118,8 @@ export default function StarWindow() {
         <Canvas
           camera={{ position: [0, 0, 1], fov: 75 }}
           style={{ background: "black" }}
+          dpr={isMobile ? 1 : 2}
+          performance={{ min: 0.5 }}
         >
           <StarField mouse={mouse} />
         </Canvas>
@@ -106,20 +136,21 @@ export default function StarWindow() {
         />
       </div>
 
-      {}
       <div
         style={{
           position: "fixed",
-          top: "50%",
+          top: isMobile ? "calc(50% + 40vw)" : "calc(50% + 16vh)",
           left: "50%",
-          transform: "translate(-50%, 20vh)", 
+          transform: "translateX(-50%)",
           color: "rgba(200,200,200,0.7)",
           fontFamily: "'Courier New', monospace",
           fontStyle: "italic",
-          fontSize: "1rem",
+          fontSize: isMobile ? "0.8rem" : "1rem",
           pointerEvents: "none",
           zIndex: 50,
           textAlign: "center",
+          width: isMobile ? "80vw" : "auto",
+          maxWidth: "300px",
         }}
       >
         Neural pathways through digital space...

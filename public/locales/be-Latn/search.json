@@ -1,0 +1,48 @@
+{
+  "pages": {
+    "movies": {
+      "title": "Totally Cats",
+      "searchPlaceholder": "Uviadzicie nazvu filma...",
+      "searchButton": "Šukać",
+      "loading": "Zahruzka...",
+      "noResults": "Filmy nie znojdzieny",
+      "searchError": "Pamylka pošuku"
+    },
+    "users": {
+      "title": "Pošuk karystalnikaŭ — Totally Guys",
+      "searchPlaceholder": "Uviadzicie imia karystalnika...",
+      "searchButton": "Šukać",
+      "loading": "Pošuk...",
+      "noResults": "Karystalniki nie znojdzieny",
+      "searchError": "Pamylka pošuku"
+    }
+  },
+  
+  "common": {
+    "search": "Šukać",
+    "loading": "Zahruzka...",
+    "error": "Pamylka",
+    "noResults": "Vynikaŭ nie znojdziena"
+  },
+  
+  "movieCard": {
+    "year": "Hod",
+    "noPoster": "Plakat adsutničaje",
+    "viewDetails": "Pahladzieć padrabiaznaści"
+  },
+  
+  "userCard": {
+    "follow": "Padpisaćsia",
+    "unfollow": "Adpisaćsia",
+    "following": "Padpisany",
+    "viewProfile": "Pahladzieć profil",
+    "you": "(Vy)"
+  },
+  
+  "messages": {
+    "followSuccess": "Padpiska paspiachovaja",
+    "unfollowSuccess": "Adpiska paspiachovaja",
+    "followError": "Pamylka padčas padpiski",
+    "unfollowError": "Pamylka padčas adpiski"
+  }
+}

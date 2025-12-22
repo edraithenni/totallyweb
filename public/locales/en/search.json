@@ -1,0 +1,48 @@
+{
+  "pages": {
+    "movies": {
+      "title": "Totally cats",
+      "searchPlaceholder": "Enter movie title...",
+      "searchButton": "Search",
+      "loading": "Loading...",
+      "noResults": "No movies found",
+      "searchError": "Search error"
+    },
+    "users": {
+      "title": "User Search — Totally Guys",
+      "searchPlaceholder": "Enter username...",
+      "searchButton": "Search",
+      "loading": "Searching...",
+      "noResults": "No users found",
+      "searchError": "Search error"
+    }
+  },
+ 
+  "common": {
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "noResults": "No results found"
+  },
+  
+  "movieCard": {
+    "year": "Year",
+    "noPoster": "Poster not available",
+    "viewDetails": "View details"
+  },
+  
+  "userCard": {
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "following": "Following",
+    "viewProfile": "View profile",
+    "you": "(You)"
+  },
+  
+  "messages": {
+    "followSuccess": "Followed successfully",
+    "unfollowSuccess": "Unfollowed successfully",
+    "followError": "Error following user",
+    "unfollowError": "Error unfollowing user"
+  }
+}

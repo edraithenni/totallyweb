@@ -1,0 +1,68 @@
+{
+  "addToPlaylist": {
+    "button": "Dadać u plejlist",
+    "modal": {
+      "title": "Dadać u plejlist",
+      "movieTitle": "\"{title}\"",
+      "createSection": "Stvaryć novy",
+      "existingSection": "Vašy plejlisty",
+      "inputPlaceholder": "Uviadzicie nazvu plejlista...",
+      "createButton": "Stvaryć",
+      "creatingButton": "Stvarajecca...",
+      "addButton": "Dadać",
+      "noPlaylists": "Plejlistaŭ pakul niama. Stvarycie adzin vyšej! ✨",
+      "noPlaylistsAvailable": "Dastupnych plejlistaŭ niama",
+      "unnamedPlaylist": "Plejlist biez nazvy",
+      "closeButton": "Zakryć",
+      "reloadButton": "Pierazahruzić plejlisty",
+      "successMessage": "Film dadadzieny ŭ plejlist!"
+    },
+    "errors": {
+      "enterName": "Kali laska, uviadzicie nazvu plejlista",
+      "loadFailed": "Nie ŭdalosia zahruzić plejlisty: {status} {text}",
+      "loadNetworkError": "Sietkavaja pamylka padčas zahruzki plejlistaŭ. Kali laska, pasprabujcie znoŭ.",
+      "addFailed": "Nie ŭdalosia dadać u plejlist: {status} {text}",
+      "addNetworkError": "Sietkavaja pamylka padčas dadavańnia ŭ plejlist. Kali laska, pasprabujcie znoŭ.",
+      "createFailed": "Nie ŭdalosia stvaryć plejlist: {status} {text} — {error}",
+      "createNetworkError": "Sietkavaja pamylka: {message}"
+    }
+  },
+  
+  "header": {
+    "title": "Cineparea",
+    "nav": {
+      "genres": "Žanry",
+      "findUsers": "Znajści karystalnikaŭ",
+      "profile": "Profil",
+      "signIn": "Uvajści",
+      "signUp": "Zarehistravacca",
+      "logOut": "Vyjści"
+    },
+    "messages": {
+      "logoutError": "Pamylka vychadu"
+    }
+  },
+  
+  "languageSwitcher": {
+    "english": "Anhlijskaja",
+    "englishShort": "EN",
+    "belarusianLatin": "Bielaruskaja (łaćinka)",
+    "belarusianLatinShort": "BE",
+    "language": "Mova"
+  },
+  
+  "signInModal": {
+    "title": "Uvachod",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Paroĺ",
+    "submitButton": "Uvajści",
+    "cancelButton": "Skasavać",
+    "loading": "Uvachod...",
+    "success": "Uvachod paspiachovy!",
+    "errors": {
+      "invalidCredentials": "Niapravilny email ci paroĺ",
+      "networkError": "Sietkavaja pamylka. Kali laska, pasprabujcie znoŭ.",
+      "serverError": "Pamylka sierviera. Kali laska, pasprabujcie paźniej."
+    }
+  }
+}

@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import Header from "../components/header";
 import HudScene from "../components/HudScene2";
 import UserCard from "../components/UserCard";
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 export default function SearchUsersPage() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -10,7 +12,8 @@ export default function SearchUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
-
+  const { t } = useTranslation(['search', 'common', 'components']);
+  
   useEffect(() => {
     async function fetchCurrentUser() {
       try {
@@ -85,7 +88,7 @@ export default function SearchUsersPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && searchUsers()}
-            placeholder="enter username..."
+            placeholder={t('pages.movies.searchPlaceholder', { ns: 'search' })}
             style={{
               flex: 1,
               padding: "0.6rem 1rem",
@@ -155,4 +158,12 @@ export default function SearchUsersPage() {
       </div>
     </>
   );
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['search', 'common', 'components'])),
+    },
+  }
 }

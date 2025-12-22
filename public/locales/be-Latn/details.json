@@ -1,0 +1,35 @@
+{
+  "page": {
+    "loading": "Zahruzka...",
+    "noDescription": "Apisańnia pakul niama"
+  },
+  
+  "movieInfo": {
+    "title": "Nazva",
+    "year": "Hod",
+    "description": "Apisańnie",
+    "genre": "Žanr",
+    "director": "Režysior",
+    "rating": "Rejtynh",
+    "na": "—"
+  },
+  
+  "reviews": {
+    "sectionTitle": "Vodkliki",
+    "noReviews": "Vodklikaŭ pakul niama.",
+    "createReview": "Stvaryć vodklik",
+    "writeReview": "Napišycie vaš vodklik",
+    "ratingPlaceholder": "Acan­ka (1–10)",
+    "submit": "Adpravić",
+    "ratingError": "Acan­ka pavinna być ad 1 da 10",
+    "submitSuccess": "Vodklik paspiachova adpravleny!",
+    "submitError": "Nie ŭdalosia adpravić vodklik",
+    "networkError": "Pamylka padčas adpraŭki vodkliku"
+  },
+  
+  "playlist": {
+    "addToPlaylist": "Dadać u plejlist",
+    "addSuccess": "Dadadziena ŭ plejlist!",
+    "addError": "Nie ŭdalosia dadać u plejlist"
+  }
+}

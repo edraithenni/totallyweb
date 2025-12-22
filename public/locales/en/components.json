@@ -1,0 +1,68 @@
+{
+  "addToPlaylist": {
+    "button": "Add to Playlist",
+    "modal": {
+      "title": "Add to Playlist",
+      "movieTitle": "\"{title}\"",
+      "createSection": "Create New",
+      "existingSection": "Your Playlists",
+      "inputPlaceholder": "Enter playlist name...",
+      "createButton": "Create",
+      "creatingButton": "Creating...",
+      "addButton": "Add",
+      "noPlaylists": "No playlists yet. Create one above! ✨",
+      "noPlaylistsAvailable": "No playlists available",
+      "unnamedPlaylist": "Unnamed Playlist",
+      "closeButton": "Close",
+      "reloadButton": "Reload Playlists",
+      "successMessage": "Movie added to playlist!"
+    },
+    "errors": {
+      "enterName": "Please enter a playlist name",
+      "loadFailed": "Failed to load playlists: {status} {text}",
+      "loadNetworkError": "Network error loading playlists. Please try again.",
+      "addFailed": "Failed to add to playlist: {status} {text}",
+      "addNetworkError": "Network error adding to playlist. Please try again.",
+      "createFailed": "Failed to create playlist: {status} {text} - {error}",
+      "createNetworkError": "Network error: {message}"
+    }
+  },
+  
+  "header": {
+    "title": "Cineparea",
+    "nav": {
+      "genres": "Genres",
+      "findUsers": "Find users",
+      "profile": "Profile",
+      "signIn": "Sign in",
+      "signUp": "Sign up",
+      "logOut": "Log out"
+    },
+    "messages": {
+      "logoutError": "Logout error"
+    }
+  },
+  
+  "languageSwitcher": {
+    "english": "English",
+    "englishShort": "EN",
+    "belarusianLatin": "Belarusian Latin",
+    "belarusianLatinShort": "BY",
+    "language": "Language"
+  },
+  
+  "signInModal": {
+    "title": "Sign In",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "submitButton": "Sign In",
+    "cancelButton": "Cancel",
+    "loading": "Signing in...",
+    "success": "Signed in successfully!",
+    "errors": {
+      "invalidCredentials": "Invalid email or password",
+      "networkError": "Network error. Please try again.",
+      "serverError": "Server error. Please try again later."
+    }
+  }
+}

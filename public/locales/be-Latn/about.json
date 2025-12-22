@@ -1,0 +1,62 @@
+{
+  "pageTitle": "Pra nas",
+  "pageSubtitle": "Daviedajciesia historyju našaj muzyčnaj supolnaści",
+  
+  "sections": {
+    "mission": {
+      "title": "Misyja",
+      "content": "Naša misyja — stvaryć žyvuju supolnaść, dzie amitary muzyki mohuć adkryvać, dzie­lićsia i jadnaćsia praz supolnuju strasć da muzyki. My vierim, što kožny plejlist ras­kazvaje historyju, a kožny vodklik stvaraie suvjaź."
+    },
+    "proof": {
+      "title": "Saćjalnaje pacvierdžańnie",
+      "content": "Nami daviarajuć boĺš za 50 000 amitaroŭ muzyki va ўсім sviecie. Pra nas pisała Music Tech Review, a tak­sama nas rajuć profesionaly haliny. Naša supolnaść stvaryła bolš za 100 000 plejlistaŭ i padzialiłasja niezličenaj koĺkasciu muzyčnych adkryćciaŭ."
+    },
+    "story": {
+      "title": "Naša historyja",
+      "content": "Platforma byla zasnavana ŭ 2020 hodzie jak univiersitetski prajekt trjoch sja­broŭ, jakich jadnała liuboŭ da muzyčnych adkryćciaŭ. Toje, što pačynałasia jak prosty instrumient dlia abmienu plejlistami, pieratvarylasia ŭ poŭnasćju funkcionalnuju muzyčnuju supolnaść."
+    },
+    "media": {
+      "title": "Vyjavy i vidiea",
+      "content": "Choć my kancentruiemsia na muzyčnym dosviedzie, my pastojanna palia­pšajem platformu, dadajučy vizualnyja elementy, jakija daŭniajuć sluchavy šliach. Minimalistyčny pad­chod dapamahae muzycy zaŭsiody być u centry ŭvahi."
+    },
+    "problem": {
+      "title": "Prablema i rašeńnie",
+      "content": "Prablema: muzyčnyja platformy časta zamykajuć sluchačoŭ u alharytmičnych puzyrach. Rašeńnie: my stvaraem žyvyja čalaviečyja suv­jazi praz supolnyja plejlisty i ščyryja vodkliki, farmujučy supolna­stna-orijentavany dosvied adkryćcia."
+    },
+    "action": {
+      "title": "Zaklik da dziejańnia",
+      "content": "Dalucajciesia da našaj supolnaści ŭžo sionnia! Stvarycie profil, padzialiciesia pieršym plejlistam i pačniacie znajomstva z inšymi amitarami muzyki. Vaša nastupnaja lubimaja piesnia ŭžo čakae na vas."
+    }
+  },
+  
+  "teamSection": {
+    "title": "Naša kamanda",
+    "members": {
+      "artiom": {
+        "name": "Arciom Fokin",
+        "role": "Frontend-raspracounik"
+      },
+      "yana": {
+        "name": "Jana Prapirnaja",
+        "role": "Viedučy raspracounik, full-stack"
+      },
+      "emiliya": {
+        "name": "Emiliya Kazloŭskaja",
+        "role": "Backend-raspracounik"
+      },
+      "sofiya": {
+        "name": "Sofija Novikava",
+        "role": "Frontend-raspracounik"
+      }
+    }
+  },
+  
+  "buttons": {
+    "readMore": "Čytać bolš",
+    "close": "Zakryć"
+  },
+  
+  "modal": {
+    "mediaPlaceholder": "Zamiennik medyja"
+  }
+}

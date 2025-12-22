@@ -1,0 +1,58 @@
+{
+  "page": {
+    "title": "Profil",
+    "loading": "Zahruzka...",
+    "private": "Pryvatny",
+    "noPlaylists": "Plejlistaŭ pakul niama",
+    "noReviews": "Vodklikaŭ pakul niama",
+    "noBio": "—"
+  },
+  
+  "sections": {
+    "bio": "Bio",
+    "playlists": "Plejlisty",
+    "reviews": "Vodkliki",
+    "followers": "Padpisčyki",
+    "following": "Padpiski"
+  },
+  
+  "labels": {
+    "email": "Email",
+    "avatar": "Avatar",
+    "avatarPreview": "Pradprahlad avatara",
+    "you": "Vy"
+  },
+  
+  "buttons": {
+    "edit": "Redahavać",
+    "save": "Zachavać",
+    "cancel": "Skasavać",
+    "changePfp": "Zmianić avatary",
+    "deletePfp": "Vydalić avatary",
+    "follow": "Padpisaćsia",
+    "unfollow": "Adpisaćsia",
+    "following": "Padpisany",
+    "editBio": "Redahavać",
+    "saveBio": "Zachavać",
+    "cancelBio": "Skasavać"
+  },
+  
+  "avatar": {
+    "uploading": "Zahruzka...",
+    "updated": "Avatar abnoŭleny.",
+    "deleting": "Vydaleńnie...",
+    "deleted": "Avatar vydaleny.",
+    "errorUpload": "Pamylka zahruzki avatara.",
+    "errorDelete": "Pamylka vydaleńnia avatara.",
+    "selectImage": "Kali laska, abiarycie fajl vyjavy.",
+    "fileTooBig": "Fajl zanadta vialiki (maks. 5 MB).",
+    "confirmDelete": "Vy sapraŭdy chočacie vydalić avatar?"
+  },
+  
+  "follow": {
+    "followers": "Padpisčyki",
+    "following": "Padpiski",
+    "noFollowers": "Padpisčykaŭ pakul niama",
+    "noFollowing": "Vy pakul nikaho nie padpisali"
+  }
+}

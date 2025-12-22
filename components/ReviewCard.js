@@ -256,4 +256,4 @@ export default function ReviewCard({ review, showMovieLink = false, showUserLink
       `}</style>
     </div>
   );
-}
+} 

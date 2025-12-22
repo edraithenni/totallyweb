@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Browse by Genre"
+  },
+  
+  "genres": {
+    "action": "Action",
+    "adventure": "Adventure",
+    "animation": "Animation",
+    "biography": "Biography",
+    "crime": "Crime",
+    "family": "Family",
+    "fantasy": "Fantasy",
+    "filmNoir": "Film-Noir",
+    "history": "History",
+    "horror": "Horror",
+    "mystery": "Mystery",
+    "romance": "Romance",
+    "scifi": "Sci-Fi",
+    "sports": "Sports",
+    "thriller": "Thriller",
+    "war": "War"
+  },
+  
+  "titles": {
+    "action": "Action Movies",
+    "adventure": "Adventure Movies",
+    "animation": "Animation Movies",
+    "biography": "Biography Movies",
+    "crime": "Crime Movies",
+    "family": "Family Movies",
+    "fantasy": "Fantasy Movies",
+    "filmNoir": "Film-Noir Movies",
+    "history": "Historical Movies",
+    "horror": "Horror Movies",
+    "mystery": "Mystery Movies",
+    "romance": "Romantic Movies",
+    "scifi": "Sci-Fi Movies",
+    "sports": "Sports Movies",
+    "thriller": "Thriller Movies",
+    "war": "War Movies"
+  },
+  
+  "buttons": {
+    "backToGenres": "Back to Genres",
+    "prev": "Previous",
+    "next": "Next"
+  },
+  
+  "messages": {
+    "noMovies": "No movies found in this genre",
+    "loading": "Loading movies...",
+    "page": "Page",
+    "selectGenre": "Select a genre to browse movies"
+  },
+  
+  "images": {
+    "horrorFooter": "Horror footer image",
+    "fantasyIcon": "Fantasy genre icon",
+    "horrorIcon": "Horror genre icon"
+  }
+}

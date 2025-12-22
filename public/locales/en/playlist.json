@@ -1,0 +1,44 @@
+{
+  "page": {
+    "title": "Playlist",
+    "loading": "Loading...",
+    "noMovies": "No movies in this playlist yet",
+    "unknownYear": "Unknown year"
+  },
+  
+  "playlistInfo": {
+    "by": "By",
+    "moviesCount": "movies",
+    "coverAlt": "Playlist Cover"
+  },
+  
+  "buttons": {
+    "pickRandom": "Pick Random",
+    "spinning": "Spinning...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "editDescription": "No description added yet. Click to edit."
+  },
+  
+  "randomPicker": {
+    "title": "You got:",
+    "youGot": "You got:"
+  },
+  
+  "movieInfo": {
+    "rating": "/10",
+    "genres": "Genres"
+  },
+  
+  "messages": {
+    "saveSuccess": "Description saved successfully",
+    "saveError": "Failed to save description",
+    "saveNetworkError": "Error saving description",
+    "missingMovieId": "Movie ID is missing",
+    "randomPickError": "Cannot pick random movie from empty playlist"
+  },
+  
+  "rating": {
+    "stars": "★"
+  }
+}
