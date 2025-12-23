@@ -5,7 +5,7 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
   const [playlists, setPlaylists] = useState([]);
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('')
+  const [error, setError] = useState('');
   
   const openModal = async () => {
     setShowPlaylistModal(true);
@@ -142,7 +142,6 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
     }
   };
 
-  // Безопасный рендеринг плейлистов
   const renderPlaylists = () => {
     if (!Array.isArray(playlists)) {
       console.warn('Playlists is not an array:', playlists);
@@ -157,13 +156,16 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
       <div className="playlist-list">
         {playlists.map(playlist => (
           <div key={playlist.id || playlist.ID} className="playlist-item">
-            <span className="playlist-name">{playlist.name || playlist.Name || 'Unnamed Playlist'}</span>
+            <span className="playlist-name">
+              {playlist.name || playlist.Name || 'Unnamed Playlist'}
+            </span>
             <button 
               onClick={() => addToPlaylist(playlist.id || playlist.ID)}
               className="add-btn"
               disabled={isLoading}
+              title="Add to this playlist"
             >
-              {isLoading ? '...' : 'Add'}
+              {isLoading ? '...' : '+'}
             </button>
           </div>
         ))}
@@ -178,21 +180,26 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
         onClick={openModal}
         disabled={isLoading}
       >
-        <span className="btn-icon"></span>
+        <span className="btn-icon">+</span>
         <span className="btn-text">Add to Playlist</span>
-        <div className="btn-gradient"></div>
       </button>
 
-      {/* Playlist Modal */}
       {showPlaylistModal && (
         <div className="modal-overlay" onClick={() => !isLoading && setShowPlaylistModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="close-modal-btn"
+              onClick={() => setShowPlaylistModal(false)}
+              disabled={isLoading}
+            >
+              ×
+            </button>
+            
             <div className="modal-header">
               <h3>Add to Playlist</h3>
               <p className="movie-title">"{movieTitle}"</p>
             </div>
             
-            {/* Display error message */}
             {error && (
               <div className="error-message">
                 <strong>Error:</strong> {error}
@@ -200,7 +207,7 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
             )}
             
             <div className="create-playlist-section">
-              <h4>Create New</h4>
+              <h4>Create New Playlist</h4>
               <div className="create-playlist-input">
                 <input
                   type="text"
@@ -215,7 +222,7 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
                   className="create-btn"
                   disabled={isLoading || !newPlaylistName.trim()}
                 >
-                  {isLoading ? 'Creating...' : 'Create'}
+                  {isLoading ? '...' : 'Create'}
                 </button>
               </div>
             </div>
@@ -227,18 +234,11 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
 
             <div className="modal-actions">
               <button 
-                className="close-modal"
-                onClick={() => setShowPlaylistModal(false)}
-                disabled={isLoading}
-              >
-                Close
-              </button>
-              <button 
                 className="reload-btn"
                 onClick={loadUserPlaylists}
                 disabled={isLoading}
               >
-                Reload Playlists
+                ↻ Reload
               </button>
             </div>
           </div>
@@ -246,80 +246,46 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
       )}
 
       <style jsx>{`
-       @font-face {
+        @font-face {
           font-family: 'Basiic';
           src: url('/src/basiic.ttf') format('truetype');
         }
 
         .add-to-playlist-btn {
-          position: relative;
-          background: linear-gradient(135deg, #fb5255 0%, #d03e78 100%);
-          color: white;
-          border: none;
-          padding: 12px 24px;
-          border-radius: 0px;
+          background: #000;
+          color: #727d79;
+          border: 1px solid #727d79;
+          padding: 8px 16px;
+          border-radius: 0;
           font-family: 'Basiic', sans-serif;
-          font-size: 16px;
-          font-weight: 600;
           cursor: pointer;
-          overflow: hidden;
-          transition: all 0.3s ease;
-          display: flex;
+          display: inline-flex;
           align-items: center;
           gap: 8px;
-          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-          min-width: 160px;
-          justify-content: center;
+          transition: all 0.2s ease;
+          font-size: 14px;
         }
 
         .add-to-playlist-btn:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-          background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-        }
-
-        .add-to-playlist-btn:active:not(:disabled) {
-          transform: translateY(0);
+          background: #292626ff;
+          color: #d2ece3;
+          border-color: #d2ece3;
         }
 
         .add-to-playlist-btn:disabled {
-          opacity: 0.6;
+          opacity: 0.5;
           cursor: not-allowed;
-          transform: none;
-        }
-
-        .btn-gradient {
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-          transition: left 0.5s ease;
-        }
-
-        .add-to-playlist-btn:hover .btn-gradient {
-          left: 100%;
         }
 
         .btn-icon {
           font-size: 18px;
+          font-weight: bold;
         }
 
-        .btn-text {
-          position: relative;
-          z-index: 1;
-        }
-
-        /* Modal Styles */
         .modal-overlay {
           position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.8);
-          backdrop-filter: blur(5px);
+          inset: 0;
+          background: rgba(0, 0, 0, 0.85);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -328,82 +294,104 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
         }
 
         .modal-content {
-          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-          border: 2px solid;
-          border-image: linear-gradient(135deg, #667eea, #764ba2) 1;
-          padding: 30px;
-          border-radius: 0px;
+          background: #262123ff;
+          border: 1px solid #727d79;
+          padding: 24px;
+          border-radius: 0;
           max-width: 500px;
           width: 100%;
           max-height: 80vh;
           overflow-y: auto;
-          color: #e2e8f0;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+          color: #9c9cc9;
+          position: relative;
+        }
+
+        .close-modal-btn {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          color: #d2ece3;
+          cursor: pointer;
+          font-size: 24px;
+          font-weight: bold;
+          background: none;
+          border: none;
+          line-height: 1;
+          transition: all 0.2s;
+          z-index: 10;
+          padding: 0;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .close-modal-btn:hover:not(:disabled) {
+          color: #fff;
+          transform: scale(1.1);
         }
 
         .modal-header {
           text-align: center;
-          margin-bottom: 25px;
-          border-bottom: 1px solid #2d3748;
-          padding-bottom: 15px;
+          margin-bottom: 24px;
+          padding-bottom: 16px;
+          border-bottom: 1px solid #727d79;
         }
 
         .modal-header h3 {
-          color: #667eea;
+          color: #fff;
           margin: 0 0 8px 0;
-          font-size: 24px;
-          font-weight: 700;
+          font-size: 20px;
         }
 
         .movie-title {
-          color: #a0aec0;
+          color: #9c9cc9;
           margin: 0;
           font-size: 14px;
           font-style: italic;
         }
 
         .error-message {
-          background: rgba(245, 101, 101, 0.1);
-          border: 1px solid #f56565;
-          color: #feb2b2;
+          background: rgba(255, 68, 68, 0.1);
+          border: 1px solid #ff4444;
+          color: #ffb3b3;
           padding: 12px;
-          border-radius: 0px;
-          margin-bottom: 15px;
+          border-radius: 0;
+          margin-bottom: 16px;
           font-size: 14px;
-          line-height: 1.4;
         }
 
         .create-playlist-section {
-          margin-bottom: 25px;
+          margin-bottom: 24px;
         }
 
-        .create-playlist-section h4 {
-          color: #68d391;
+        .create-playlist-section h4,
+        .existing-playlists h4 {
+          color: #d2ece3;
           margin: 0 0 12px 0;
           font-size: 16px;
-          font-weight: 600;
         }
 
         .create-playlist-input {
           display: flex;
-          gap: 10px;
+          gap: 8px;
         }
 
         .create-playlist-input input {
           flex: 1;
-          padding: 12px;
-          background: #2d3748;
-          border: 1px solid #4a5568;
-          border-radius: 0px;
-          color: white;
+          padding: 10px 12px;
+          background: #000;
+          border: 1px solid #727d79;
+          border-radius: 0;
+          color: #d2ece3;
           font-family: 'Basiic', sans-serif;
-          transition: all 0.3s ease;
+          font-size: 14px;
         }
 
         .create-playlist-input input:focus {
           outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+          border-color: #d2ece3;
         }
 
         .create-playlist-input input:disabled {
@@ -411,64 +399,78 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
         }
 
         .create-btn, .add-btn {
-          background: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
-          color: white;
-          border: none;
-          padding: 12px 20px;
-          border-radius: 0px;
+          background: #000;
+          color: #727d79;
+          border: 1px solid #727d79;
           cursor: pointer;
           font-family: 'Basiic', sans-serif;
-          font-weight: 600;
-          transition: all 0.3s ease;
+          transition: all 0.2s ease;
           white-space: nowrap;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
-        .create-btn:hover:not(:disabled), .add-btn:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(104, 211, 145, 0.3);
+        .create-btn {
+          padding: 10px 20px;
+          font-size: 14px;
+          min-width: 80px;
         }
 
-        .create-btn:disabled, .add-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-          transform: none;
-        }
-
-        .existing-playlists h4 {
-          color: #f6ad55;
-          margin: 0 0 12px 0;
+        .add-btn {
+          padding: 6px 12px;
           font-size: 16px;
-          font-weight: 600;
+          font-weight: bold;
+          width: 36px;
+          height: 36px;
+          flex-shrink: 0;
+        }
+
+        .create-btn:hover:not(:disabled), 
+        .add-btn:hover:not(:disabled) {
+          background: #292626ff;
+          color: #d2ece3;
+          border-color: #d2ece3;
+        }
+
+        .create-btn:disabled, 
+        .add-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .existing-playlists {
+          margin-bottom: 24px;
         }
 
         .no-playlists {
           text-align: center;
-          color: #a0aec0;
+          color: #727d79;
           font-style: italic;
           padding: 20px;
-          background: rgba(45, 55, 72, 0.5);
-          border-radius: 0px;
+          background: rgba(0, 0, 0, 0.3);
+          border-radius: 0;
+          font-size: 14px;
         }
 
         .playlist-list {
-          max-height: 200px;
+          max-height: 250px;
           overflow-y: auto;
-          border: 1px solid #4a5568;
-          border-radius: 0px;
-          background: #2d3748;
+          border: 1px solid #727d79;
+          background: #000;
         }
 
         .playlist-item {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 12px 15px;
-          border-bottom: 1px solid #4a5568;
-          transition: background 0.3s ease;
+          padding: 12px 16px;
+          border-bottom: 1px solid #727d79;
+          transition: background 0.2s;
         }
 
         .playlist-item:hover {
-          background: rgba(74, 85, 104, 0.3);
+          background: rgba(114, 125, 121, 0.1);
         }
 
         .playlist-item:last-child {
@@ -476,71 +478,61 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
         }
 
         .playlist-name {
-          color: #e2e8f0;
-          font-weight: 500;
+          color: #d2ece3;
+          font-size: 15px;
+          flex: 1;
+          margin-right: 12px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .modal-actions {
           display: flex;
-          gap: 10px;
+          justify-content: center;
           margin-top: 20px;
         }
 
-        .close-modal {
-          flex: 1;
-          padding: 12px;
-          background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
-          color: white;
-          border: none;
-          border-radius: 0px;
-          cursor: pointer;
-          font-family: "So Bad", sans-serif;
-          font-weight: 600;
-          transition: all 0.3s ease;
-        }
-
         .reload-btn {
-          flex: 1;
-          padding: 12px;
-          background: linear-gradient(135deg, #d69e2e 0%, #ed8936 100%);
-          color: white;
-          border: none;
-          border-radius: 0px;
+          background: #000;
+          color: #727d79;
+          border: 1px solid #727d79;
+          padding: 8px 20px;
+          border-radius: 0;
           cursor: pointer;
-          font-family: "So Bad", sans-serif;
-          font-weight: 600;
-          transition: all 0.3s ease;
+          font-family: 'Basiic', sans-serif;
+          font-size: 14px;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 6px;
         }
 
-        .close-modal:hover:not(:disabled),
         .reload-btn:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+          background: #292626ff;
+          color: #d2ece3;
+          border-color: #d2ece3;
         }
 
-        .close-modal:disabled,
         .reload-btn:disabled {
-          opacity: 0.6;
+          opacity: 0.5;
           cursor: not-allowed;
-          transform: none;
         }
 
-        /* Scrollbar styling */
         .playlist-list::-webkit-scrollbar {
           width: 6px;
         }
 
         .playlist-list::-webkit-scrollbar-track {
-          background: #2d3748;
+          background: #000;
         }
 
         .playlist-list::-webkit-scrollbar-thumb {
-          background: #667eea;
-          border-radius: 0px;
+          background: #727d79;
         }
 
         .playlist-list::-webkit-scrollbar-thumb:hover {
-          background: #764ba2;
+          background: #9c9cc9;
         }
       `}</style>
     </>

@@ -2,43 +2,74 @@
   "page": {
     "title": "Plejlist",
     "loading": "Zahruzka...",
-    "noMovies": "U hetym plejliście pakul niama filmaŭ",
+    "noMovies": "U hetym plejlisce pakul niama filmaŭ",
     "unknownYear": "Nieviadomy hod"
   },
-  
+
   "playlistInfo": {
     "by": "Ad",
-    "moviesCount": "filmy",
-    "coverAlt": "Vokładka plejlista"
+    "moviesCount": "filmaŭ",
+    "coverAlt": "Vokladka plejlista"
   },
-  
+
   "buttons": {
-    "pickRandom": "Vybrać vypadkovy",
-    "spinning": "Krucicca...",
+    "pickRandom": "Vybrać vypadkaŭy",
+    "spinning": "Kruciacca...",
     "save": "Zachavać",
     "cancel": "Skasavać",
-    "editDescription": "Apisańnie pakul nie dadadziena. Nacisnicie, kab redahavać."
+    "editDescription": "Apisańnie adsutničaje. Nacisni, kab redahavać.",
+    "deletePlaylist": "Vydalić plejlist",
+    "removeMovie": "Prybrać",
+    "uploadCover": "Zahruzić novuju vokladku",
+    "deleteCover": "Vydalić vokladku",
+    "close": "Zakryć"
   },
-  
+
   "randomPicker": {
-    "title": "Vy atrymali:",
-    "youGot": "Vy atrymali:"
+    "title": "Vypadkovy vybar filma",
+    "youGot": "Ty atrymaŭ:"
   },
-  
+
   "movieInfo": {
     "rating": "/10",
     "genres": "Žanry"
   },
-  
+
+  "modal": {
+    "coverTitle": "Vokladka plejlista",
+    "previewAlt": "Prahliad"
+  },
+
+  "rating": {
+    "stars": "★"
+  },
+
   "messages": {
     "saveSuccess": "Apisańnie paspiachova zachavana",
     "saveError": "Nie ŭdalosia zachavać apisańnie",
-    "saveNetworkError": "Pamylka padčas zachavańnia apisańnia",
-    "missingMovieId": "ID filma adsutničaje",
-    "randomPickError": "Niemahčyma vybrać vypadkovy film z pustaho plejlista"
+    "saveNetworkError": "Pamylka pry zachavańni apisańnia",
+    "missingMovieId": "Adsutničaje ID filma",
+    "randomPickError": "Niemahčyma vybrać film z pustaha plejlista",
+    "confirmRemoveMovie": "Prybrać hety film z plejlista?",
+    "movieRemoved": "Film prybrany z plejlista",
+    "failedRemoveMovie": "Nie ŭdalosia prybrać film",
+    "errorRemovingMovie": "Pamylka pry vydaleńni filma",
+    "confirmDeletePlaylist": "Vydalić hety plejlist?",
+    "playlistDeleted": "Plejlist vydaleny!",
+    "failedDeletePlaylist": "Nie ŭdalosia vydalić plejlist",
+    "errorDeletingPlaylist": "Pamylka pry vydaleńni plejlista",
+    "selectImageFile": "Kali laska, abiarycie fajl vyjavy",
+    "fileTooBig": "Fajl zanadta vialiki (maks. 5MB)",
+    "uploading": "Zahruzka...",
+    "coverUpdated": "Vokladka abnoŭliena",
+    "errorUploading": "Pamylka pry zahruzcy vokladki",
+    "confirmDeleteCover": "Sapraŭdy vydalić vokladku plejlista?",
+    "deleting": "Vydaleńnie...",
+    "coverDeleted": "Vokladka vydaliena",
+    "errorDeleting": "Pamylka pry vydaleńni"
   },
-  
-  "rating": {
-    "stars": "★"
+
+  "common": {
+    "user": "Karystalnik"
   }
 }

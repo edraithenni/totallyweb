@@ -163,42 +163,32 @@ export default function SearchPage() {
           ))}
         </div>
       </div>
-
-      <style jsx>{`
-        .movie-card {
-          background: #333333ff;
-          color: #cd77ff;
-          cursor: pointer;
-          border-radius: 0;
-          outline: 2px solid #ce3ed0;
-          transition: all ease 0.3s;
-          overflow: hidden;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-        }
-        .movie-card:hover {
-          transform: scale(1.05);
-          outline-color: #8dd9ff;
-          box-shadow: 0 0 15px rgba(141, 217, 255, 0.5);
-        }
-        
-        .movie-card img {
-          transition: transform 0.3s ease;
-        }
-        
-        .movie-card:hover img {
-          transform: scale(1.05);
-        }
-      `}</style>
+  <style jsx>{`
+    
+    .movie-card{
+      background: #333333ff;
+      color: #cd77ff;
+      cursor: pointer;
+      borderRadius: 0;
+      outline: 2px solid #ce3ed0;
+      transition: all ease 0.3s;
+    }
+    .movie-card:hover{
+      transform: scale(1.05);
+     }   
+    `
+  }
+    </style>
     </>
+    
   );
-}
 
+
+}
 export async function getStaticProps({ locale }) {
   return {
     props: {
       ...(await serverSideTranslations(locale, ['search', 'common', 'components'])),
     },
-  }
+  };
 }

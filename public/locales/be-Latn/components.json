@@ -64,5 +64,19 @@
       "networkError": "Sietkavaja pamylka. Kali laska, pasprabujcie znoŭ.",
       "serverError": "Pamylka sierviera. Kali laska, pasprabujcie paźniej."
     }
+  },
+
+  
+  "followList": {
+    "title": "SUVIAZI KARYSTALNIKA",
+    "followers": "PADPISČYKI",
+    "following": "PADPISKY",
+    "loading": "Zahruzka...",
+    "empty": "Niama {{tab}}",
+    "searchPrompt": "C:/POŠUK> ",
+    "user": "Karystalnik #{{id}}",
+    "you": "Ty"
   }
+
+
 }

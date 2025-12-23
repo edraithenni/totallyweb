@@ -26,6 +26,7 @@ export default function SignInModal({ open, onClose, onSuccess }) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Login failed");
+      window.location.assign("/search");
       onSuccess && onSuccess();
       onClose && onClose();
     } catch (err) {
@@ -92,7 +93,7 @@ export default function SignInModal({ open, onClose, onSuccess }) {
         <div className="modal-content">
           <div className="modal-frame">
             <span className="modal-close" onClick={onClose}>
-              ✖
+              X
             </span>
 
             <div className="modal-body">
@@ -146,34 +147,62 @@ export default function SignInModal({ open, onClose, onSuccess }) {
               )}
 
               {mode === "reset" && (
-                <>
-                  <h2>Reset password</h2>
-                  {error && <div className="error">{error}</div>}
-                  <form onSubmit={handleReset}>
-                    <input
-                      name="code"
-                      type="text"
-                      placeholder="Verification code"
-                      required
-                    />
-                    <input
-                      name="new_password"
-                      type="password"
-                      placeholder="New password"
-                      required
-                    />
-                    <button type="submit" disabled={loading}>
-                      {loading ? "Resetting..." : "Reset password"}
-                    </button>
-                    <small
-                      className="forgot-link"
-                      onClick={() => setMode("login")}
-                    >
-                      Back to login
-                    </small>
-                  </form>
-                </>
-              )}
+  <>
+    <h2>Reset password</h2>
+    {error && error !== "Passwords do not match" && (
+      <div className="error">{error}</div>
+    )}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const f = e.target;
+        const pass1 = f.new_password.value;
+        const pass2 = f.confirm_password.value;
+
+        if (pass1 !== pass2) {
+          setError("Passwords do not match");
+          return;
+        }
+
+        handleReset(e);
+      }}
+    >
+      <input
+        name="code"
+        type="text"
+        placeholder="Verification code"
+        required
+      />
+      <input
+        name="new_password"
+        type="password"
+        placeholder="New password"
+        required
+      />
+      <input
+        name="confirm_password"
+        type="password"
+        placeholder="Confirm new password"
+        required
+      />
+      {error === "Passwords do not match" && (
+        <div className="error">Passwords do not match</div>
+      )}
+
+      <button type="submit" disabled={loading}>
+        {loading ? "Resetting..." : "Reset password"}
+      </button>
+
+      <small
+        className="forgot-link"
+        onClick={() => setMode("login")}
+      >
+        Back to login
+      </small>
+    </form>
+  </>
+)}
+
             </div>
           </div>
         </div>

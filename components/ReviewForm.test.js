@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import ReviewForm from "./ReviewForm";
 
@@ -20,7 +17,7 @@ describe("ReviewForm component", () => {
 
     render(<ReviewForm onSubmit={mockSubmit} />);
 
-    // Заполняем поля
+    
     fireEvent.change(screen.getByPlaceholderText("Enter movie name"), {
       target: { value: "Avatar" },
     });
@@ -35,28 +32,28 @@ describe("ReviewForm component", () => {
 
     fireEvent.click(screen.getByText("Post Review"));
 
-    // Сначала появляется статус "Sending..."
+    
     expect(screen.getByText("Sending...")).toBeInTheDocument();
 
-    // Прокручиваем таймеры (имитация 800мс)
+    
     act(() => {
       jest.advanceTimersByTime(800);
     });
 
-    // Потом появляется "Review submitted!"
+    
     expect(screen.getByText("Review submitted!")).toBeInTheDocument();
 
-    // Проверяем вызов onSubmit
+    
     expect(mockSubmit).toHaveBeenCalledTimes(1);
     const submitted = mockSubmit.mock.calls[0][0];
 
-    // Проверяем данные
+    
     expect(submitted.movie_title).toBe("Avatar");
     expect(submitted.rating).toBe(9);
     expect(submitted.content).toBe("Amazing!");
     expect(typeof submitted.created_at).toBe("string");
 
-    // Поля должны очиститься
+    
     expect(screen.getByPlaceholderText("Enter movie name").value).toBe("");
     expect(screen.getByPlaceholderText("Enter rating").value).toBe("");
     expect(screen.getByPlaceholderText("Share your thoughts...").value).toBe("");
@@ -80,13 +77,13 @@ describe("ReviewForm component", () => {
     fireEvent.click(screen.getByText("Post Review"));
 
     act(() => {
-      jest.advanceTimersByTime(800); // показывается "Review submitted!"
+      jest.advanceTimersByTime(800); 
     });
 
     expect(screen.getByText("Review submitted!")).toBeInTheDocument();
 
     act(() => {
-      jest.advanceTimersByTime(2000); // статус должен исчезнуть
+      jest.advanceTimersByTime(2000); 
     });
 
     expect(screen.queryByText("Review submitted!")).toBeNull();

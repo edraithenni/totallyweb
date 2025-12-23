@@ -3,7 +3,7 @@ module.exports = {
     defaultLocale: 'en',
     locales: ['en', 'be-Latn'],
   },
-  ns: ['common', 'about', 'search','components','auth','genres'], 
+  ns: ['common', 'about', 'search','components','auth','genres','playlist'], 
   defaultNS: 'common',
   localePath: typeof window === 'undefined' 
     ? require('path').resolve('./public/locales') 

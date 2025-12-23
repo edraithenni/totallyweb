@@ -38,9 +38,7 @@ export default function Header() {
       </Head>
 
       <header>
-        <h1 onClick={() => (window.location.href = "/search")}>
-          {t('header.title')}
-        </h1>
+        <h1 onClick={() => (window.location.href = "/search")}>Cineparea</h1>
         <nav>
           <button
             className="secondary"
@@ -48,6 +46,12 @@ export default function Header() {
           >
             {t('components:header.nav.genres')}
           </button>
+          <button
+            className="secondary"
+            onClick={() => (window.location.href = "/genres")}
+        >
+            Genres
+        </button>
           <button
             className="secondary"
             onClick={() => (window.location.href = "/SearchUsers")}

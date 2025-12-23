@@ -1,25 +1,22 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom'
 
-
-const originalError = console.error;
+// Мокаем глобальные функции
 beforeAll(() => {
-  console.error = (...args) => {
-    if (/Warning.*not wrapped in act/.test(args[0]) || /Received `true` for a non-boolean attribute `jsx`/.test(args[0])) {
-      return;
-    }
-    originalError.call(console, ...args);
-  };
-});
+  // Мок для alert
+  global.alert = jest.fn()
+  
+  // Мок для console.log чтобы не засорять вывод тестов
+  jest.spyOn(console, 'log').mockImplementation(() => {})
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  jest.spyOn(console, 'warn').mockImplementation(() => {})
+})
 
 afterAll(() => {
-  console.error = originalError;
-});
-
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    ok: true,
-    json: () => Promise.resolve({}),
-  })
-);
-
-global.alert = jest.fn();
+  // Восстанавливаем оригинальные функции
+  console.log.mockRestore()
+  console.error.mockRestore()
+  console.warn.mockRestore()
+  if (global.alert.mockRestore) {
+    global.alert.mockRestore()
+  }
+})

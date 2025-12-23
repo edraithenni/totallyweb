@@ -17,11 +17,16 @@
     "spinning": "Spinning...",
     "save": "Save",
     "cancel": "Cancel",
-    "editDescription": "No description added yet. Click to edit."
+    "editDescription": "No description added yet. Click to edit.",
+    "deletePlaylist": "Delete playlist",
+    "removeMovie": "Remove",
+    "uploadCover": "Upload new cover",
+    "deleteCover": "Delete cover",
+    "close": "Close"
   },
   
   "randomPicker": {
-    "title": "You got:",
+    "title": "Random Movie Picker",
     "youGot": "You got:"
   },
   
@@ -30,15 +35,42 @@
     "genres": "Genres"
   },
   
+  "modal": {
+    "coverTitle": "Playlist Cover",
+    "previewAlt": "Preview"
+  },
+  
+  "rating": {
+    "stars": "★"
+  },
+  
   "messages": {
     "saveSuccess": "Description saved successfully",
     "saveError": "Failed to save description",
     "saveNetworkError": "Error saving description",
     "missingMovieId": "Movie ID is missing",
-    "randomPickError": "Cannot pick random movie from empty playlist"
+    "randomPickError": "Cannot pick random movie from empty playlist",
+    "confirmRemoveMovie": "Remove this movie from the playlist?",
+    "movieRemoved": "Movie removed from playlist",
+    "failedRemoveMovie": "Failed to remove movie",
+    "errorRemovingMovie": "Error removing movie",
+    "confirmDeletePlaylist": "Delete this playlist?",
+    "playlistDeleted": "Playlist deleted!",
+    "failedDeletePlaylist": "Failed to delete playlist",
+    "errorDeletingPlaylist": "Error removing playlist",
+    "selectImageFile": "Please select an image file.",
+    "fileTooBig": "File is too big (max 5MB).",
+    "uploading": "Uploading...",
+    "coverUpdated": "Cover updated.",
+    "errorUploading": "Error uploading cover.",
+    "confirmDeleteCover": "Are you sure you want to delete the playlist cover?",
+    "deleting": "Deleting...",
+    "coverDeleted": "Cover deleted.",
+    "errorDeleting": "Error deleting cover."
   },
   
-  "rating": {
-    "stars": "★"
+  "common": {
+    "user": "User",
+    "loading": "Loading..."
   }
 }
