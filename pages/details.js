@@ -365,6 +365,96 @@ export default function DetailsPage() {
         .website-rating b {
           color: #ffc659;
         }
+        @media (max-width: 768px) {
+
+  .movie-container {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 15px;
+  }
+
+  .movie-poster {
+    align-items: center;
+  }
+
+  .movie-poster img {
+    width: 100%;
+    max-width: 300px;
+    border-width: 3px;
+  }
+
+  .movie-info h2 {
+    font-size: 26px;
+    text-align: center;
+  }
+
+  .movie-info p {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .movie-info b {
+    display: inline-block;
+    min-width: 90px;
+  }
+
+  /* GIF убираем на мобилке */
+  .movie-gif {
+    display: none;
+  }
+
+  .reviews-section {
+    padding: 15px;
+    margin: 0 auto;
+  }
+
+  .reviews-section h3 {
+    font-size: 22px;
+    text-align: center;
+  }
+
+  .review-form {
+    padding: 12px;
+  }
+
+  .review-form h4 {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .review-form textarea {
+    font-size: 14px;
+    height: 90px;
+  }
+
+  .star-rating {
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: 28px;
+  }
+
+  .review-form-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .review-form button {
+    width: 100%;
+    font-size: 16px;
+    padding: 10px;
+  }
+
+  .spoiler-checkbox {
+    justify-content: center;
+  }
+
+  .website-rating {
+    font-size: 16px;
+    text-align: center;
+  }
+}
+
       `}</style>
     </>
   );

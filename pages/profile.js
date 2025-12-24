@@ -312,7 +312,7 @@ export default function ProfilePage() {
                 <button 
                   className="btn btn-settings"
                   onClick={() => setSettingsOpen(true)}
-                  title={t('profile:buttons.settings', { defaultValue: "Settings" })}
+                  title={t('profile:sections.settings', { defaultValue: "Settings" })}
                 >
                   ⚙
                 </button>

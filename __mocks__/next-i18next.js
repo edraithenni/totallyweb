@@ -1,43 +1,50 @@
 // __mocks__/next-i18next.js
 module.exports = {
-  useTranslation: (namespaces) => {
+  useTranslation: (namespace) => {
+    const mockT = (key, options) => {
+      // Если options.defaultValue существует, используем его
+      if (options?.defaultValue) {
+        return options.defaultValue;
+      }
+      
+      // Создаем понятный текст из ключа
+      // Примеры:
+      // "reviewForm.buttons.submit" -> "reviewForm buttons submit"
+      // "reviewForm:buttons.submit" -> "reviewForm buttons submit"
+      // "playlist.modal.title" -> "playlist modal title"
+      
+      const cleanedKey = key.replace(/[:.]/g, ' ');
+      
+      // Если ключ уже в правильном формате, возвращаем как есть
+      if (key.includes('reviewForm') || key.includes('playlist')) {
+        return cleanedKey;
+      }
+      
+      // Иначе преобразуем camelCase в слова
+      return cleanedKey
+        .replace(/([A-Z])/g, ' $1')
+        .toLowerCase()
+        .replace(/^\w/, c => c.toUpperCase());
+    };
+
     return {
-      t: (key, options) => {
-        // Словарь переводов для тестов
-        const translations = {
-          // LanguageSwitcher
-          'components:languageSwitcher.english': 'English',
-          'components:languageSwitcher.belarusianLatin': 'Belarusian (Latin)',
-          
-          // Header
-          'components:header.nav.signIn': 'Sign in',
-          'components:header.nav.signUp': 'Sign up', 
-          'components:header.nav.profile': 'Profile',
-          'components:header.nav.logOut': 'Log out',
-          'components:header.nav.genres': 'Genres',
-          'components:header.nav.findUsers': 'Find Users',
-          'common:welcome': 'Welcome',
-          
-          // По умолчанию - возвращаем последнюю часть ключа
-          'components:': '',
-          'common:': '',
-        };
-        
-        // Если ключ есть в словаре - возвращаем перевод
-        if (translations[key]) return translations[key];
-        
-        // Иначе возвращаем читаемую строку
-        return key.replace(/^(components|common):/, '').replace(/\./g, ' ');
-      },
+      t: mockT,
       i18n: {
         language: 'en',
         changeLanguage: jest.fn(),
-        t: function(key) { return this.t(key); }
+        t: mockT,
       },
     };
   },
-  Trans: ({ children, i18nKey }) => i18nKey || children,
-  Translation: ({ children }) => children((t) => t('')),
+  
+  Trans: ({ children, i18nKey, values }) => {
+    if (i18nKey) {
+      return i18nKey.replace(/[:.]/g, ' ');
+    }
+    return children;
+  },
+  
+  Translation: ({ children }) => children((t, options) => t('', options)),
   I18nextProvider: ({ children }) => children,
   initReactI18next: {
     type: '3rdParty',
