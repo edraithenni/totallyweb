@@ -132,7 +132,7 @@ export default function ReviewPage() {
 export async function getStaticProps({ locale }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ['profile', 'common', 'components'])),
+      ...(await serverSideTranslations(locale, [ 'common', 'components','modal'])),
     },
   };
 }

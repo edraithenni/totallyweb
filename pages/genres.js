@@ -492,7 +492,7 @@ export default function GenresPage() {
 export async function getStaticProps({ locale }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ['genres', 'common', 'components'])),
+      ...(await serverSideTranslations(locale, ['genres', 'common', 'components','modal'])),
     },
   };
 }

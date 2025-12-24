@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
+import { useTranslation } from "next-i18next";
 
 export default function NotificationBell({ userId, maxNotifications = 10 }) {
+  const { t } = useTranslation("components");
   const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -73,14 +75,16 @@ export default function NotificationBell({ userId, maxNotifications = 10 }) {
   return (
     <div className="notif-container">
       <button className="notif-btn" onClick={toggleDropdown}>
-        <img src="/src/mail-pink.png" alt="notifications" />
+        <img src="/src/mail-pink.png" alt={t("notificationBell.alt", "Notifications")} />
         {unreadCount > 0 && <span className="notif-count">{unreadCount}</span>}
       </button>
 
       {open && (
         <div className="notif-dropdown">
           {notifications.length === 0 ? (
-            <div className="notif-empty">No new notifications</div>
+            <div className="notif-empty">
+              {t("notificationBell.empty", "No new notifications")}
+            </div>
           ) : (
             notifications
               .slice()

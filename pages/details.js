@@ -5,8 +5,11 @@ import AddToPlaylistButton from "../components/AddToPlaylistButton";
 import SignInModal from "../components/SignInModal";
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from 'next-i18next'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 export default function DetailsPage() {
+  const { t } = useTranslation(['details', 'common']);
   const [movie, setMovie] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [reviewContent, setReviewContent] = useState("");
@@ -71,7 +74,7 @@ const averageRating =
     }
 
     if (!reviewRating || reviewRating < 1 || reviewRating > 10) {
-      alert("Rating must be between 1 and 10");
+      alert(t('details:reviews.ratingError'));
       return;
     }
     try {
@@ -87,12 +90,12 @@ const averageRating =
         setContainsSpoiler(false);
         loadReviews();
       } else {
-        alert("Failed to submit review");
+        alert(t('details:reviews.submitError'));
       }
-    } catch (err) { alert("Error submitting review"); }
+    } catch (err) { alert(t('details:reviews.networkError')); }
   }
 
-  if (!movie) return <div>Loading...</div>;
+  if (!movie) return <div>{t('details:page.loading')}</div>;
 
   return (
     <>
@@ -105,14 +108,14 @@ const averageRating =
         </div>
         <div className="movie-info">
           <h2>{movie.title}</h2>
-          <p><b>Year:</b> {movie.year || "—"}</p>
-          <p><b>Description:</b> {movie.plot || "No description yet"}</p>
-          <p><b>Genre:</b> {movie.genre || "—"}</p>
-          <p><b>Director:</b> {movie.director || "—"}</p>
-          <p><b> IMDB Rating:</b> {movie.rating || "—"}</p>
+          <p><b>{t('details:movieInfo.year')}:</b> {movie.year || t('details:movieInfo.na')}</p>
+          <p><b>{t('details:movieInfo.description')}:</b> {movie.plot || t('details:page.noDescription')}</p>
+          <p><b>{t('details:movieInfo.genre')}:</b> {movie.genre || t('details:movieInfo.na')}</p>
+          <p><b>{t('details:movieInfo.director')}:</b> {movie.director || t('details:movieInfo.na')}</p>
+          <p><b>{t('details:movieInfo.rating')}:</b> {movie.rating || t('details:movieInfo.na')}</p>
           {averageRating && (
             <p className="website-rating">
-            <b>Website Rating:</b> ★ {averageRating}/10 ({reviews.length} reviews)
+            <b>{t('details:movieInfo.rating')}:</b> ★ {averageRating}/10 ({reviews.length} {t('details:reviews.sectionTitle').toLowerCase()})
             </p>
             )}
         </div>
@@ -122,8 +125,8 @@ const averageRating =
       </div>
 
       <div className="reviews-section">
-        <h3>Reviews</h3>
-        {reviews === null ? <p>No reviews yet.</p> : reviews.map(r => 
+        <h3>{t('details:reviews.sectionTitle')}</h3>
+        {reviews === null ? <p>{t('details:reviews.noReviews')}</p> : reviews.map(r => 
         <ReviewCard 
           key={r.id} 
           review={r}
@@ -136,9 +139,9 @@ const averageRating =
           }} />)}
 
         <div className="review-form">
-          <h4>Create Review</h4>
+          <h4>{t('details:reviews.createReview')}</h4>
           <textarea
-            placeholder="Write your review"
+            placeholder={t('details:reviews.writeReview')}
             value={reviewContent}
             onChange={e => setReviewContent(e.target.value)}
           />
@@ -321,4 +324,12 @@ const averageRating =
       `}</style>
     </>
   );
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['details', 'common', 'components','modal'])),
+    },
+  };
 }

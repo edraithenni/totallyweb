@@ -1,0 +1,34 @@
+{
+  "signInModal": {
+    "title": "Uvachod",
+    "forgotTitle": "Zabylі parol",
+    "resetTitle": "Skіd parolju",
+
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Parol",
+    "codePlaceholder": "Kod paćvierdžannia",
+    "newPassword": "Novy parol",
+    "confirmPassword": "Paćvierdzić parol",
+
+    "submitButton": "Praciahnuć",
+    "sendCode": "Dасlać kod skіdu",
+    "resetButton": "Skіnuć parol",
+
+    "loading": "Uvachod...",
+    "sending": "Dasyłajecca...",
+    "resetting": "Skіd parolju...",
+
+    "forgot": "Zabylі parol?",
+    "backToLogin": "Nazad da uvachodu",
+
+    "resetSuccess": "Parol paśpiachova skіnuty. Ciapier možna uvachodzić.",
+
+    "errors": {
+      "invalidCredentials": "Niapravilny email ci parol",
+      "networkError": "Pamyłka sietki. Pasprabujcie jašče raz.",
+      "resetSendFailed": "Nie ŭdałosia dasłać kod skіdu",
+      "resetFailed": "Nie ŭdałosia skіnuć parol",
+      "passwordsMismatch": "Paroli nie supadajuć"
+    }
+  }
+}

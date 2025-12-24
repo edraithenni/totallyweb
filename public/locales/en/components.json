@@ -76,5 +76,9 @@
     "searchPrompt": "C:/SEARCH> ",
     "user": "User #{{id}}",
     "you": "You"
+  },
+  "notificationBell": {
+    "alt": "Notifications",
+    "empty": "No new notifications"
   }
 }

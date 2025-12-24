@@ -39,7 +39,7 @@ export default function SearchUsersPage() {
       const data = await res.json();
       setUsers(data.users || []);
     } catch (err) {
-      alert("Search error");
+      alert(t('pages.users.searchError'));
     } finally {
       setLoading(false);
     }
@@ -50,7 +50,7 @@ export default function SearchUsersPage() {
   return (
     <>
       <Head>
-        <title>User Search — Totally Guys</title>
+        <title>{t('pages.users.title')}</title>
       </Head>
 
       {showHud && (
@@ -88,7 +88,7 @@ export default function SearchUsersPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && searchUsers()}
-            placeholder={t('pages.movies.searchPlaceholder', { ns: 'search' })}
+            placeholder={t('pages.users.searchPlaceholder')}
             style={{
               flex: 1,
               padding: "0.6rem 1rem",
@@ -113,7 +113,7 @@ export default function SearchUsersPage() {
               borderRadius: "0px",
             }}
           >
-            {loading ? "searching..." : "search"}
+            {loading ? t('pages.users.loading') : t('pages.users.searchButton')}
           </button>
         </div>
 
@@ -150,7 +150,8 @@ export default function SearchUsersPage() {
                   padding: "1rem 0",
                 }}
               >
-                no users found
+                {t('pages.users.noResults')}
+
               </div>
             )}
           </div>
@@ -163,7 +164,7 @@ export default function SearchUsersPage() {
 export async function getStaticProps({ locale }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ['search', 'common', 'components'])),
+      ...(await serverSideTranslations(locale, ['search', 'common', 'components','modal'])),
     },
   }
 }

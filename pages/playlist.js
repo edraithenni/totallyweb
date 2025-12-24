@@ -913,6 +913,7 @@ export async function getServerSideProps({ locale }) {
         'playlist',
         'common',
         'components',
+        'modal'
       ])),
     },
   };

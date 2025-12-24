@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from 'next/router';
 import Header from "../components/header";
 import ReviewCard from "../components/ReviewCard";
 import PlaylistCard from "../components/PlaylistCard";
@@ -14,6 +15,9 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 export default function ProfilePage() {
   const { t, ready } = useTranslation(['profile', 'common', 'components']);
+  const router = useRouter();
+  const { id } = router.query;
+  
   if (!ready) {
     return (
       <div style={{
@@ -23,10 +27,11 @@ export default function ProfilePage() {
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-        <p style={{ color: '#fff' }}>Loading...</p>
+        <p style={{ color: '#fff' }}>{t('profile:page.loading', { defaultValue: "Loading..." })}</p>
       </div>
     );
   }
+  
   const [user, setUser] = useState(null);
   const [playlists, setPlaylists] = useState([]);
   const [reviews, setReviews] = useState([]);
@@ -51,19 +56,19 @@ export default function ProfilePage() {
     async function loadProfile() {
       try {
         setLoading(true);
-        const params = new URLSearchParams(window.location.search);
-        let profileId = params.get("id");
+        let profileId = id;
 
         const resMe = await fetch("/api/users/me", { credentials: "include" });
         if (resMe.ok) {
           const me = await resMe.json();
           setCurrentUserId(me.id);
-           setUserRole(me.role || '');
+          setUserRole(me.role || '');
+          
           if (!profileId) {
             profileId = me.id;
-
-            window.history.replaceState(null, "", `/profile?id=${profileId}`);
+            router.replace(`/profile?id=${profileId}`, undefined, { shallow: true });
           }
+          
           setViewingProfileId(profileId);
 
           const res = await fetch(`/api/users/${profileId}`, { credentials: "include" });
@@ -80,11 +85,12 @@ export default function ProfilePage() {
 
               if (Array.isArray(list) && me?.id) {
                 list = list.map(f => 
-                  f.ID === me.id ? { ...f, name: "You", isYou: true } : f
+                  f.ID === me.id ? { ...f, name: t('profile:labels.you', { defaultValue: "You" }), isYou: true } : f
                 );
               }
               setFollowers(list);
             }
+            
             await loadPlaylists(profileId);
             await loadReviews(profileId);
           } else {
@@ -132,7 +138,7 @@ export default function ProfilePage() {
     }
 
     loadProfile();
-  }, [t]);
+  }, [t, id, router]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -188,7 +194,7 @@ export default function ProfilePage() {
       setAvatarUrl(finalAvatarUrl);
       setPreviewUrl(finalAvatarUrl);
       setUser(prev => ({ ...prev, avatar: finalAvatarUrl }));
-      setUploadStatus("Avatar updated.");
+      setUploadStatus(t('profile:avatar.updated', { defaultValue: "Avatar updated." }));
     } catch {
       setUploadStatus(t('profile:avatar.errorUpload', { defaultValue: "Error uploading avatar." }));
     } finally {
@@ -219,11 +225,11 @@ export default function ProfilePage() {
 
   const handleDeleteAccount = async () => {
     if (deleteConfirm !== "DELETE") {
-      toast.error("Please type DELETE to confirm");
+      toast.error(t('profile:messages.typeDelete', { defaultValue: "Please type DELETE to confirm" }));
       return;
     }
 
-    if (!confirm("Are you absolutely sure? This will permanently delete your account, playlists, reviews, and all data. This action cannot be undone!")) {
+    if (!confirm(t('profile:messages.confirmDelete', { defaultValue: "Are you absolutely sure? This will permanently delete your account, playlists, reviews, and all data. This action cannot be undone!" }))) {
       return;
     }
 
@@ -235,17 +241,17 @@ export default function ProfilePage() {
       });
 
       if (resp.ok) {
-        toast.success("Account deleted successfully");
+        toast.success(t('profile:messages.accountDeleted', { defaultValue: "Account deleted successfully" }));
         setTimeout(() => {
           window.location.href = "/search";
         }, 1500);
       } else {
         const error = await resp.text();
-        toast.error(`Failed to delete account: ${error}`);
+        toast.error(`${t('profile:messages.deleteFailed', { defaultValue: "Failed to delete account" })}: ${error}`);
         setDeleting(false);
       }
     } catch (err) {
-      toast.error("Error deleting account");
+      toast.error(t('profile:messages.deleteError', { defaultValue: "Error deleting account" }));
       console.error(err);
       setDeleting(false);
     }
@@ -301,28 +307,28 @@ export default function ProfilePage() {
           />
           <div className="name-and-email">
             <div className="name-header">
-              <h1 className="name">{user?.name || "Loading..."}</h1>
+              <h1 className="name">{user?.name || t('profile:page.loading', { defaultValue: "Loading..." })}</h1>
               {isOwnProfile && (
                 <button 
                   className="btn btn-settings"
                   onClick={() => setSettingsOpen(true)}
-                  title="Settings"
-                
+                  title={t('profile:buttons.settings', { defaultValue: "Settings" })}
                 >
                   ⚙
                 </button>
               )}
               {!isOwnProfile && (
                 <>
-                <FollowButton
-                  userId={viewingProfileId}
-                  currentUserId={currentUserId}
-                  followers={followers}
-                  setFollowers={setFollowers}
-                />
-                 {userRole === 'admin' && (
-        <AdminBanButton targetUserId={viewingProfileId} />
-      )}  </>
+                  <FollowButton
+                    userId={viewingProfileId}
+                    currentUserId={currentUserId}
+                    followers={followers}
+                    setFollowers={setFollowers}
+                  />
+                  {userRole === 'admin' && (
+                    <AdminBanButton targetUserId={viewingProfileId} />
+                  )}
+                </>
               )}
             </div>
             {isOwnProfile ? (
@@ -341,7 +347,7 @@ export default function ProfilePage() {
         <input ref={fileInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFileChange} />
 
         <hr />
-        <h3>Bio</h3>
+        <h3>{t('profile:sections.bio', { defaultValue: "Bio" })}</h3>
         <div
           ref={el => {
             if (bioEdit && el) {
@@ -384,7 +390,10 @@ export default function ProfilePage() {
               }}
               className="btn btn-edit"
             >
-              {bioEdit ? "Save" : "Edit"}
+              {bioEdit 
+                ? t('profile:buttons.save', { defaultValue: "Save" }) 
+                : t('profile:buttons.edit', { defaultValue: "Edit" })
+              }
             </button>
 
             {bioEdit && (
@@ -396,18 +405,29 @@ export default function ProfilePage() {
         <hr />
         <h3>{t('profile:sections.playlists', { defaultValue: "Playlists" })}</h3>
         <div className="playlists-grid">
-          {playlists.length === 0 ? <p className="muted">No playlists yet</p> : playlists.map(pl => <Link href={`/playlist?id=${pl.id}`}>
-              <PlaylistCard key={pl.id} playlist={pl}/>
-           </Link>)}
+          {playlists.length === 0 ? (
+            <p className="muted">{t('profile:page.noPlaylists', { defaultValue: "No playlists yet" })}</p>
+          ) : playlists.map(pl => (
+            <Link key={pl.id} href={`/playlist?id=${pl.id}`}>
+              <PlaylistCard playlist={pl}/>
+            </Link>
+          ))}
         </div>
-      <hr />
-        <h3>Reviews</h3>
+        
+        <hr />
+        <h3>{t('profile:sections.reviews', { defaultValue: "Reviews" })}</h3>
         <div>
-          {reviews.length === 0 ? <p className="muted">No reviews yet</p> : reviews.map(rv =>
-             <ReviewCard key={rv.id} review={{ ...rv, user_avatar: avatarUrl, user_name: user?.name }} 
+          {reviews.length === 0 ? (
+            <p className="muted">{t('profile:page.noReviews', { defaultValue: "No reviews yet" })}</p>
+          ) : reviews.map(rv => (
+            <ReviewCard 
+              key={rv.id} 
+              review={{ ...rv, user_avatar: avatarUrl, user_name: user?.name }} 
               currentUser={{ id: currentUserId }}
               showMovieLink={true}
-              onReviewDeleted={() => setReviews(prev => prev.filter(r => r.id !== rv.id))}/>)}
+              onReviewDeleted={() => setReviews(prev => prev.filter(r => r.id !== rv.id))}
+            />
+          ))}
         </div>
 
         {/* --- MODALS --- */}
@@ -434,7 +454,7 @@ export default function ProfilePage() {
         <div id="settingsModal" className={`modal ${settingsOpen ? "open" : ""}`}>
           <div className="modal-content settings-content">
             <div className="close-modal" onClick={() => setSettingsOpen(false)}>&times;</div>
-            <h2>Settings</h2>
+            <h2>{t('profile:sections.settings', { defaultValue: "Settings" })}</h2>
             <div className="settings-section">             
               <div className="settings-actions">
                 <button
@@ -444,7 +464,7 @@ export default function ProfilePage() {
                   }}
                   className="btn btn-delete-settings"
                 >
-                  Delete Account
+                  {t('profile:buttons.deleteAccount', { defaultValue: "Delete Account" })}
                 </button>
               </div>
             </div>
@@ -459,20 +479,20 @@ export default function ProfilePage() {
               setDeleteConfirm("");
             }}>&times;</div>
             
-            <h2>Delete Account</h2>
+            <h2>{t('profile:buttons.deleteAccount', { defaultValue: "Delete Account" })}</h2>
             
             <div className="danger-zone">
               <p className="warning-text">
-                ⚠️ Deleting your account is permanent. All your playlists, reviews, comments, and data will be removed.
+                ⚠️ {t('profile:messages.deleteWarning', { defaultValue: "Deleting your account is permanent. All your playlists, reviews, comments, and data will be removed." })}
               </p>
               
               <div className="delete-confirm">
-                <p>Type <strong>DELETE</strong> to confirm:</p>
+                <p>{t('profile:messages.typeDeleteConfirm', { defaultValue: "Type DELETE to confirm" })}:</p>
                 <input
                   type="text"
                   value={deleteConfirm}
                   onChange={(e) => setDeleteConfirm(e.target.value)}
-                  placeholder="Type DELETE here"
+                  placeholder={t('profile:placeholders.typeDelete', { defaultValue: "Type DELETE here" })}
                   className="delete-input"
                   disabled={deleting}
                 />
@@ -484,7 +504,10 @@ export default function ProfilePage() {
                   disabled={deleteConfirm !== "DELETE" || deleting}
                   className={`btn ${deleteConfirm === "DELETE" ? "btn-delete" : "btn-delete-disabled"}`}
                 >
-                  {deleting ? "Deleting..." : "Delete Account"}
+                  {deleting 
+                    ? t('profile:buttons.deleting', { defaultValue: "Deleting..." }) 
+                    : t('profile:buttons.deleteAccount', { defaultValue: "Delete Account" })
+                  }
                 </button>
                 
                 <button
@@ -495,20 +518,19 @@ export default function ProfilePage() {
                   className="btn btn-cancel"
                   disabled={deleting}
                 >
-                  Cancel
+                  {t('profile:buttons.cancel', { defaultValue: "Cancel" })}
                 </button>
               </div>
             </div>
           </div>
         </div>
-      </div> {/* Конец .profile-card */}
+      </div>
 
       <ToastContainer
         position="bottom-right"
         autoClose={2500}
         theme="dark"
       />
-
       
       <style jsx>{`
         @font-face {
@@ -572,8 +594,7 @@ export default function ProfilePage() {
           object-fit: cover;
           border: 0px solid #fff;
           background: #000;
-           max-width: 100%;
-
+          max-width: 100%;
         }
 
         .name-header {
@@ -600,7 +621,7 @@ export default function ProfilePage() {
           align-items: center;
           justify-content: center;
           padding: 0;
-           position: absolute;
+          position: absolute;
           top: 10px;
           right: 0px;
           z-index: 5;
@@ -742,28 +763,27 @@ export default function ProfilePage() {
           max-width: 600px;
           width: 90%;
           border: 1px solid #727d79;
-           max-height: 90vh;
-  overflow-y: auto;
-  box-sizing: border-box; 
-  overflow-x: hidden; 
-  word-wrap: break-word; 
-  margin: 0 auto; 
+          max-height: 90vh;
+          overflow-y: auto;
+          box-sizing: border-box; 
+          overflow-x: hidden; 
+          word-wrap: break-word; 
+          margin: 0 auto; 
         }
         
         .modal-content img {
-  max-width: calc(100% - 2rem); 
-  max-height: 60vh;
-  width: auto;
-  height: auto;
-  border-radius: 0px;
-  display: block;
-  margin: 0 auto; 
-
-  position: relative;
-  left: 0;
-  right: 0;
-  object-position: center;
-}
+          max-width: calc(100% - 2rem); 
+          max-height: 60vh;
+          width: auto;
+          height: auto;
+          border-radius: 0px;
+          display: block;
+          margin: 0 auto; 
+          position: relative;
+          left: 0;
+          right: 0;
+          object-position: center;
+        }
         
         .close-modal {
           position: absolute;
@@ -790,7 +810,6 @@ export default function ProfilePage() {
           display: flex;
           gap: 10px;
           justify-content: center;
-          
         }
         
         .upload-status {
@@ -813,26 +832,6 @@ export default function ProfilePage() {
           padding-bottom: 0.5rem;
         }
 
-        .settings-content h3 {
-          color: #ff4444;
-          margin-top: 1.5rem;
-          margin-bottom: 1rem;
-        }
-
-        .settings-section {
-          margin-bottom: 2rem;
-        }
-
-        .warning-text {
-          color: #d2ece3;
-          margin-bottom: 1rem;
-          line-height: 1.5;
-        }
-
-        .settings-actions {
-          margin-top: 1.5rem;
-        }
-
         .delete-content {
           max-width: 500px;
         }
@@ -845,8 +844,6 @@ export default function ProfilePage() {
           border-bottom: 1px solid #727d79;
           padding-bottom: 0.5rem;
         }
-
-       
 
         .delete-confirm {
           margin: 1.5rem 0;
@@ -893,10 +890,10 @@ export default function ProfilePage() {
   );
 }
 
-export async function getStaticProps({ locale }) {
+export async function getServerSideProps({ locale }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ['profile', 'common', 'components'])),
+      ...(await serverSideTranslations(locale, ['profile', 'common', 'components','modal'])),
     },
   };
 }

@@ -1,0 +1,34 @@
+{
+    "signInModal": {
+  "title": "Sign In",
+  "forgotTitle": "Forgot password",
+  "resetTitle": "Reset password",
+
+  "emailPlaceholder": "Email",
+  "passwordPlaceholder": "Password",
+  "codePlaceholder": "Verification code",
+  "newPassword": "New password",
+  "confirmPassword": "Confirm new password",
+
+  "submitButton": "Continue",
+  "sendCode": "Send reset code",
+  "resetButton": "Reset password",
+
+  "loading": "Signing in...",
+  "sending": "Sending...",
+  "resetting": "Resetting...",
+
+  "forgot": "Forgot password?",
+  "backToLogin": "Back to login",
+
+  "resetSuccess": "Password reset successful. You can now log in.",
+
+  "errors": {
+    "invalidCredentials": "Invalid email or password",
+    "networkError": "Network error. Please try again.",
+    "resetSendFailed": "Failed to send reset code",
+    "resetFailed": "Failed to reset password",
+    "passwordsMismatch": "Passwords do not match"
+  }
+}
+}

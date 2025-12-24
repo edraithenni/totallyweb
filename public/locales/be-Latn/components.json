@@ -76,6 +76,10 @@
     "searchPrompt": "C:/POŠUK> ",
     "user": "Karystalnik #{{id}}",
     "you": "Ty"
+  },
+  "notificationBell": {
+  "alt": "Apaviashchenni",
+  "empty": "Niama novych apaviashchenniaŭ"
   }
 
 

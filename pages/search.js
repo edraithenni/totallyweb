@@ -188,7 +188,7 @@ export default function SearchPage() {
 export async function getStaticProps({ locale }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ['search', 'common', 'components'])),
+      ...(await serverSideTranslations(locale, ['search', 'common', 'components','modal'])),
     },
   };
 }

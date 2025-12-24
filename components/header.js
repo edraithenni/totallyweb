@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import SignInModal from "./SignInModal";
 import LanguageSwitcher from './LanguageSwitcher'
 import { useTranslation } from 'next-i18next'
+import { useRouter } from "next/router";
 
 
 export default function Header() {
   const { t } = useTranslation(['components', 'common']);
   const [loggedIn, setLoggedIn] = useState(false);
   const [signOpen, setSignOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     (async () => {
@@ -38,23 +40,19 @@ export default function Header() {
       </Head>
 
       <header>
-        <h1 onClick={() => (window.location.href = "/search")}>Cineparea</h1>
+        <h1 onClick={() => router.push("/search")}>Cineparea</h1>
         <nav>
           <button
             className="secondary"
-            onClick={() => (window.location.href = "/genres")}
+            onClick={() => router.push("/genres")}
+
           >
             {t('components:header.nav.genres')}
           </button>
+          
           <button
             className="secondary"
-            onClick={() => (window.location.href = "/genres")}
-        >
-            Genres
-        </button>
-          <button
-            className="secondary"
-            onClick={() => (window.location.href = "/SearchUsers")}
+            onClick={() => router.push("/SearchUsers") }
           >
             {t('components:header.nav.findUsers')}
           </button>
@@ -66,7 +64,7 @@ export default function Header() {
               </button>
               <button
                 className="secondary"
-                onClick={() => (window.location.href = "/auth")}
+                onClick={() => router.push("/auth")}
               >
                 {t('components:header.nav.signUp')}
               </button>
@@ -75,7 +73,7 @@ export default function Header() {
             <>
               <button
                 className="secondary"
-                onClick={() => (window.location.href = "/profile")}
+                onClick={() => router.push("/profile")}
               >
                 {t('components:header.nav.profile')}
               </button>

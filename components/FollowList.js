@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
+import { useTranslation } from "next-i18next";
 
-export default function FollowList({ userId, followers}) {
+export default function FollowList({ userId, followers }) {
+  const { t } = useTranslation("components");
   const [tab, setTab] = useState("followers");
   const [list, setList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
@@ -21,10 +23,16 @@ export default function FollowList({ userId, followers}) {
   }, []);
 
   function normalizeItems(items, meId) {
-    return (items || []).map(u => {
-      if (u.ID === meId) return { ...u, name: "You", isYou: true };
+    return (items || []).map((u) => {
+      if (u.ID === meId)
+        return { ...u, name: t("followList.you", "You"), isYou: true };
       return { ...u, isYou: false };
     });
+  }
+
+  function getUserDisplayName(user) {
+    if (user.isYou) return user.name;
+    return user.name || t("followList.user", "User #{{id}}", { id: user.ID });
   }
 
   useEffect(() => {
@@ -70,7 +78,7 @@ export default function FollowList({ userId, followers}) {
     if (e.key === "Enter") {
       const query = e.target.value.trim().toLowerCase();
       const newList = list.filter((u) =>
-        (u.name || "").toLowerCase().includes(query)
+        getUserDisplayName(u).toLowerCase().includes(query)
       );
       setFilteredList(newList);
     } else if (e.key === "Escape") {
@@ -85,28 +93,38 @@ export default function FollowList({ userId, followers}) {
 
   return (
     <div className="dos-followlist">
-      <div className="dos-header">[ USER RELATIONS ]</div>
+      <div className="dos-header">
+        [{t("followList.title", "USER RELATIONS")}]
+      </div>
 
       <div className="dos-tabs">
         <button
           className={`dos-tab ${tab === "followers" ? "active" : ""}`}
           onClick={() => setTab("followers")}
         >
-          FOLLOWERS
+          {t("followList.followers", "FOLLOWERS")}
         </button>
         <button
           className={`dos-tab ${tab === "following" ? "active" : ""}`}
           onClick={() => setTab("following")}
         >
-          FOLLOWING
+          {t("followList.following", "FOLLOWING")}
         </button>
       </div>
 
       <div className="dos-body">
         {loading ? (
-          <p className="dos-line">Loading...</p>
+          <p className="dos-line">
+            {t("followList.loading", "Loading...")}
+          </p>
         ) : filteredList.length === 0 ? (
-          <p className="dos-line">No {tab}</p>
+          <p className="dos-line">
+            {t("followList.empty", "No {{tab}}", {
+              tab: tab === "followers"
+                ? t("followList.followers", "FOLLOWERS")
+                : t("followList.following", "FOLLOWING"),
+            })}
+          </p>
         ) : (
           <ul>
             {filteredList.map((u) => (
@@ -115,7 +133,7 @@ export default function FollowList({ userId, followers}) {
                 onClick={() => (window.location.href = `/profile?id=${u.ID}`)}
                 className={u.isYou ? "you-item" : ""}
               >
-                ▓ {u.name || `User #${u.ID}`}
+                ▓ {getUserDisplayName(u)}
               </li>
             ))}
           </ul>
@@ -125,7 +143,7 @@ export default function FollowList({ userId, followers}) {
       <div className="dos-footer" onClick={activateSearch}>
         {searchActive ? (
           <>
-            C:/SEARCH&gt;&nbsp;
+            {t("followList.searchPrompt", "C:/SEARCH&gt; ")}
             <input
               ref={inputRef}
               type="text"
@@ -148,8 +166,8 @@ export default function FollowList({ userId, followers}) {
 
       <style jsx>{`
         @font-face {
-          font-family: 'Basiic';
-          src: url('/src/basiic.ttf') format('truetype');
+          font-family: "Basiic";
+          src: url("/src/basiic.ttf") format("truetype");
         }
 
         .dos-followlist {
@@ -159,9 +177,9 @@ export default function FollowList({ userId, followers}) {
           width: 230px;
           height: 420px;
           background: #000084;
-          color: #FEFEFE;
-          font-family: 'Basiic', monospace;
-          border: 2px solid #BBBBBB;
+          color: #fefefe;
+          font-family: "Basiic", monospace;
+          border: 2px solid #bbbbbb;
           display: flex;
           flex-direction: column;
           z-index: 80;
@@ -188,7 +206,7 @@ export default function FollowList({ userId, followers}) {
           border: none;
           border-right: 1px solid #00ff00;
           cursor: pointer;
-          font-family: 'Basiic', monospace;
+          font-family: "Basiic", monospace;
           padding: 3px 0;
         }
 
@@ -203,7 +221,7 @@ export default function FollowList({ userId, followers}) {
 
         .dos-tab:hover {
           background: #002000;
-          color: #61E0F4;
+          color: #61e0f4;
         }
 
         .dos-body {
@@ -230,14 +248,13 @@ export default function FollowList({ userId, followers}) {
 
         li:hover {
           background: #082050;
-          color: #61E0F4;
+          color: #61e0f4;
         }
 
         .you-item {
           color: #ff66cc;
           background: #30001f;
           font-weight: bold;
-          
         }
 
         .dos-line {

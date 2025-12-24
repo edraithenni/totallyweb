@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "next-i18next";
 
 export default function SignInModal({ open, onClose, onSuccess }) {
+  const { t } = useTranslation("modal");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [mode, setMode] = useState("login"); // "login" | "forgot" | "reset"
@@ -25,12 +27,12 @@ export default function SignInModal({ open, onClose, onSuccess }) {
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Login failed");
+      if (!res.ok) throw new Error(data.error || t("signInModal.errors.invalidCredentials", "Invalid email or password"));
       window.location.assign("/search");
       onSuccess && onSuccess();
       onClose && onClose();
     } catch (err) {
-      setError(err.message || "Login error");
+      setError(err.message || t("signInModal.errors.networkError", "Network error. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -48,11 +50,11 @@ export default function SignInModal({ open, onClose, onSuccess }) {
         body: JSON.stringify({ email }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Failed to send code");
+      if (!res.ok) throw new Error(data.error || t("signInModal.errors.resetSendFailed", "Failed to send reset code"));
       setEmailForReset(email);
       setMode("reset");
     } catch (err) {
-      setError(err.message || "Request error");
+      setError(err.message || t("signInModal.errors.networkError", "Network error. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -74,11 +76,11 @@ export default function SignInModal({ open, onClose, onSuccess }) {
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Reset failed");
-      alert("Password reset successful. You can now log in.");
+      if (!res.ok) throw new Error(data.error || t("signInModal.errors.resetFailed", "Failed to reset password"));
+      alert(t("signInModal.resetSuccess", "Password reset successful. You can now log in."));
       setMode("login");
     } catch (err) {
-      setError(err.message || "Reset error");
+      setError(err.message || t("signInModal.errors.networkError", "Network error. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -92,31 +94,34 @@ export default function SignInModal({ open, onClose, onSuccess }) {
       >
         <div className="modal-content">
           <div className="modal-frame">
-            <span className="modal-close" onClick={onClose}>
-              X
-            </span>
-
+            <span className="modal-close" onClick={onClose}>X</span>
             <div className="modal-body">
+
               {mode === "login" && (
                 <>
-                  <h2>Sign in</h2>
+                  <h2>{t("signInModal.title", "Sign In")}</h2>
                   {error && <div className="error">{error}</div>}
                   <form onSubmit={handleSubmit}>
-                    <input name="email" type="email" placeholder="Email" required />
+                    <input
+                      name="email"
+                      type="email"
+                      placeholder={t("signInModal.emailPlaceholder", "Email")}
+                      required
+                    />
                     <input
                       name="password"
                       type="password"
-                      placeholder="Password"
+                      placeholder={t("signInModal.passwordPlaceholder", "Password")}
                       required
                     />
                     <small
                       className="forgot-link"
                       onClick={() => setMode("forgot")}
                     >
-                      Forgot password?
+                      {t("signInModal.forgot", "Forgot password?")}
                     </small>
                     <button type="submit" disabled={loading}>
-                      {loading ? "Loading..." : "Continue"}
+                      {loading ? t("signInModal.loading", "Signing in...") : t("signInModal.submitButton", "Continue")}
                     </button>
                   </form>
                 </>
@@ -124,84 +129,84 @@ export default function SignInModal({ open, onClose, onSuccess }) {
 
               {mode === "forgot" && (
                 <>
-                  <h2>Forgot password</h2>
+                  <h2>{t("signInModal.forgotTitle", "Forgot password")}</h2>
                   {error && <div className="error">{error}</div>}
                   <form onSubmit={handleForgot}>
                     <input
                       name="email"
                       type="email"
-                      placeholder="Your account email"
+                      placeholder={t("signInModal.emailPlaceholder", "Email")}
                       required
                     />
                     <button type="submit" disabled={loading}>
-                      {loading ? "Sending..." : "Send reset code"}
+                      {loading ? t("signInModal.sending", "Sending...") : t("signInModal.sendCode", "Send reset code")}
                     </button>
                     <small
                       className="forgot-link"
                       onClick={() => setMode("login")}
                     >
-                      Back to login
+                      {t("signInModal.backToLogin", "Back to login")}
                     </small>
                   </form>
                 </>
               )}
 
               {mode === "reset" && (
-  <>
-    <h2>Reset password</h2>
-    {error && error !== "Passwords do not match" && (
-      <div className="error">{error}</div>
-    )}
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        const f = e.target;
-        const pass1 = f.new_password.value;
-        const pass2 = f.confirm_password.value;
+                <>
+                  <h2>{t("signInModal.resetTitle", "Reset password")}</h2>
+                  {error && error !== t("signInModal.errors.passwordsMismatch", "Passwords do not match") && (
+                    <div className="error">{error}</div>
+                  )}
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const f = e.target;
+                      const pass1 = f.new_password.value;
+                      const pass2 = f.confirm_password.value;
 
-        if (pass1 !== pass2) {
-          setError("Passwords do not match");
-          return;
-        }
+                      if (pass1 !== pass2) {
+                        setError(t("signInModal.errors.passwordsMismatch", "Passwords do not match"));
+                        return;
+                      }
 
-        handleReset(e);
-      }}
-    >
-      <input
-        name="code"
-        type="text"
-        placeholder="Verification code"
-        required
-      />
-      <input
-        name="new_password"
-        type="password"
-        placeholder="New password"
-        required
-      />
-      <input
-        name="confirm_password"
-        type="password"
-        placeholder="Confirm new password"
-        required
-      />
-      {error === "Passwords do not match" && (
-        <div className="error">Passwords do not match</div>
-      )}
+                      handleReset(e);
+                    }}
+                  >
+                    <input
+                      name="code"
+                      type="text"
+                      placeholder={t("signInModal.codePlaceholder", "Verification code")}
+                      required
+                    />
+                    <input
+                      name="new_password"
+                      type="password"
+                      placeholder={t("signInModal.newPassword", "New password")}
+                      required
+                    />
+                    <input
+                      name="confirm_password"
+                      type="password"
+                      placeholder={t("signInModal.confirmPassword", "Confirm new password")}
+                      required
+                    />
+                    {error === t("signInModal.errors.passwordsMismatch", "Passwords do not match") && (
+                      <div className="error">{t("signInModal.errors.passwordsMismatch", "Passwords do not match")}</div>
+                    )}
 
-      <button type="submit" disabled={loading}>
-        {loading ? "Resetting..." : "Reset password"}
-      </button>
+                    <button type="submit" disabled={loading}>
+                      {loading ? t("signInModal.resetting", "Resetting...") : t("signInModal.resetButton", "Reset password")}
+                    </button>
 
-      <small
-        className="forgot-link"
-        onClick={() => setMode("login")}
-      >
-        Back to login
-      </small>
-    </form>
-  </>
-)}
+                    <small
+                      className="forgot-link"
+                      onClick={() => setMode("login")}
+                    >
+                      {t("signInModal.backToLogin", "Back to login")}
+                    </small>
+                  </form>
+                </>
+              )}
 
             </div>
           </div>

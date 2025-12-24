@@ -222,7 +222,6 @@ export default function AboutUs() {
           padding: 1.5rem;
           cursor: pointer;
           transition: all 0.3s ease;
-          height: 200px;
           display: flex;
           flex-direction: column;
           justify-content: space-between;

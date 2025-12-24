@@ -3,8 +3,12 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import LetterGlitch from "@/components/LetterGlitch";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
 
 export default function AuthPage() {
+  const { t } = useTranslation("auth");
   const [active, setActive] = useState("register");
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
@@ -19,7 +23,7 @@ export default function AuthPage() {
   const [logPass, setLogPass] = useState("");
   const [logMsg, setLogMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  
+  const router = useRouter();
 
   const [glitchingButtons, setGlitchingButtons] = useState({
     register: false,
@@ -43,9 +47,12 @@ export default function AuthPage() {
   }, []);
 
   // Функция для перехода на страницу поиска
+  //const handleGoToSearch = () => {
+ //   const base = window.location.pathname.startsWith("/app") ? "/app" : "";
+ //   window.location.href = `${base}/search`;
+ // };
   const handleGoToSearch = () => {
-    const base = window.location.pathname.startsWith("/app") ? "/app" : "";
-    window.location.href = `${base}/search`;
+  router.push("/search", undefined, { locale: router.locale });
   };
 
   const triggerButtonGlitch = (buttonType) => {
@@ -93,9 +100,10 @@ export default function AuthPage() {
 
         setVerEmail(regEmail);
         showForm("verify");
-        setVerMsg("^_^ Registered successfully! Enter your verification code below.");
+        setVerMsg(t("register.success"));
       } catch (err) {
-        setRegMsg("X Registration error: " + (err.message || "Unknown error"));
+        setRegMsg("X " + t("register.error") + (err.message || t("messages.unknownError")));
+
       }
     }, 300);
   }
@@ -111,11 +119,12 @@ export default function AuthPage() {
           body: JSON.stringify({ email: verEmail, code: verCode }),
         });
         if (!res.ok) throw new Error(await res.text());
-        setVerMsg("Email confirmed! Please sign in.");
+        setVerMsg(t("verify.success"));
         showForm("login");
         setLogEmail(verEmail);
       } catch (err) {
-        alert("Confirmation error: " + (err.message || err));
+        alert(t("verify.error") + (err.message || t("messages.unknownError")));
+
       }
     }, 300);
   }
@@ -164,7 +173,7 @@ export default function AuthPage() {
   return (
     <>
       <Head>
-        <title>Auth</title>
+        <title>{t("page.title")}</title>
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
@@ -206,17 +215,20 @@ export default function AuthPage() {
         <div className="card">
           <div className="card-header">
             <span className="card-title">
-              {active === "register" && "REGISTER"}
-              {active === "login" && "LOGIN"}
-              {active === "verify" && "VERIFICATION"}
+              {active === "register" && t("tabs.register").toUpperCase()}
+              {active === "login" && t("tabs.login").toUpperCase()}
+              {active === "verify" && t("tabs.verify").toUpperCase()}
             </span>
-            <button 
+
+            
+            <button
               className="close-button"
               onClick={handleGoToSearch}
-              title="Go to Search"
-            >
-              X
+              title={t("buttons.goToSearch")}
+           >
+            X
             </button>
+
           </div>
 
           <div className="card-body">
@@ -227,7 +239,7 @@ export default function AuthPage() {
               </div>
 
               <div className="input-group">
-                <label htmlFor="regName">Name</label>
+                <label htmlFor="regName">{t("register.nameLabel")}</label>
                 <div className="terminal-input">
                   <span className="prompt">&gt;</span>
                   <input
@@ -241,7 +253,7 @@ export default function AuthPage() {
               </div>
 
               <div className="input-group">
-                <label htmlFor="regEmail">Email</label>
+                <label htmlFor="regEmail">{t("register.emailLabel")}</label>
                 <div className="terminal-input">
                   <span className="prompt">&gt;</span>
                   <input
@@ -255,7 +267,7 @@ export default function AuthPage() {
               </div>
 
               <div className="input-group">
-                <label htmlFor="regPass">Password</label>
+                <label htmlFor="regPass">{t("register.passwordLabel")}</label>
                 <div className="terminal-input">
                   <span className="prompt">&gt;</span>
                   <input
@@ -269,14 +281,14 @@ export default function AuthPage() {
               </div>
 
               <button 
-                className={`glitch-button ${glitchingButtons.register ? 'glitching' : ''}`}
+                className={`glitch-button ${glitchingButtons.register ? "glitching" : ""}`}
                 onClick={register}
               >
-                {glitchingButtons.register ? generateGlitchText("[Sign up]", 0.4) : "[Sign up]"}
+                {glitchingButtons.register ? generateGlitchText(t("register.submit"), 0.4) : t("register.submit")}
               </button>
               
               <div className="switch" onClick={() => showForm("login")}>
-                Already have an account? Log in
+               {t("register.switchText")}
               </div>
             </div>
 
@@ -287,7 +299,7 @@ export default function AuthPage() {
               </div>
 
               <div className="input-group">
-                <label htmlFor="logEmail">Email</label>
+                <label htmlFor="logEmail">{t("login.emailLabel")}</label>
                 <div className="terminal-input">
                   <span className="prompt">&gt;</span>
                   <input
@@ -301,7 +313,7 @@ export default function AuthPage() {
               </div>
 
               <div className="input-group">
-                <label htmlFor="logPass">Password</label>
+                <label htmlFor="logPass">{t("login.passwordLabel")}</label>
                 <div className="terminal-input">
                   <span className="prompt">&gt;</span>
                   <input
@@ -315,10 +327,10 @@ export default function AuthPage() {
               </div>
 
               <button 
-                className={`glitch-button ${glitchingButtons.login ? 'glitching' : ''}`}
+                className={`glitch-button ${glitchingButtons.verify ? "glitching" : ""}`}
                 onClick={login}
               >
-                {glitchingButtons.login ? generateGlitchText("[Log in]", 0.4) : "[Log in]"}
+                {glitchingButtons.login ? generateGlitchText(t("verify.submit"), 0.4) : t("verify.submit")}
               </button>
               
               <div className="switch" onClick={() => showForm("register")}>
@@ -588,7 +600,57 @@ export default function AuthPage() {
           border: 0px solid #00c60dff;
           color: #21d410ff;
         }
+          
+        @media (max-width: 480px) {
+        .card {
+          width: 92vw;
+          height: auto;
+          min-height: 300px;
+        }
+
+        .card-body {
+          padding: 12px;
+          gap: 6px;
+        }
+
+       .input-group {
+          margin-bottom: 0.6rem;
+        }
+
+       .input-group label {
+          font-size: 0.55rem;
+        }
+
+      .terminal-input,
+      .terminal-input input {
+      font-size: 0.75rem;
+        }
+
+      .glitch-button {
+     padding: 0.5rem 0.6rem;
+     font-size: 0.8rem;
+        }
+
+  .switch {
+    margin-top: 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .msg {
+    font-size: 0.75rem;
+    padding: 0.4rem;
+  }
+}
+
+        
       `}</style>
     </>
   );
+}
+export async function getServerSideProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["auth"])),
+    },
+  };
 }
