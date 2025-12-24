@@ -29,6 +29,7 @@ const nextConfig = {
   i18n: {
     defaultLocale: 'en',
     locales: ['en', 'be-Latn'],
+    localeDetection: true,
   },
   
   assetPrefix: '',
