@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useTranslation } from 'next-i18next';
 
 export default function AddToPlaylistButton({ movieId, movieTitle }) {
+  const { t } = useTranslation('components');
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
   const [playlists, setPlaylists] = useState([]);
   const [newPlaylistName, setNewPlaylistName] = useState('');
@@ -47,12 +49,18 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
       } else {
         const errorText = await res.text();
         console.error('Failed to load playlists:', res.status, errorText);
-        setError(`Failed to load playlists: ${res.status} ${res.statusText}`);
+        setError(t('playlist.errors.loadFailed', { 
+          defaultValue: 'Failed to load playlists: {status} {statusText}',
+          status: res.status,
+          statusText: res.statusText
+        }));
         setPlaylists([]);
       }
     } catch (error) {
       console.error('Network error loading playlists:', error);
-      setError('Network error loading playlists. Please try again.');
+      setError(t('playlist.errors.networkLoad', { 
+        defaultValue: 'Network error loading playlists. Please try again.' 
+      }));
       setPlaylists([]);
     }
   };
@@ -77,16 +85,22 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
       if (res.ok) {
         const result = await res.json();
         console.log('Add to playlist success:', result);
-        alert("Movie added to playlist!");
+        alert(t('playlist.messages.addedSuccess', { defaultValue: "Movie added to playlist!" }));
         setShowPlaylistModal(false);
       } else {
         const errorText = await res.text();
         console.error('Add to playlist failed:', res.status, errorText);
-        setError(`Failed to add to playlist: ${res.status} ${res.statusText}`);
+        setError(t('playlist.errors.addFailed', { 
+          defaultValue: 'Failed to add to playlist: {status} {statusText}',
+          status: res.status,
+          statusText: res.statusText
+        }));
       }
     } catch (error) {
       console.error('Network error adding to playlist:', error);
-      setError('Network error adding to playlist. Please try again.');
+      setError(t('playlist.errors.networkAdd', { 
+        defaultValue: 'Network error adding to playlist. Please try again.' 
+      }));
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +108,7 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
 
   const createNewPlaylist = async () => {
     if (!newPlaylistName.trim()) {
-      setError('Please enter a playlist name');
+      setError(t('playlist.errors.emptyName', { defaultValue: 'Please enter a playlist name' }));
       return;
     }
 
@@ -123,7 +137,11 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
         await loadUserPlaylists();
         
       } else {
-        let errorMessage = `Failed to create playlist: ${res.status} ${res.statusText}`;
+        let errorMessage = t('playlist.errors.createFailed', { 
+          defaultValue: 'Failed to create playlist: {status} {statusText}',
+          status: res.status,
+          statusText: res.statusText
+        });
         try {
           const errorData = await res.json();
           errorMessage += ` - ${errorData.error || JSON.stringify(errorData)}`;
@@ -136,7 +154,10 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
       }
     } catch (error) {
       console.error('Network error creating playlist:', error);
-      setError(`Network error: ${error.message}`);
+      setError(t('playlist.errors.networkCreate', { 
+        defaultValue: 'Network error: {message}',
+        message: error.message
+      }));
     } finally {
       setIsLoading(false);
     }
@@ -145,11 +166,15 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
   const renderPlaylists = () => {
     if (!Array.isArray(playlists)) {
       console.warn('Playlists is not an array:', playlists);
-      return <p className="no-playlists">No playlists available</p>;
+      return <p className="no-playlists">
+        {t('playlist.messages.noPlaylistsAvailable', { defaultValue: 'No playlists available' })}
+      </p>;
     }
 
     if (playlists.length === 0) {
-      return <p className="no-playlists">No playlists yet. Create one above! ✨</p>;
+      return <p className="no-playlists">
+        {t('playlist.messages.noPlaylistsYet', { defaultValue: 'No playlists yet. Create one above! ✨' })}
+      </p>;
     }
 
     return (
@@ -157,13 +182,13 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
         {playlists.map(playlist => (
           <div key={playlist.id || playlist.ID} className="playlist-item">
             <span className="playlist-name">
-              {playlist.name || playlist.Name || 'Unnamed Playlist'}
+              {playlist.name || playlist.Name || t('playlist.labels.unnamedPlaylist', { defaultValue: 'Unnamed Playlist' })}
             </span>
             <button 
               onClick={() => addToPlaylist(playlist.id || playlist.ID)}
               className="add-btn"
               disabled={isLoading}
-              title="Add to this playlist"
+              title={t('playlist.buttons.addToThis', { defaultValue: 'Add to this playlist' })}
             >
               {isLoading ? '...' : '+'}
             </button>
@@ -179,9 +204,12 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
         className="add-to-playlist-btn"
         onClick={openModal}
         disabled={isLoading}
+        title={t('playlist.buttons.addToPlaylist', { defaultValue: 'Add to playlist' })}
       >
         <span className="btn-icon">+</span>
-        <span className="btn-text">Add to Playlist</span>
+        <span className="btn-text">
+          {t('playlist.buttons.addToPlaylist', { defaultValue: 'Add to Playlist' })}
+        </span>
       </button>
 
       {showPlaylistModal && (
@@ -191,27 +219,30 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
               className="close-modal-btn"
               onClick={() => setShowPlaylistModal(false)}
               disabled={isLoading}
+              title={t('playlist.buttons.close', { defaultValue: 'Close' })}
             >
               ×
             </button>
             
             <div className="modal-header">
-              <h3>Add to Playlist</h3>
-              <p className="movie-title">"{movieTitle}"</p>
+              <h3>{t('playlist.modal.title', { defaultValue: 'Add to Playlist' })}</h3>
+              <p className="movie-title">
+                "{movieTitle || t('playlist.labels.untitledMovie', { defaultValue: 'Untitled Movie' })}"
+              </p>
             </div>
             
             {error && (
               <div className="error-message">
-                <strong>Error:</strong> {error}
+                <strong>{t('playlist.labels.error', { defaultValue: 'Error' })}:</strong> {error}
               </div>
             )}
             
             <div className="create-playlist-section">
-              <h4>Create New Playlist</h4>
+              <h4>{t('playlist.modal.createNew', { defaultValue: 'Create New Playlist' })}</h4>
               <div className="create-playlist-input">
                 <input
                   type="text"
-                  placeholder="Enter playlist name..."
+                  placeholder={t('playlist.placeholders.playlistName', { defaultValue: 'Enter playlist name...' })}
                   value={newPlaylistName}
                   onChange={(e) => setNewPlaylistName(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && createNewPlaylist()}
@@ -222,13 +253,13 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
                   className="create-btn"
                   disabled={isLoading || !newPlaylistName.trim()}
                 >
-                  {isLoading ? '...' : 'Create'}
+                  {isLoading ? '...' : t('playlist.buttons.create', { defaultValue: 'Create' })}
                 </button>
               </div>
             </div>
 
             <div className="existing-playlists">
-              <h4>Your Playlists</h4>
+              <h4>{t('playlist.modal.yourPlaylists', { defaultValue: 'Your Playlists' })}</h4>
               {renderPlaylists()}
             </div>
 
@@ -237,8 +268,9 @@ export default function AddToPlaylistButton({ movieId, movieTitle }) {
                 className="reload-btn"
                 onClick={loadUserPlaylists}
                 disabled={isLoading}
+                title={t('playlist.buttons.reloadTooltip', { defaultValue: 'Reload playlists' })}
               >
-                ↻ Reload
+                ↻ {t('playlist.buttons.reload', { defaultValue: 'Reload' })}
               </button>
             </div>
           </div>

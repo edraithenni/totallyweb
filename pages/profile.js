@@ -457,6 +457,18 @@ export default function ProfilePage() {
             <h2>{t('profile:sections.settings', { defaultValue: "Settings" })}</h2>
             <div className="settings-section">             
               <div className="settings-actions">
+                {/* Кнопка About Us */}
+                <button
+                  onClick={() => {
+                    setSettingsOpen(false);
+                    router.push('/aboutUs');
+                  }}
+                  className="btn btn-settings-action"
+                >
+                  {t('profile:buttons.aboutUs', { defaultValue: "About Us" })}
+                </button>
+
+                {/* Кнопка Delete Account */}
                 <button
                   onClick={() => {
                     setSettingsOpen(false);
@@ -498,7 +510,7 @@ export default function ProfilePage() {
                 />
               </div>
               
-              <div className="delete-actions" style={{display: "flex", gap: "1rem", justifyContent: "center"}}>
+              <div className="delete-actions">
                 <button
                   onClick={handleDeleteAccount}
                   disabled={deleteConfirm !== "DELETE" || deleting}
@@ -625,12 +637,14 @@ export default function ProfilePage() {
           top: 10px;
           right: 0px;
           z-index: 5;
+          cursor: pointer;
+          transition: all 0.3s ease;
         }
 
         .btn-settings:hover {
-          background: #292626ff;
-          color: #d2ece3;
-          border: 1px solid #727d79;
+          background: #727d79;
+          color: #000;
+          transform: rotate(90deg);
         }
 
         .email {
@@ -678,6 +692,8 @@ export default function ProfilePage() {
           margin-right: 0.5rem;
           border-radius: 0;
           font-family: 'Basiic', sans-serif;
+          transition: all 0.3s ease;
+          outline: none;
         }
 
         .btn-edit {
@@ -687,33 +703,33 @@ export default function ProfilePage() {
         }
 
         .btn-edit:hover {
-          background: #292626ff;
-          color: #d2ece3;
+          background: #727d79;
+          color: #000;
           border: 1px solid #727d79;
         }
 
         .btn-cancel {
+          background: #000;
+          color: #ffb3ff;
+          border: 1px solid #ffb3ff;
+        }
+
+        .btn-cancel:hover {
           background: #ffb3ff;
           color: #000;
           border: 1px solid #ffb3ff;
         }
 
-        .btn-cancel:hover {
-          background: #ff99ff;
-          color: #000;
-          border: 1px solid #ff99ff;
-        }
-
         .btn-delete {
-          background: #ff4444;
-          color: #fff;
+          background: #000;
+          color: #ff4444;
           border: 1px solid #ff4444;
         }
 
         .btn-delete:hover {
-          background: #ff2222;
-          color: #fff;
-          border: 1px solid #ff2222;
+          background: #ff4444;
+          color: #000;
+          border: 1px solid #ff4444;
         }
 
         .btn-delete-disabled {
@@ -729,6 +745,27 @@ export default function ProfilePage() {
           border: 1px solid #444;
         }
 
+        /* Кнопка Settings Action (About Us) */
+        .btn-settings-action {
+          background: #000;
+          color: #ff4444;
+          border: 1px solid #ff4444;
+          width: 100%;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-family: 'Basiic', sans-serif;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin-bottom: 10px;
+        }
+
+        .btn-settings-action:hover {
+          background: #727d79;
+          color: #000;
+          border-color: #000;
+        }
+
+        /* Кнопка Delete Account в Settings */
         .btn-delete-settings {
           background: #000;
           color: #ff4444;
@@ -740,7 +777,7 @@ export default function ProfilePage() {
         .btn-delete-settings:hover {
           background: #ff4444;
           color: #000;
-          border: 1px solid #ff4444;
+          border-color: #000;
         }
 
         .modal {
@@ -832,6 +869,12 @@ export default function ProfilePage() {
           padding-bottom: 0.5rem;
         }
 
+        .settings-actions {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
+
         .delete-content {
           max-width: 500px;
         }
@@ -879,6 +922,7 @@ export default function ProfilePage() {
           gap: 1rem;
           margin-top: 1.5rem;
           flex-wrap: wrap;
+          justify-content: center;
         }
 
         .muted {

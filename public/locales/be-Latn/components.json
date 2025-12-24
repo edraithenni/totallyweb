@@ -80,7 +80,70 @@
   "notificationBell": {
   "alt": "Apaviashchenni",
   "empty": "Niama novych apaviashchenniaŭ"
+  },
+  "playlist": {
+  "buttons": {
+    "addToPlaylist": "Dadać u plejlist",
+    "close": "Zakryć",
+    "create": "Stvaryć",
+    "reload": "Pierazahruzić",
+    "reloadTooltip": "Pierazahruzić plejlisty",
+    "addToThis": "Dadać u hety plejlist"
+  },
+  "labels": {
+    "error": "Pamylka",
+    "unnamedPlaylist": "Biez nazvy",
+    "untitledMovie": "Biez nazvy filma"
+  },
+  "messages": {
+    "addedSuccess": "Film dadadzieny da plejlistu!",
+    "noPlaylistsAvailable": "Plejlisty adsutničajuć",
+    "noPlaylistsYet": "Plejlistau jašče niama. Stvary adzin vyšej! ✨"
+  },
+  "errors": {
+    "loadFailed": "Nie ŭdalośia zahruzić plejlisty: {status} {statusText}",
+    "networkLoad": "Sieciavaja pamylka pry zahruźcy plejlistau. Kali laska, pasprabuj znoŭ.",
+    "addFailed": "Nie ŭdalośia dadać da plejlistu: {status} {statusText}",
+    "networkAdd": "Sieciavaja pamylka pry dadanni da plejlistu. Kali laska, pasprabuj znoŭ.",
+    "emptyName": "Kali laska, ŭviadzicie nazvu plejlistu",
+    "createFailed": "Nie ŭdalośia stvaryć plejlist: {status} {statusText}",
+    "networkCreate": "Sieciavaja pamylka: {message}"
+  },
+  "modal": {
+    "title": "Dadać u plejlist",
+    "createNew": "Stvaryć novy plejlist",
+    "yourPlaylists": "Tvae plejlisty"
+  },
+  "placeholders": {
+    "playlistName": "Uviadzicie nazvu plejlistu..."
   }
+},
+"reviewForm": {
+  "title": "Napisać vodhuk",
+  "labels": {
+    "movieTitle": "Nazva filma",
+    "rating": "Acyenka (1–10)",
+    "yourReview": "Tvoj vodhuk"
+  },
+  "placeholders": {
+    "movieTitle": "Uviadzicie nazvu filma",
+    "rating": "Uviadzicie acyenku",
+    "review": "Padzialiciesia svaimi dumkami..."
+  },
+  "buttons": {
+    "submit": "Apublikavać vodhuk"
+  },
+  "status": {
+    "sending": "Adpraŭlajecca...",
+    "submitted": "Vodhuk adpraŭleny!"
+  },
+  "errors": {
+    "fillAllFields": "Kali laska, zapoŭnicie ŭsie pali.",
+    "submitError": "Pamylka pry adpraŭlienni vodhuku."
+  }
+}
+
+
 
 
 }

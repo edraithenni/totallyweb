@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from 'next-i18next';
 
 export default function ReviewForm({ onSubmit }) {
+  const { t } = useTranslation('components');
   const [movieTitle, setMovieTitle] = useState("");
   const [rating, setRating] = useState("");
   const [content, setContent] = useState("");
@@ -10,7 +12,7 @@ export default function ReviewForm({ onSubmit }) {
     e.preventDefault();
 
     if (!movieTitle.trim() || !rating.trim() || !content.trim()) {
-      setStatus("Please fill out all fields.");
+      setStatus(t('reviewForm.errors.fillAllFields', { defaultValue: "Please fill out all fields." }));
       return;
     }
 
@@ -22,9 +24,9 @@ export default function ReviewForm({ onSubmit }) {
     };
 
     try {
-      setStatus("Sending...");
+      setStatus(t('reviewForm.status.sending', { defaultValue: "Sending..." }));
       setTimeout(() => {
-        setStatus("Review submitted!");
+        setStatus(t('reviewForm.status.submitted', { defaultValue: "Review submitted!" }));
         onSubmit && onSubmit(newReview);
         setMovieTitle("");
         setRating("");
@@ -33,49 +35,57 @@ export default function ReviewForm({ onSubmit }) {
       }, 800);
     } catch (err) {
       console.error(err);
-      setStatus("Error submitting review.");
+      setStatus(t('reviewForm.errors.submitError', { defaultValue: "Error submitting review." }));
     }
   };
 
   return (
     <div className="review-form">
-      <h2 className="form-title">Write a Review</h2>
+      <h2 className="form-title">
+        {t('reviewForm.title', { defaultValue: "Write a Review" })}
+      </h2>
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Movie Title</label>
+          <label>
+            {t('reviewForm.labels.movieTitle', { defaultValue: "Movie Title" })}
+          </label>
           <input
             type="text"
             value={movieTitle}
             onChange={(e) => setMovieTitle(e.target.value)}
-            placeholder="Enter movie name"
+            placeholder={t('reviewForm.placeholders.movieTitle', { defaultValue: "Enter movie name" })}
           />
         </div>
 
         <div className="form-group">
-          <label>Rating (1–10)</label>
+          <label>
+            {t('reviewForm.labels.rating', { defaultValue: "Rating (1–10)" })}
+          </label>
           <input
             type="number"
             min="1"
             max="10"
             value={rating}
             onChange={(e) => setRating(e.target.value)}
-            placeholder="Enter rating"
+            placeholder={t('reviewForm.placeholders.rating', { defaultValue: "Enter rating" })}
           />
         </div>
 
         <div className="form-group">
-          <label>Your Review</label>
+          <label>
+            {t('reviewForm.labels.yourReview', { defaultValue: "Your Review" })}
+          </label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows="4"
-            placeholder="Share your thoughts..."
+            placeholder={t('reviewForm.placeholders.review', { defaultValue: "Share your thoughts..." })}
           />
         </div>
 
         <button type="submit" className="btn-submit">
-          Post Review
+          {t('reviewForm.buttons.submit', { defaultValue: "Post Review" })}
         </button>
 
         {status && <div className="status">{status}</div>}

@@ -80,5 +80,69 @@
   "notificationBell": {
     "alt": "Notifications",
     "empty": "No new notifications"
+  },
+  "playlist": {
+    "buttons": {
+      "addToPlaylist": "Add to Playlist",
+      "close": "Close",
+      "create": "Create",
+      "reload": "Reload",
+      "reloadTooltip": "Reload playlists",
+      "addToThis": "Add to this playlist"
+    },
+    "labels": {
+      "error": "Error",
+      "unnamedPlaylist": "Unnamed Playlist",
+      "untitledMovie": "Untitled Movie"
+    },
+    "messages": {
+      "addedSuccess": "Movie added to playlist!",
+      "noPlaylistsAvailable": "No playlists available",
+      "noPlaylistsYet": "No playlists yet. Create one above! ✨"
+    },
+    "errors": {
+      "loadFailed": "Failed to load playlists: {status} {statusText}",
+      "networkLoad": "Network error loading playlists. Please try again.",
+      "addFailed": "Failed to add to playlist: {status} {statusText}",
+      "networkAdd": "Network error adding to playlist. Please try again.",
+      "emptyName": "Please enter a playlist name",
+      "createFailed": "Failed to create playlist: {status} {statusText}",
+      "networkCreate": "Network error: {message}"
+    },
+    "modal": {
+      "title": "Add to Playlist",
+      "createNew": "Create New Playlist",
+      "yourPlaylists": "Your Playlists"
+    },
+    "placeholders": {
+      "playlistName": "Enter playlist name..."
+    }
+  },
+  
+  "reviewForm": {
+    "title": "Write a Review",
+    "labels": {
+      "movieTitle": "Movie Title",
+      "rating": "Rating (1–10)",
+      "yourReview": "Your Review"
+    },
+    "placeholders": {
+      "movieTitle": "Enter movie name",
+      "rating": "Enter rating",
+      "review": "Share your thoughts..."
+    },
+    "buttons": {
+      "submit": "Post Review"
+    },
+    "status": {
+      "sending": "Sending...",
+      "submitted": "Review submitted!"
+    },
+    "errors": {
+      "fillAllFields": "Please fill out all fields.",
+      "submitError": "Error submitting review."
+    }
   }
+
+
 }
